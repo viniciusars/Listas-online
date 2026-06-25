@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos gerados pelo sistema (output de cada processamento)
+data/output/
+
+# Planilhas de entrada do usuário (dados de obra — não versionar)
+data/input/
+
+# Pasta config da raiz (screenshots, etc.) — apenas o nível raiz
+/config/
+
+# Windows
+Thumbs.db
+desktop.ini
