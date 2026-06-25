@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 
-CAMINHO_RECEITA = os.path.join('data', 'config', 'QUANTIDADE-MATERIAIS.xlsx')
+CAMINHO_RECEITA = os.path.join('config', 'QUANTIDADE-MATERIAIS.xlsx')
 
 
 def _normalizar_tipo(nome_aba):
@@ -24,7 +24,7 @@ def _ler_receita():
     if not os.path.exists(CAMINHO_RECEITA):
         raise FileNotFoundError(
             f"Arquivo de receita não encontrado: {CAMINHO_RECEITA}\n"
-            "Copie 'QUANTIDADE-MATERIAIS.xlsx' para a pasta data/config/"
+            "Copie 'QUANTIDADE-MATERIAIS.xlsx' para a pasta config/"
         )
 
     xl = pd.ExcelFile(CAMINHO_RECEITA)

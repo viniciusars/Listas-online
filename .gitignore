@@ -9,8 +9,8 @@ data/output/
 # Planilhas de entrada do usuário (dados de obra — não versionar)
 data/input/
 
-# Pasta config da raiz (screenshots, etc.) — apenas o nível raiz
-/config/
+# Screenshots avulsas
+*.png
 
 # Windows
 Thumbs.db

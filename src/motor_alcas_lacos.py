@@ -13,7 +13,7 @@ def _preparar_df(df_locacao):
     Regra: se uma estrutura tiver cabo em apenas um dos lados, o lado vazio recebe
     o valor do lado preenchido (ex: ponto final de circuito só tem cabo no vante).
     """
-    caminho_receita = os.path.join('data', 'config', 'receita_alcas_lacos.csv')
+    caminho_receita = os.path.join('config', 'receita_alcas_lacos.csv')
     receita = pd.read_csv(caminho_receita)
 
     df = df_locacao.copy()
