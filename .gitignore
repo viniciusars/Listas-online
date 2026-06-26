@@ -9,6 +9,9 @@ data/output/
 # Planilhas de entrada do usuário (dados de obra — não versionar)
 data/input/
 
+# Banco de dados SQLite (estado de runtime; semeado a partir de config/ no 1º uso)
+*.db
+
 # Screenshots avulsas
 *.png
 

@@ -1,74 +1,11 @@
 import pandas as pd
-import os
 
-
-CAMINHO_RECEITA = os.path.join('config', 'QUANTIDADE-MATERIAIS.xlsx')
-
-
-def _normalizar_tipo(nome_aba):
-    """Converte separadores do Excel (' I ' e ' | ') para '/' usado na Tabela de Locação."""
-    return nome_aba.replace(' I ', '/').replace(' | ', '/').strip()
-
-
-def _is_valid_qty(val):
-    """Retorna True apenas se val for um número finito maior que zero."""
-    try:
-        n = float(val)
-        return n > 0 and pd.notna(n)
-    except (TypeError, ValueError):
-        return False
+from src import banco
 
 
 def _ler_receita():
-    """Lê o Excel e retorna dict {tipo_normalizado: [(descricao, unidade, qtd), ...]}"""
-    if not os.path.exists(CAMINHO_RECEITA):
-        raise FileNotFoundError(
-            f"Arquivo de receita não encontrado: {CAMINHO_RECEITA}\n"
-            "Copie 'QUANTIDADE-MATERIAIS.xlsx' para a pasta config/"
-        )
-
-    xl = pd.ExcelFile(CAMINHO_RECEITA)
-    receita = {}
-
-    for aba in xl.sheet_names:
-        if aba.strip().upper() == 'CONTAGEM':
-            continue
-
-        tipo = _normalizar_tipo(aba)
-        # header=0: linha 0 vira nome das colunas; dados começam na linha 1
-        df = xl.parse(aba, header=0)
-
-        materiais = []
-        for _, row in df.iterrows():
-            item    = row.iloc[0]
-            descr   = row.iloc[1]
-            unidade = row.iloc[2]
-            qty     = row.iloc[3]
-
-            # Linha vazia/separador
-            if pd.isna(item) or pd.isna(descr):
-                continue
-
-            # Cabeçalho da seção de Fibra Óptica → para o loop desta aba
-            if str(item).strip().upper() == 'ITEM':
-                if 'FIBRA' in str(descr).upper():
-                    break
-                continue
-
-            # Quantidade ausente ou variável ("Var.", "var.", NaN)
-            if not _is_valid_qty(qty):
-                continue
-
-            materiais.append({
-                'codigo':    str(item).strip(),
-                'descricao': str(descr).strip(),
-                'unidade':   str(unidade).strip(),
-                'qtd':       float(qty),
-            })
-
-        receita[tipo] = materiais
-
-    return receita
+    """Receita de ferragens vinda do banco: {tipo: [{codigo, descricao, unidade, qtd}, ...]}."""
+    return banco.ler_receita_ferragens()
 
 
 def gerar_tabela_validacao_ferragens(df_locacao):

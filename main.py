@@ -10,6 +10,7 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
+from src import banco
 from src.leitor_excel import consolidar_tabela_locacao
 from src.motor_postes import calcular_quantitativo_postes
 from src.motor_estais import calcular_quantitativo_estais
@@ -18,6 +19,9 @@ from src.motor_ferragens import calcular_ferragens, gerar_tabela_validacao_ferra
 from src.exportador import exportar_para_excel, exportar_multiplas_abas
 
 app = Flask(__name__)
+
+# Cria o schema e popula o banco a partir do xlsx na primeira execução
+banco.inicializar()
 
 
 @app.errorhandler(Exception)
