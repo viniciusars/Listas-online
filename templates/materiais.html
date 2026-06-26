@@ -2,23 +2,561 @@
 
 {% block title %}Materiais por Poste — Sistema RMT{% endblock %}
 
-{% block content %}
-    <a class="back-link" href="/">← Início</a>
+{% block styles %}
+main { max-width: 1080px; }
 
-    <div class="card">
-        <div class="card-header">
-            <h2>Materiais por Poste</h2>
-        </div>
-        <div class="card-body">
-            <p style="font-size:0.9rem;color:#475569;line-height:1.6">
-                A receita de materiais (ferragens) está no banco de dados:
-                <strong>{{ total_materiais }}</strong> materiais distribuídos em
-                <strong>{{ total_tipos }}</strong> tipos de estrutura.
-            </p>
-            <p style="font-size:0.85rem;color:#94a3b8;margin-top:12px">
-                ⏳ A edição (alterar nomes, códigos e quantidades, busca-e-substitui em massa
-                e filtros por estrutura/código) será construída na próxima etapa.
-            </p>
-        </div>
+/* ── Filtros ─────────────────────────────────────────────────── */
+.filtros {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.filtros select,
+.filtros input[type=text] {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    background: white;
+    color: #1e293b;
+}
+.filtros select:focus,
+.filtros input[type=text]:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+.filtros select    { min-width: 240px; }
+.filtros input     { flex: 1; min-width: 180px; }
+
+/* ── Tabela ──────────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; }
+
+table.mat {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.855rem;
+}
+table.mat th {
+    background: #f8fafc;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+table.mat td {
+    padding: 3px 4px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+table.mat tr:hover td { background: #f8fafc; }
+
+/* inputs nas células */
+table.mat input {
+    width: 100%;
+    padding: 5px 7px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 0.855rem;
+    background: transparent;
+    color: #1e293b;
+    font-family: inherit;
+}
+table.mat input:hover  { border-color: #cbd5e1; }
+table.mat input:focus  {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+table.mat .col-cod  { width: 110px; }
+table.mat .col-unid { width: 68px; }
+table.mat .col-qtd  { width: 80px; }
+table.mat .col-del  { width: 36px; text-align: center; }
+
+/* somente leitura */
+table.mat td span {
+    display: block;
+    padding: 5px 8px;
+}
+table.mat td span.tipo-link {
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 600;
+}
+table.mat td span.tipo-link:hover { text-decoration: underline; }
+table.mat td.right span { text-align: right; }
+
+/* botão remover linha */
+.btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: color 0.1s;
+}
+.btn-del:hover { color: #ef4444; }
+
+/* ── Rodapé ───────────────────────────────────────────────────── */
+.tbl-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0 4px;
+    flex-wrap: wrap;
+}
+.counter { font-size: 0.8rem; color: #94a3b8; }
+
+/* ── Botões ───────────────────────────────────────────────────── */
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-success { background: #16a34a; color: white; }
+.btn-success:hover { background: #15803d; }
+.btn-outline {
+    background: white;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.btn-outline:hover { background: #f1f5f9; }
+
+/* ── Substituição em massa ───────────────────────────────────── */
+.subst-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.subst-row label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+}
+.subst-row input,
+.subst-row select {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    background: white;
+    color: #1e293b;
+    min-width: 160px;
+}
+.subst-row input:focus,
+.subst-row select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+#toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.ok   { background: #dcfce7; color: #166534; }
+#toast.err  { background: #fee2e2; color: #991b1b; }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">← Início</a>
+
+<!-- ── Card principal ───────────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header">
+        <h2>Materiais por Poste</h2>
+        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="header-stats">
+            {{ total_tipos }} tipos · {{ total_materiais }} materiais
+        </span>
     </div>
+    <div class="card-body">
+
+        <!-- Filtros -->
+        <div class="filtros" style="margin-bottom:16px">
+            <select id="sel-tipo" onchange="carregarTipo()">
+                <option value="">— Selecione um tipo de estrutura —</option>
+                <option value="__todos__">Ver todos (somente leitura)</option>
+            </select>
+            <input type="text" id="filtro-txt"
+                   placeholder="Filtrar por código ou descrição…"
+                   oninput="filtrarTabela()"
+                   style="display:none">
+            <span class="counter" id="contador" style="display:none"></span>
+        </div>
+
+        <!-- Tabela -->
+        <div class="tbl-wrap">
+            <table class="mat" id="tbl">
+                <thead id="tbl-head" style="display:none"></thead>
+                <tbody id="tbl-body">
+                    <tr><td colspan="5" style="text-align:center;padding:40px;
+                            color:#94a3b8;font-size:0.88rem">
+                        Selecione um tipo de estrutura acima para visualizar os materiais.
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Rodapé (oculto até carregar tipo específico) -->
+        <div class="tbl-footer" id="tbl-footer" style="display:none">
+            <button class="btn btn-add" onclick="adicionarLinha()">+ Adicionar linha</button>
+            <div style="margin-left:auto;display:flex;gap:8px">
+                <button class="btn btn-outline" onclick="descartar()">Descartar</button>
+                <button class="btn btn-success" id="btn-salvar" onclick="salvar()">
+                    Salvar alterações
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Card substituição em massa ─────────────────────────────────── -->
+<div class="card">
+    <div class="card-header">
+        <h2>Substituição em Massa</h2>
+    </div>
+    <div class="card-body">
+        <p style="font-size:0.85rem;color:#64748b;margin-bottom:16px;line-height:1.5">
+            Renomeia um valor em <strong>todos</strong> os tipos de estrutura de uma só vez.
+            Busca por correspondência exata — ideal para padronizar descrições e códigos.
+        </p>
+        <div class="subst-row">
+            <label>Campo
+                <select id="subst-campo">
+                    <option value="descricao">Descrição</option>
+                    <option value="codigo">Código</option>
+                    <option value="unidade">Unidade</option>
+                </select>
+            </label>
+            <label>Buscar (exato)
+                <input type="text" id="subst-de" placeholder="Valor atual…">
+            </label>
+            <label>Substituir por
+                <input type="text" id="subst-para" placeholder="Novo valor…">
+            </label>
+            <button class="btn btn-primary" onclick="substituirGlobal()"
+                    style="margin-bottom:1px">
+                Substituir em todos
+            </button>
+        </div>
+        <div id="subst-msg" style="margin-top:12px;font-size:0.85rem;display:none"></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Estado ──────────────────────────────────────────────────────────────────
+let tipoAtual  = '';      // tipo carregado para edição
+let modoTodos  = false;   // true = modo "ver todos" (somente leitura)
+let dadosAtual = [];      // cópia em memória do tipo carregado
+
+// ── Boot: carrega lista de tipos no select ──────────────────────────────────
+fetch('/materiais/api/tipos')
+    .then(r => r.json())
+    .then(tipos => {
+        const sel = document.getElementById('sel-tipo');
+        tipos.forEach(t => {
+            const o = document.createElement('option');
+            o.value = t; o.textContent = t;
+            sel.appendChild(o);
+        });
+    });
+
+// ── Carregar tipo ───────────────────────────────────────────────────────────
+function carregarTipo() {
+    const tipo   = document.getElementById('sel-tipo').value;
+    const filtro = document.getElementById('filtro-txt');
+    const footer = document.getElementById('tbl-footer');
+
+    if (!tipo) {
+        modoTodos = false; tipoAtual = ''; dadosAtual = [];
+        renderVazio();
+        filtro.style.display = 'none';
+        footer.style.display = 'none';
+        return;
+    }
+
+    filtro.style.display = '';
+
+    if (tipo === '__todos__') {
+        modoTodos = true; tipoAtual = '';
+        footer.style.display = 'none';
+        fetch('/materiais/api/todos')
+            .then(r => r.json())
+            .then(dados => { dadosAtual = dados; renderTodos(dados); });
+        return;
+    }
+
+    modoTodos = false; tipoAtual = tipo;
+    filtro.value = '';
+    footer.style.display = '';
+
+    fetch('/materiais/api/materiais?tipo=' + encodeURIComponent(tipo))
+        .then(r => r.json())
+        .then(dados => {
+            dadosAtual = JSON.parse(JSON.stringify(dados));
+            renderEdicao(dadosAtual, '');
+        });
+}
+
+// ── Filtrar ─────────────────────────────────────────────────────────────────
+function filtrarTabela() {
+    if (modoTodos)   renderTodos(dadosAtual);
+    else if (tipoAtual) renderEdicao(dadosAtual, document.getElementById('filtro-txt').value);
+}
+
+// ── Render: vazio ───────────────────────────────────────────────────────────
+function renderVazio() {
+    document.getElementById('tbl-head').style.display = 'none';
+    document.getElementById('contador').style.display = 'none';
+    document.getElementById('tbl-body').innerHTML =
+        '<tr><td colspan="5" style="text-align:center;padding:40px;color:#94a3b8;font-size:0.88rem">' +
+        'Selecione um tipo de estrutura acima para visualizar os materiais.</td></tr>';
+}
+
+// ── Render: edição ──────────────────────────────────────────────────────────
+function renderEdicao(dados, textoBusca) {
+    const head = document.getElementById('tbl-head');
+    head.style.display = '';
+    head.innerHTML =
+        '<tr><th class="col-cod">Código</th><th>Descrição</th>' +
+        '<th class="col-unid">Unid.</th><th class="col-qtd">Qtd</th>' +
+        '<th class="col-del"></th></tr>';
+
+    const termo = textoBusca.toLowerCase();
+    const filtrado = termo
+        ? dados.filter(m =>
+            (m.codigo    || '').toLowerCase().includes(termo) ||
+            (m.descricao || '').toLowerCase().includes(termo))
+        : dados;
+
+    const tbody = document.getElementById('tbl-body');
+    tbody.innerHTML = '';
+
+    filtrado.forEach(m => {
+        const idx = dados.indexOf(m);
+        const tr  = document.createElement('tr');
+        tr.dataset.idx = idx;
+        tr.innerHTML =
+            '<td class="col-cod">'  +
+                '<input type="text"   value="' + esc(m.codigo)    + '" data-campo="codigo"    placeholder="—"></td>' +
+            '<td>'  +
+                '<input type="text"   value="' + esc(m.descricao) + '" data-campo="descricao" placeholder="Descrição"></td>' +
+            '<td class="col-unid">' +
+                '<input type="text"   value="' + esc(m.unidade)   + '" data-campo="unidade"   placeholder="UN" style="max-width:56px"></td>' +
+            '<td class="col-qtd">'  +
+                '<input type="number" value="' + m.qtd             + '" data-campo="qtd"       step="any" min="0" style="max-width:68px"></td>' +
+            '<td class="col-del"><button class="btn-del" title="Remover" onclick="removerLinha(this)">×</button></td>';
+
+        tr.querySelectorAll('input').forEach(inp =>
+            inp.addEventListener('input', () => sincronizar(tr))
+        );
+        tbody.appendChild(tr);
+    });
+
+    if (!filtrado.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;' +
+            'color:#94a3b8">Nenhum resultado para o filtro atual.</td></tr>';
+    }
+
+    atualizarContador(filtrado.length, dados.length);
+}
+
+// ── Render: todos (somente leitura) ────────────────────────────────────────
+function renderTodos(dados) {
+    const termo    = document.getElementById('filtro-txt').value.toLowerCase();
+    const filtrado = termo
+        ? dados.filter(m =>
+            (m.tipo      || '').toLowerCase().includes(termo) ||
+            (m.codigo    || '').toLowerCase().includes(termo) ||
+            (m.descricao || '').toLowerCase().includes(termo))
+        : dados;
+
+    const head = document.getElementById('tbl-head');
+    head.style.display = '';
+    head.innerHTML =
+        '<tr><th>Tipo</th><th class="col-cod">Código</th><th>Descrição</th>' +
+        '<th class="col-unid">Unid.</th><th class="col-qtd" style="text-align:right">Qtd</th></tr>';
+
+    const tbody = document.getElementById('tbl-body');
+    tbody.innerHTML = '';
+
+    filtrado.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><span class="tipo-link">' + esc(m.tipo)     + '</span></td>' +
+            '<td><span>'                   + esc(m.codigo)   + '</span></td>' +
+            '<td><span>'                   + esc(m.descricao)+ '</span></td>' +
+            '<td><span>'                   + esc(m.unidade)  + '</span></td>' +
+            '<td class="right"><span>'     + m.qtd           + '</span></td>';
+
+        tr.querySelector('.tipo-link').addEventListener('click', () => {
+            const sel = document.getElementById('sel-tipo');
+            sel.value = m.tipo;
+            carregarTipo();
+        });
+        tbody.appendChild(tr);
+    });
+
+    if (!filtrado.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;' +
+            'color:#94a3b8">Nenhum resultado.</td></tr>';
+    }
+
+    atualizarContador(filtrado.length, dados.length);
+}
+
+// ── Sincronizar inputs → dadosAtual ────────────────────────────────────────
+function sincronizar(tr) {
+    const idx = parseInt(tr.dataset.idx);
+    tr.querySelectorAll('input').forEach(inp => {
+        const c = inp.dataset.campo;
+        dadosAtual[idx][c] = c === 'qtd' ? (parseFloat(inp.value) || 0) : inp.value;
+    });
+}
+
+// ── Adicionar linha ─────────────────────────────────────────────────────────
+function adicionarLinha() {
+    dadosAtual.push({ codigo: '', descricao: '', unidade: 'UN', qtd: 1 });
+    document.getElementById('filtro-txt').value = '';
+    renderEdicao(dadosAtual, '');
+    const linhas = document.querySelectorAll('#tbl-body tr');
+    if (linhas.length) {
+        const inp = linhas[linhas.length - 1].querySelectorAll('input');
+        if (inp[1]) inp[1].focus();
+    }
+}
+
+// ── Remover linha ───────────────────────────────────────────────────────────
+function removerLinha(btn) {
+    const tr  = btn.closest('tr');
+    const idx = parseInt(tr.dataset.idx);
+    dadosAtual.splice(idx, 1);
+    renderEdicao(dadosAtual, document.getElementById('filtro-txt').value);
+}
+
+// ── Descartar ────────────────────────────────────────────────────────────────
+function descartar() {
+    if (!tipoAtual) return;
+    fetch('/materiais/api/materiais?tipo=' + encodeURIComponent(tipoAtual))
+        .then(r => r.json())
+        .then(dados => {
+            dadosAtual = JSON.parse(JSON.stringify(dados));
+            document.getElementById('filtro-txt').value = '';
+            renderEdicao(dadosAtual, '');
+            mostrarToast('Alterações descartadas.', 'ok');
+        });
+}
+
+// ── Salvar ───────────────────────────────────────────────────────────────────
+function salvar() {
+    if (!tipoAtual) return;
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Salvando…';
+
+    fetch('/materiais/api/salvar', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ tipo: tipoAtual, materiais: dadosAtual })
+    })
+    .then(r => r.json())
+    .then(resp => {
+        btn.disabled = false;
+        btn.innerHTML = 'Salvar alterações';
+        if (resp.ok) mostrarToast('✓ ' + resp.count + ' materiais salvos.', 'ok');
+        else         mostrarToast('Erro: ' + (resp.erro || '?'), 'err');
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Salvar alterações';
+        mostrarToast('Erro de rede.', 'err');
+    });
+}
+
+// ── Substituição em massa ────────────────────────────────────────────────────
+function substituirGlobal() {
+    const campo = document.getElementById('subst-campo').value;
+    const de    = document.getElementById('subst-de').value;
+    const para  = document.getElementById('subst-para').value;
+    const msg   = document.getElementById('subst-msg');
+
+    if (!de.trim()) { mostrarToast('Preencha o campo "Buscar".', 'err'); return; }
+
+    const nomeCampo = { descricao: 'Descrição', codigo: 'Código', unidade: 'Unidade' }[campo];
+    if (!confirm('Substituir "' + de + '" por "' + para + '" no campo ' + nomeCampo +
+            ' em TODOS os tipos de estrutura?\n\nEsta ação não pode ser desfeita.')) return;
+
+    msg.style.display = 'none';
+    fetch('/materiais/api/substituir', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ campo, de, para })
+    })
+    .then(r => r.json())
+    .then(resp => {
+        if (resp.ok) {
+            const pl = resp.count === 1 ? 'linha atualizada' : 'linhas atualizadas';
+            msg.style.display = '';
+            msg.style.color   = '#166534';
+            msg.innerHTML     = '✓ <strong>' + resp.count + '</strong> ' + pl + '.';
+            // recarrega o tipo atual se houver um aberto
+            if (tipoAtual) carregarTipo();
+        } else {
+            mostrarToast('Erro: ' + (resp.erro || '?'), 'err');
+        }
+    })
+    .catch(() => mostrarToast('Erro de rede.', 'err'));
+}
+
+// ── Utilitários ──────────────────────────────────────────────────────────────
+function atualizarContador(vis, total) {
+    const cnt = document.getElementById('contador');
+    cnt.style.display = '';
+    cnt.textContent   = vis === total ? total + ' itens' : vis + ' de ' + total + ' itens';
+}
+
+function esc(s) {
+    return (s || '').toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function mostrarToast(msg, tipo) {
+    const t   = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = 'show ' + tipo;
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => { t.className = ''; }, 3200);
+}
+</script>
 {% endblock %}

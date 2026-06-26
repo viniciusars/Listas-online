@@ -221,6 +221,44 @@ def substituir_materiais(tipo, materiais):
         conn.close()
 
 
+def obter_todos_materiais():
+    """Retorna todos os materiais (todos os tipos), ordenados por tipo e ordem."""
+    conn = conectar()
+    try:
+        rows = conn.execute(
+            "SELECT tipo, codigo, descricao, unidade, quantidade "
+            "FROM materiais_poste ORDER BY tipo, ordem"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [
+        {'tipo': r['tipo'], 'codigo': r['codigo'], 'descricao': r['descricao'],
+         'unidade': r['unidade'], 'qtd': r['quantidade']}
+        for r in rows
+    ]
+
+
+def substituir_campo_global(campo, de, para):
+    """Substitui um valor de texto em TODOS os registros de um campo.
+
+    campo: 'descricao', 'codigo' ou 'unidade'.
+    Retorna o número de linhas afetadas.
+    """
+    if campo not in ('descricao', 'codigo', 'unidade'):
+        raise ValueError(f"Campo não permitido para substituição global: {campo}")
+    conn = conectar()
+    try:
+        conn.execute(
+            f"UPDATE materiais_poste SET {campo} = ? WHERE {campo} = ?",
+            (para, de)
+        )
+        affected = conn.execute("SELECT changes()").fetchone()[0]
+        conn.commit()
+    finally:
+        conn.close()
+    return affected
+
+
 # ---------------------------------------------------------------------------
 # Exportação (backup em Excel)
 # ---------------------------------------------------------------------------

@@ -11,6 +11,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
 from src import banco
+from src.banco import (listar_tipos_ferragens, obter_materiais,
+                        obter_todos_materiais, substituir_materiais,
+                        substituir_campo_global)
 from src.leitor_excel import consolidar_tabela_locacao
 from src.motor_postes import calcular_quantitativo_postes
 from src.motor_estais import calcular_quantitativo_estais
@@ -69,6 +72,52 @@ def materiais():
 @app.route('/parafusos')
 def parafusos():
     return render_template('parafusos.html')
+
+
+# ── API: Materiais por Poste ───────────────────────────────────────────────
+
+@app.route('/materiais/api/tipos')
+def api_mat_tipos():
+    return jsonify(listar_tipos_ferragens())
+
+
+@app.route('/materiais/api/materiais')
+def api_mat_por_tipo():
+    tipo = request.args.get('tipo', '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Parâmetro "tipo" é obrigatório.'}), 400
+    return jsonify(obter_materiais(tipo))
+
+
+@app.route('/materiais/api/todos')
+def api_mat_todos():
+    return jsonify(obter_todos_materiais())
+
+
+@app.route('/materiais/api/salvar', methods=['POST'])
+def api_mat_salvar():
+    data = request.get_json(force=True)
+    tipo = (data.get('tipo') or '').strip()
+    materiais = data.get('materiais', [])
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    substituir_materiais(tipo, materiais)
+    return jsonify({'ok': True, 'count': len(materiais)})
+
+
+@app.route('/materiais/api/substituir', methods=['POST'])
+def api_mat_substituir():
+    data = request.get_json(force=True)
+    campo = (data.get('campo') or '').strip()
+    de    = (data.get('de')    or '')
+    para  = (data.get('para')  or '')
+    if not campo or de == '':
+        return jsonify({'erro': 'Campos "campo" e "de" são obrigatórios.'}), 400
+    try:
+        count = substituir_campo_global(campo, de, para)
+    except ValueError as e:
+        return jsonify({'erro': str(e)}), 400
+    return jsonify({'ok': True, 'count': count})
 
 
 @app.route('/processar', methods=['POST'])
