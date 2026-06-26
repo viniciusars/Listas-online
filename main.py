@@ -47,9 +47,28 @@ MOTORES_DISPONIVEIS = [
 
 @app.route('/')
 def index():
-    return render_template('index.html',
+    return render_template('home.html')
+
+
+@app.route('/gerar')
+def gerar():
+    return render_template('gerar.html',
                            motores=MOTORES_DISPONIVEIS,
                            cabos_padrao=CABOS_PADRAO)
+
+
+@app.route('/materiais')
+def materiais():
+    tipos = banco.listar_tipos_ferragens()
+    total_materiais = sum(len(banco.obter_materiais(t)) for t in tipos)
+    return render_template('materiais.html',
+                           total_tipos=len(tipos),
+                           total_materiais=total_materiais)
+
+
+@app.route('/parafusos')
+def parafusos():
+    return render_template('parafusos.html')
 
 
 @app.route('/processar', methods=['POST'])

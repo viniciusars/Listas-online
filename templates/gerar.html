@@ -1,73 +1,8 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Quantitativos RMT</title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+{% extends "base.html" %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
-            min-height: 100vh;
-        }
+{% block title %}Gerar Quantitativos — Sistema RMT{% endblock %}
 
-        header {
-            background: #1a2744;
-            color: white;
-            padding: 18px 40px;
-            display: flex;
-            align-items: baseline;
-            gap: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
-        header span { font-size: 0.82rem; opacity: 0.5; }
-
-        main {
-            max-width: 840px;
-            margin: 36px auto;
-            padding: 0 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 13px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .step {
-            background: #1a2744;
-            color: white;
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            font-size: 0.72rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .card-header h2 { font-size: 0.92rem; font-weight: 600; }
-
-        .card-body { padding: 18px 20px; }
-
+{% block styles %}
         /* File zone */
         .file-zone {
             border: 2px dashed #cbd5e1;
@@ -78,23 +13,11 @@
             transition: border-color 0.18s, background 0.18s;
             user-select: none;
         }
-
-        .file-zone:hover, .file-zone.dragover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
+        .file-zone:hover, .file-zone.dragover { border-color: #3b82f6; background: #eff6ff; }
         .file-zone input[type="file"] { display: none; }
         .file-zone .icon { font-size: 2rem; display: block; margin-bottom: 8px; }
-
         .file-zone p { font-size: 0.88rem; color: #64748b; line-height: 1.5; }
-
-        #file-name {
-            margin-top: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #2563eb;
-        }
+        #file-name { margin-top: 10px; font-size: 0.85rem; font-weight: 600; color: #2563eb; }
 
         /* Motors */
         .motors-grid {
@@ -102,7 +25,6 @@
             grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
             gap: 10px;
         }
-
         .motor-item {
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
@@ -113,156 +35,63 @@
             cursor: pointer;
             transition: border-color 0.15s, background 0.15s;
         }
-
-        .motor-item:has(input:checked) {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
-        .motor-item input[type="checkbox"] {
-            accent-color: #2563eb;
-            width: 16px; height: 16px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
+        .motor-item:has(input:checked) { border-color: #3b82f6; background: #eff6ff; }
+        .motor-item input[type="checkbox"] { accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
         .motor-item label { font-size: 0.9rem; font-weight: 600; cursor: pointer; display: block; }
         .motor-item small { font-size: 0.78rem; color: #64748b; display: block; margin-top: 2px; }
 
         /* Opções extras */
-        .extra-options {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid #e2e8f0;
-        }
-
+        .extra-options { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; }
         .extra-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
-            margin-bottom: 8px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;
         }
-
         .option-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: border-color 0.15s, background 0.15s;
-            user-select: none;
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+            border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer;
+            transition: border-color 0.15s, background 0.15s; user-select: none;
         }
-
-        .option-item:has(input:checked) {
-            border-color: #f59e0b;
-            background: #fffbeb;
-        }
-
-        .option-item input[type="checkbox"] {
-            accent-color: #d97706;
-            width: 16px; height: 16px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
+        .option-item:has(input:checked) { border-color: #f59e0b; background: #fffbeb; }
+        .option-item input[type="checkbox"] { accent-color: #d97706; width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
         .option-item label { font-size: 0.88rem; font-weight: 600; cursor: pointer; display: block; }
         .option-item small { font-size: 0.78rem; color: #64748b; display: block; margin-top: 2px; }
 
         /* Cables */
-        .cabo-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
+        .cabo-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         select, input[type="number"] {
-            border: 1.5px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 0.87rem;
-            color: #1e293b;
-            outline: none;
-            background: white;
+            border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 8px 12px;
+            font-size: 0.87rem; color: #1e293b; outline: none; background: white;
             transition: border-color 0.15s;
         }
-
         select:focus, input:focus { border-color: #3b82f6; }
         select { flex: 1; min-width: 200px; }
         input[type="number"] { width: 100px; }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.87rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.15s, transform 0.1s;
-        }
-
-        .btn:active { transform: scale(0.97); }
-        .btn-add { background: #e2e8f0; color: #334155; }
-        .btn-add:hover { background: #cbd5e1; }
-
         .cabo-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
-
         .cabo-tag {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 0.84rem;
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+            padding: 8px 12px; font-size: 0.84rem;
         }
-
-        .cabo-tag button {
-            background: none; border: none;
-            color: #94a3b8; cursor: pointer;
-            font-size: 1rem; line-height: 1; padding: 0 4px;
-        }
-
+        .cabo-tag button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 4px; }
         .cabo-tag button:hover { color: #ef4444; }
 
         /* Execute */
         .execute-area { text-align: center; }
-
         .btn-run {
-            background: #1a2744;
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            padding: 14px 0;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 420px;
-            border: none;
-            cursor: pointer;
-            letter-spacing: 0.01em;
+            background: #1a2744; color: white; font-size: 1rem; font-weight: 700;
+            padding: 14px 0; border-radius: 8px; width: 100%; max-width: 420px;
+            border: none; cursor: pointer; letter-spacing: 0.01em;
             transition: background 0.15s, transform 0.1s;
         }
-
         .btn-run:hover { background: #243560; }
         .btn-run:active { transform: scale(0.98); }
         .btn-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* Log */
         .log-area {
-            background: #0f172a;
-            padding: 16px;
-            font-family: 'Courier New', Consolas, monospace;
-            font-size: 0.81rem;
-            min-height: 130px;
-            max-height: 300px;
-            overflow-y: auto;
+            background: #0f172a; padding: 16px; font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.81rem; min-height: 130px; max-height: 300px; overflow-y: auto;
         }
-
         .log-line { margin: 2px 0; line-height: 1.6; }
         .log-info { color: #94a3b8; }
         .log-ok   { color: #34d399; }
@@ -271,102 +100,34 @@
 
         /* Downloads */
         #downloads-section { display: none; }
-
         .downloads-list { display: flex; flex-direction: column; gap: 8px; }
-
         .download-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: #f0fdf4;
-            border: 1.5px solid #86efac;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #166534;
-            font-size: 0.9rem;
-            font-weight: 600;
+            display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+            background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px;
+            text-decoration: none; color: #166534; font-size: 0.9rem; font-weight: 600;
             transition: background 0.15s;
         }
-
         .download-link:hover { background: #dcfce7; }
 
         /* Preview table */
         #preview-section { display: none; }
-
-        .preview-wrap {
-            overflow-x: auto;
-            max-height: 360px;
-            overflow-y: auto;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            white-space: nowrap;
-        }
-
+        .preview-wrap { overflow-x: auto; max-height: 360px; overflow-y: auto; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .preview-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; white-space: nowrap; }
         .preview-table thead th {
-            background: #1a2744;
-            color: white;
-            padding: 8px 12px;
-            text-align: left;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+            background: #1a2744; color: white; padding: 8px 12px; text-align: left;
+            font-weight: 600; position: sticky; top: 0; z-index: 1;
         }
-
         .preview-table tbody tr:nth-child(even) { background: #f8fafc; }
         .preview-table tbody tr:hover { background: #eff6ff; }
-
-        .preview-table td {
-            padding: 6px 12px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #334155;
-        }
-
+        .preview-table td { padding: 6px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
         .preview-table td.vazio { color: #cbd5e1; font-style: italic; }
+        .preview-count { margin-top: 8px; font-size: 0.78rem; color: #64748b; }
+        .preview-loading { text-align: center; padding: 20px; color: #64748b; font-size: 0.85rem; }
+{% endblock %}
 
-        .preview-count {
-            margin-top: 8px;
-            font-size: 0.78rem;
-            color: #64748b;
-        }
+{% block content %}
 
-        .preview-loading {
-            text-align: center;
-            padding: 20px;
-            color: #64748b;
-            font-size: 0.85rem;
-        }
-
-        /* Spinner */
-        .spinner {
-            display: inline-block;
-            width: 15px; height: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            vertical-align: middle;
-            margin-right: 6px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>Sistema de Quantitativos RMT</h1>
-    <span>Redes de Média Tensão</span>
-</header>
-
-<main>
+    <a class="back-link" href="/">← Início</a>
 
     <!-- 1. Arquivo -->
     <div class="card">
@@ -471,8 +232,9 @@
         </div>
     </div>
 
-</main>
+{% endblock %}
 
+{% block scripts %}
 <script>
     let cabos = [];
 
@@ -644,6 +406,4 @@
         }
     });
 </script>
-
-</body>
-</html>
+{% endblock %}

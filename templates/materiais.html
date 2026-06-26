@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Materiais por Poste — Sistema RMT{% endblock %}
+
+{% block content %}
+    <a class="back-link" href="/">← Início</a>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Materiais por Poste</h2>
+        </div>
+        <div class="card-body">
+            <p style="font-size:0.9rem;color:#475569;line-height:1.6">
+                A receita de materiais (ferragens) está no banco de dados:
+                <strong>{{ total_materiais }}</strong> materiais distribuídos em
+                <strong>{{ total_tipos }}</strong> tipos de estrutura.
+            </p>
+            <p style="font-size:0.85rem;color:#94a3b8;margin-top:12px">
+                ⏳ A edição (alterar nomes, códigos e quantidades, busca-e-substitui em massa
+                e filtros por estrutura/código) será construída na próxima etapa.
+            </p>
+        </div>
+    </div>
+{% endblock %}
