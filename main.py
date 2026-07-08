@@ -19,6 +19,7 @@ from src.motor_postes import calcular_quantitativo_postes
 from src.motor_estais import calcular_quantitativo_estais
 from src.motor_alcas_lacos import calcular_alcas_lacos, gerar_tabela_validacao
 from src.motor_ferragens import calcular_ferragens, gerar_tabela_validacao_ferragens
+from src.motor_parafusos import calcular_parafusos, identificar_estruturas_ambiguas
 from src.exportador import exportar_para_excel, exportar_multiplas_abas
 
 app = Flask(__name__)
@@ -45,6 +46,7 @@ MOTORES_DISPONIVEIS = [
     {"id": "estais",      "label": "Estais",        "descricao": "Estaiamento e ferragens de ancoragem"},
     {"id": "alcas_lacos", "label": "Alças e Laços", "descricao": "Alças e laços preformados por nível"},
     {"id": "ferragens",   "label": "Ferragens",     "descricao": "Ferragens gerais por tipo de estrutura"},
+    {"id": "parafusos",   "label": "Parafusos",     "descricao": "Cabeça quadrada e rosca dupla por comprimento"},
 ]
 
 
@@ -135,10 +137,23 @@ def processar():
         motores = set(request.form.getlist('motores'))
         cabos = json.loads(request.form.get('cabos', '[]'))
         gerar_validacao = request.form.get('gerar_validacao', 'false') == 'true'
+        resolucoes = json.loads(request.form.get('resolucoes', '{}'))
         log.append(f"Lendo arquivo: {arquivo.filename}...")
         conteudo = io.BytesIO(arquivo.read())
         df_base = consolidar_tabela_locacao(conteudo)
         log.append(f"✓ {len(df_base)} estruturas lidas.")
+
+        if 'parafusos' in motores:
+            ambiguos = identificar_estruturas_ambiguas(df_base)
+            pendentes = [a for a in ambiguos if resolucoes.get(a['numero']) not in ('C', 'I')]
+            if pendentes:
+                vistos, unicos = set(), []
+                for a in pendentes:
+                    chave = (a['numero'], a['tipo'])
+                    if chave not in vistos:
+                        vistos.add(chave)
+                        unicos.append(a)
+                return jsonify({'ambiguidade': unicos})
 
         abas = {}  # {nome_aba: df} ou {nome_aba: (df_esq, df_dir)} — ordem de inserção = ordem das abas
 
@@ -180,6 +195,38 @@ def processar():
             for aviso in avisos:
                 log.append(f"⚠ {aviso}")
             log.append(f"✓ {len(df)} itens de ferragens calculados.")
+
+        if 'parafusos' in motores:
+            log.append("Calculando Parafusos...")
+            df, incremento_item36, avisos = calcular_parafusos(df_base, resolucoes)
+            if not df.empty:
+                abas['Parafusos'] = df
+            for aviso in avisos:
+                log.append(f"⚠ {aviso}")
+            log.append(f"✓ {len(df)} itens de parafusos calculados.")
+
+            if incremento_item36 > 0:
+                info36 = next((m for m in obter_todos_materiais() if str(m['codigo']).strip() == '36'), None)
+                descricao36 = info36['descricao'] if info36 else 'Viga tipo U (Cruzeta metálica)'
+                unidade36   = info36['unidade'] if info36 else 'un.'
+
+                if 'Ferragens' in abas:
+                    df_ferr, df_val_ferr, freeze = abas['Ferragens']
+                    mask = df_ferr['Código'].astype(str).str.strip() == '36'
+                    if mask.any():
+                        df_ferr.loc[mask, 'Quantidade'] += incremento_item36
+                    else:
+                        df_ferr.loc[len(df_ferr)] = {
+                            'Código': '36', 'Material': descricao36,
+                            'Unidade': unidade36, 'Quantidade': incremento_item36,
+                        }
+                    abas['Ferragens'] = (df_ferr, df_val_ferr, freeze)
+                else:
+                    abas['Ferragens'] = pd.DataFrame([{
+                        'Código': '36', 'Material': descricao36,
+                        'Unidade': unidade36, 'Quantidade': incremento_item36,
+                    }])
+                log.append(f"✓ +{incremento_item36:g} un. de '{descricao36}' (cruzeta adicional) somadas ao item 36.")
 
         if cabos:
             log.append(f"Adicionando {len(cabos)} cabo(s) manual(is)...")

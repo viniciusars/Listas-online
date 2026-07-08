@@ -18,6 +18,14 @@ def _numero_valido(valor):
     return tem_digito and tem_letra_final
 
 
+def detectar_coluna_numero(df):
+    """Encontra a coluna NÚMERO da estrutura, cujo nome pode variar entre planilhas."""
+    for c in df.columns:
+        if c.strip().upper() in ('NÚMERO', 'NUMERO', 'N°', 'Nº', 'NUM'):
+            return c
+    return None
+
+
 def consolidar_tabela_locacao(caminho_arquivo):
     print(f"Lendo e unificando abas do arquivo: {caminho_arquivo}...")
     xls = pd.ExcelFile(caminho_arquivo)

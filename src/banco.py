@@ -14,6 +14,11 @@ import pandas as pd
 
 CAMINHO_DB = os.path.join('data', 'sistema.db')
 CAMINHO_SEED_FERRAGENS = os.path.join('config', 'QUANTIDADE-MATERIAIS.xlsx')
+CAMINHO_SEED_PARAFUSOS = os.path.join('config', 'PARAFUSOS POR ESTRUTURA.xlsx')
+
+# Sufixos usados para desambiguar estruturas cuja receita de parafusos muda
+# conforme o sentido de chegada dos cabos (só visível na planta perfil/DWG).
+SUFIXOS_PARAFUSOS_AMBIGUOS = ('.C', '.I')
 
 
 # ---------------------------------------------------------------------------
@@ -42,6 +47,23 @@ def _criar_schema(conn):
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_materiais_tipo ON materiais_poste(tipo)"
     )
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS parafusos_receita (
+            id                INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo              TEXT    NOT NULL,
+            esforco           REAL    NOT NULL,
+            altura            REAL,
+            posicao           TEXT    NOT NULL,
+            parafuso          TEXT    NOT NULL,
+            esf_parafuso      REAL    NOT NULL,
+            comprimento       INTEGER NOT NULL,
+            quantidade        REAL    NOT NULL,
+            cruzeta_adicional REAL
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_parafusos_tipo ON parafusos_receita(tipo)"
+    )
     conn.commit()
 
 
@@ -61,6 +83,17 @@ def inicializar():
             else:
                 print(f"[BANCO] AVISO: {CAMINHO_SEED_FERRAGENS} não encontrado — "
                       "banco de ferragens iniciará vazio.")
+
+        vazio_parafusos = conn.execute("SELECT COUNT(*) FROM parafusos_receita").fetchone()[0] == 0
+        if vazio_parafusos:
+            if os.path.exists(CAMINHO_SEED_PARAFUSOS):
+                linhas = _parse_xlsx_parafusos(CAMINHO_SEED_PARAFUSOS)
+                _gravar_receita_parafusos(conn, linhas)
+                print(f"[BANCO] Seed inicial: {len(linhas)} linhas de receita de parafusos "
+                      f"importadas de {CAMINHO_SEED_PARAFUSOS}")
+            else:
+                print(f"[BANCO] AVISO: {CAMINHO_SEED_PARAFUSOS} não encontrado — "
+                      "banco de parafusos iniciará vazio.")
     finally:
         conn.close()
 
@@ -127,6 +160,106 @@ def _parse_xlsx_ferragens(caminho):
     return receita
 
 
+_PARAFUSOS_COLS_META = {
+    'TIPO', 'ESFORCO', 'ALTURA', 'POSIÇÃO', 'PARAFUSO',
+    'ESF_PARAFUSO', 'COMECO', 'CRUZETA ADICIONAL',
+}
+
+
+def _parse_xlsx_parafusos(caminho):
+    """Lê as abas TIPICAS/ESPECIAIS/TE e retorna uma lista de linhas planas.
+
+    Cada linha da planilha original tem uma coluna por comprimento comercial
+    (200, 250, ... 900mm); aqui cada célula preenchida vira uma linha própria.
+    Quando a coluna COMECO estiver preenchida ('C' ou 'I'), ela é incorporada
+    ao TIPO (ex: 'N3-3' + 'C' -> 'N3-3.C'), pois essa variação só é visível na
+    planta perfil (DWG) e precisa ser escolhida manualmente na Locação.
+    """
+    xl = pd.ExcelFile(caminho)
+    linhas = []
+
+    for aba in xl.sheet_names:
+        df = xl.parse(aba, header=0)
+        df.columns = [str(c).strip() for c in df.columns]
+        df = df.dropna(how='all')
+
+        cols_comprimento = [c for c in df.columns if c not in _PARAFUSOS_COLS_META]
+
+        for _, row in df.iterrows():
+            tipo_base = row.get('TIPO')
+            if pd.isna(tipo_base):
+                continue
+            tipo_base = str(tipo_base).strip()
+
+            comeco = row.get('COMECO')
+            if pd.notna(comeco) and str(comeco).strip():
+                tipo = f"{tipo_base}.{str(comeco).strip().upper()}"
+            else:
+                tipo = tipo_base
+
+            try:
+                esforco = float(row['ESFORCO'])
+            except (TypeError, ValueError):
+                continue
+
+            altura = None
+            altura_val = row.get('ALTURA')
+            if pd.notna(altura_val) and str(altura_val).strip() not in ('', '-'):
+                try:
+                    altura = float(altura_val)
+                except (TypeError, ValueError):
+                    altura = None
+
+            posicao = str(row.get('POSIÇÃO', '')).strip().upper()
+            parafuso = str(row.get('PARAFUSO', '')).strip().upper()
+
+            try:
+                esf_parafuso = float(row['ESF_PARAFUSO'])
+            except (TypeError, ValueError):
+                continue
+
+            cruzeta_val = row.get('CRUZETA ADICIONAL')
+            cruzeta = float(cruzeta_val) if pd.notna(cruzeta_val) else None
+
+            for col in cols_comprimento:
+                qtd = row[col]
+                if pd.isna(qtd):
+                    continue
+                try:
+                    qtd = float(qtd)
+                except (TypeError, ValueError):
+                    continue
+                if qtd <= 0:
+                    continue
+                try:
+                    comprimento = int(float(col))
+                except (TypeError, ValueError):
+                    continue
+
+                linhas.append({
+                    'tipo': tipo, 'esforco': esforco, 'altura': altura,
+                    'posicao': posicao, 'parafuso': parafuso,
+                    'esf_parafuso': esf_parafuso, 'comprimento': comprimento,
+                    'quantidade': qtd, 'cruzeta_adicional': cruzeta,
+                })
+
+    return linhas
+
+
+def _gravar_receita_parafusos(conn, linhas):
+    """Substitui toda a tabela parafusos_receita pelo conteúdo de `linhas`."""
+    conn.execute("DELETE FROM parafusos_receita")
+    for l in linhas:
+        conn.execute(
+            "INSERT INTO parafusos_receita "
+            "(tipo, esforco, altura, posicao, parafuso, esf_parafuso, comprimento, quantidade, cruzeta_adicional) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (l['tipo'], l['esforco'], l['altura'], l['posicao'], l['parafuso'],
+             l['esf_parafuso'], l['comprimento'], l['quantidade'], l['cruzeta_adicional'])
+        )
+    conn.commit()
+
+
 def _gravar_receita_ferragens(conn, receita):
     """Substitui toda a tabela materiais_poste pelo conteúdo de `receita`."""
     conn.execute("DELETE FROM materiais_poste")
@@ -167,6 +300,36 @@ def ler_receita_ferragens():
             'qtd':       r['quantidade'],
         })
     return receita
+
+
+def ler_receita_parafusos_df():
+    """Retorna a receita de parafusos completa como DataFrame (para o motor operar em pandas)."""
+    conn = conectar()
+    try:
+        df = pd.read_sql_query(
+            "SELECT tipo, esforco, altura, posicao, parafuso, esf_parafuso, "
+            "comprimento, quantidade, cruzeta_adicional FROM parafusos_receita",
+            conn
+        )
+    finally:
+        conn.close()
+    return df
+
+
+def listar_tipos_ambiguos_parafusos():
+    """Bases de TIPO cuja receita de parafusos varia conforme o sentido de chegada dos
+    cabos (sufixo .C ou .I) — precisam de confirmação manual quando aparecem sem sufixo."""
+    conn = conectar()
+    try:
+        rows = conn.execute("SELECT DISTINCT tipo FROM parafusos_receita").fetchall()
+    finally:
+        conn.close()
+    bases = set()
+    for r in rows:
+        tipo = r['tipo']
+        if tipo.endswith(SUFIXOS_PARAFUSOS_AMBIGUOS):
+            bases.add(tipo[:-2])
+    return bases
 
 
 # ---------------------------------------------------------------------------

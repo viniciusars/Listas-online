@@ -123,6 +123,27 @@
         .preview-table td.vazio { color: #cbd5e1; font-style: italic; }
         .preview-count { margin-top: 8px; font-size: 0.78rem; color: #64748b; }
         .preview-loading { text-align: center; padding: 20px; color: #64748b; font-size: 0.85rem; }
+
+        /* Ambiguidade de sentido de chegada dos cabos (parafusos) */
+        #ambiguidade-section { display: none; border: 1.5px solid #f59e0b; }
+        #ambiguidade-section .card-header { background: #fffbeb; }
+        .ambiguidade-lista { display: flex; flex-direction: column; gap: 10px; }
+        .ambiguidade-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; flex-wrap: wrap;
+        }
+        .ambiguidade-item .info { font-size: 0.87rem; }
+        .ambiguidade-item .info strong { color: #1a2744; }
+        .ambiguidade-opcoes { display: flex; gap: 14px; }
+        .ambiguidade-opcoes label {
+            display: flex; align-items: center; gap: 5px; font-size: 0.84rem;
+            cursor: pointer; font-weight: 600;
+        }
+        .btn-confirmar-ambiguidade {
+            background: #d97706; color: white; font-weight: 700; border: none;
+            border-radius: 8px; padding: 12px 0; width: 100%; cursor: pointer; margin-top: 14px;
+        }
+        .btn-confirmar-ambiguidade:hover { background: #b45309; }
 {% endblock %}
 
 {% block content %}
@@ -207,6 +228,21 @@
         </div>
     </div>
 
+    <!-- Ambiguidade: sentido de chegada dos cabos (parafusos) -->
+    <div class="card" id="ambiguidade-section">
+        <div class="card-header">
+            <h2>⚠ Confirme o sentido de chegada dos cabos</h2>
+        </div>
+        <div class="card-body">
+            <p style="font-size:0.85rem;color:#78350f;margin-bottom:14px">
+                Essas estruturas têm receita de parafusos diferente dependendo do sentido de
+                chegada dos cabos (só visível na planta perfil/DWG). Confirme cada uma pra continuar.
+            </p>
+            <div class="ambiguidade-lista" id="ambiguidade-lista"></div>
+            <button class="btn-confirmar-ambiguidade" onclick="confirmarAmbiguidade()">Confirmar e Calcular</button>
+        </div>
+    </div>
+
     <!-- Executar -->
     <div class="execute-area">
         <button class="btn-run" id="btn-run" onclick="executar()">Executar Motor</button>
@@ -237,10 +273,13 @@
 {% block scripts %}
 <script>
     let cabos = [];
+    let resolucoesParafusos = {};
 
     async function onFileSelected(input) {
         const file = input.files[0];
         if (!file) return;
+        resolucoesParafusos = {};
+        document.getElementById('ambiguidade-section').style.display = 'none';
         document.getElementById('file-name').textContent = file.name;
         await carregarPreview(file);
     }
@@ -351,6 +390,7 @@
         motores.forEach(m => fd.append('motores', m));
         fd.append('cabos', JSON.stringify(cabos));
         fd.append('gerar_validacao', gerarValidacao ? 'true' : 'false');
+        fd.append('resolucoes', JSON.stringify(resolucoesParafusos));
 
         try {
             const resp = await fetch('/processar', { method: 'POST', body: fd });
@@ -366,6 +406,16 @@
                 btn.innerHTML = 'Executar Motor';
                 return;
             }
+
+            if (data.ambiguidade && data.ambiguidade.length) {
+                renderAmbiguidade(data.ambiguidade);
+                addLog('⚠ Confirme o sentido de chegada dos cabos nas estruturas destacadas acima.', 'warn');
+                btn.disabled = false;
+                btn.innerHTML = 'Executar Motor';
+                return;
+            }
+
+            document.getElementById('ambiguidade-section').style.display = 'none';
 
             (data.log || []).forEach(msg => {
                 const tipo = msg.startsWith('✓') ? 'ok'
@@ -389,6 +439,28 @@
 
         btn.disabled = false;
         btn.innerHTML = 'Executar Motor';
+    }
+
+    function renderAmbiguidade(lista) {
+        document.getElementById('ambiguidade-lista').innerHTML = lista.map((a, i) => `
+            <div class="ambiguidade-item">
+                <div class="info">Estrutura <strong>${a.numero}</strong> — Tipo <strong>${a.tipo}</strong></div>
+                <div class="ambiguidade-opcoes">
+                    <label><input type="radio" name="amb-${i}" value="C" data-numero="${a.numero}" checked> C — chega pelo 1º nível</label>
+                    <label><input type="radio" name="amb-${i}" value="I" data-numero="${a.numero}"> I — chega pelo nível inferior</label>
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('ambiguidade-section').style.display = 'block';
+        document.getElementById('ambiguidade-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function confirmarAmbiguidade() {
+        document.querySelectorAll('#ambiguidade-lista input[type="radio"]:checked').forEach(input => {
+            resolucoesParafusos[input.dataset.numero] = input.value;
+        });
+        document.getElementById('ambiguidade-section').style.display = 'none';
+        executar();
     }
 
     // Drag and drop na file zone
