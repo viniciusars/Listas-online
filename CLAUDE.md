@@ -14,6 +14,8 @@ O projeto consiste em um sistema web local desenvolvido em Python para gerar lis
 * **Fase 6: Alças e Laços (Implementado):** A lógica foi refeita do zero usando um arquivo de receita externo `data/config/receita_alcas_lacos.csv`. Cada linha do CSV mapeia um TIPO de estrutura + NÍVEL + DIREÇÃO (VANTE ou RE) para uma quantidade de alças e laços. O motor lê a coluna de cabo do nível atual (Vante) e da linha anterior dentro do mesmo circuito (Ré, usando `.shift(1)` agrupado por `_letra_circuito`). O módulo `motor_alcas_lacos.py` está implementado e integrado ao fluxo do `main.py`.
 * **Fase 7: Migração da Interface para Flask/Web:** A interface Tkinter foi substituída por uma aplicação web Flask. O `main.py` virou um servidor Flask com rotas `/` (página principal), `/preview` (lê o Excel e retorna JSON para pré-visualização), `/processar` (executa todos os motores e exporta), e `/download/<arquivo>` (servir os arquivos gerados). O front-end é `templates/index.html` com HTML/CSS/JS puro, sem dependências externas. O arquivo `src/interface.py` (Tkinter) ficou obsoleto mas não foi deletado.
 * **Fase 8: Validação e Maturação do Motor de Alças/Laços:** O motor foi reescrito do zero após divergências detectadas na validação manual. A causa raiz era o uso de `groupby().transform(lambda s: s.astype(str).shift(1))`, que preenchia o primeiro elemento de cada circuito com Python `None` (não `numpy.NaN`). `str(None)` = `'None'` passava pelo filtro `cabo.lower() == 'nan'` e gerava contagens espúrias. A correção foi fazer o `.shift(1)` nos valores originais (antes do `astype(str)`), garantindo que o fill seja `NaN` → capturado pelo filtro `in ('nan', 'none', '<na>')`. Foram adicionadas duas funcionalidades: (1) `gerar_tabela_validacao()` em `motor_alcas_lacos.py`, que retorna uma tabela detalhada por TIPO·NÍVEL·DIREÇÃO·CABO com COUNT e totais de alças/laços, exportável opcionalmente via checkbox na UI; (2) sistema de aviso (⚠ amarelo no log) para TIPOs presentes na planilha mas ausentes na `receita_alcas_lacos.csv`, permitindo identificar estruturas novas que precisam ser cadastradas. O motor foi validado com dados reais e os resultados foram confirmados corretos pelo usuário.
+* **Fase 9: Reestruturação Multi-página, Banco SQLite e Motor de Ferragens:** A página única (`index.html`) virou um menu inicial (`home.html`) com 3 cards de navegação: "Gerar Quantitativos" (`/gerar`, motores de cálculo), "Materiais por Poste" (`/materiais`, CRUD da receita de ferragens) e "Cadastrar Parafusos" (`/parafusos`, ainda placeholder). Foi criado `src/banco.py`, uma camada SQLite (`data/sistema.db`, gitignored) que passou a ser a **fonte única de verdade** das receitas — os motores não leem mais Excel diretamente. Na primeira execução, se as tabelas estiverem vazias, o banco é semeado a partir dos arquivos em `config/`. A receita de ferragens gerais (antes descartada do MVP) foi implementada em `src/motor_ferragens.py`, semeada de `config/QUANTIDADE-MATERIAIS.xlsx` (uma aba por TIPO de estrutura), com o mesmo padrão de avisos ⚠ para tipos sem receita cadastrada e uma `gerar_tabela_validacao_ferragens()` pivotada por material×tipo. A tela `/materiais` permite listar, editar e substituir globalmente valores de um campo (ex: trocar um código de material em todos os registros de uma vez).
+* **Fase 10: Motor de Parafusos:** O usuário forneceu `PARAFUSOS POR ESTRUTURA.xlsx` (exportado da `CALCULADORA PARAFUSO 2.0.xlsx`, uma calculadora geométrica de 34 abas já validada — **não reimplementada em Python**, só consultada). A planilha tem 3 abas (TIPICAS, ESPECIAIS, TE) com uma linha por especificação de parafuso (TIPO+ESFORÇO+POSIÇÃO+PARAFUSO+ESF_PARAFUSO, e ALTURA para estruturas TR-CH/TE dependentes de altura) e colunas de comprimento comercial (200–900mm) onde a célula é a quantidade. Decisões de modelagem, fechadas por rodadas de perguntas ao usuário: (1) a coluna `COMECO` (valores `C`/`I`) só existe na família N3-3/2N3-3/N4-N3-3 e indica o sentido de chegada dos cabos (`C` = chega pelo 1º nível, `I` = chega pelo nível inferior) — informação só visível na planta perfil (DWG), nunca derivável da Tabela de Locação. Por isso ela é resolvida **manualmente pelo usuário na interface web**, nunca automaticamente, mesmo quando só existe uma variante cadastrada na receita (a receita é alimentada aos poucos conforme obras reais aparecem, então "só ter C hoje" não decide o caso — pode surgir "I" amanhã). (2) `ESF_PARAFUSO` (50 ou 70, classe em kN) são parafusos fisicamente diferentes e nunca somam juntos. (3) A coluna `CRUZETA ADICIONAL` (1 ou 2, repetida em todas as linhas do mesmo bloco de estrutura) não é material novo — é uma quantidade extra do item **código 36** ("Viga tipo U") que já existe na receita de ferragens (`materiais_poste`), e deve ser somada **uma vez por estrutura**, não uma vez por linha de parafuso repetida. Implementação: tabela `parafusos_receita` no banco (seed de `config/PARAFUSOS POR ESTRUTURA.xlsx`, concatenando `TIPO+"."+COMECO` na gravação, ex. `N3-3`+`C` → `N3-3.C`); `src/motor_parafusos.py` com `identificar_estruturas_ambiguas()` e `calcular_parafusos(df, resolucoes)`; a rota `/processar` retorna `{'ambiguidade': [...]}` quando encontra TIPOs ambíguos sem sufixo, e a tela `gerar.html` mostra um painel amarelo pedindo pro usuário escolher C/I por estrutura antes de recalcular. O motor decide por tipo se a receita depende de altura (checando se existe algum `altura` não nulo pra aquele TIPO) em vez de assumir isso globalmente — necessário porque TE tem altura real na Locação mas a receita de TE não depende dela.
 
 ---
 
@@ -42,29 +44,42 @@ O projeto consiste em um sistema web local desenvolvido em Python para gerar lis
 ---
 
 ## 6. Estado Atual do Projeto
-O sistema roda como servidor web Flask local. A interface web está funcional e validada com dados reais. Todos os motores (Postes, Estais, Alças/Laços) estão implementados, integrados e com resultados confirmados. O motor de Alças/Laços possui planilha de validação opcional e sistema de aviso para estruturas novas não cadastradas na receita.
+O sistema roda como servidor web Flask local, multi-página. Todos os motores (Postes, Estais, Alças/Laços, Ferragens, Parafusos) estão implementados e integrados na tela `/gerar`. O banco SQLite (`data/sistema.db`) é a fonte de verdade das receitas de Ferragens e Parafusos, semeado automaticamente dos arquivos de `config/` na primeira execução. O motor de Parafusos foi validado com dados reais (arquivo de exemplo `LOCACAO - EDIV 14 - 0B.xlsx`) via teste HTTP ponta a ponta: detecção de ambiguidade C/I, resolução manual, cálculo de comprimentos/classes e incremento do item 36 — todos corretos. A tela `/parafusos` (CRUD de edição da receita) ainda é um placeholder "em construção", mas não bloqueia o cálculo.
 
 **Árvore de Diretórios:**
 > sistema_quantitativos/
+> ├── config/                        # Seeds do banco (lidos só na 1ª execução, se as tabelas estiverem vazias)
+> │   ├── QUANTIDADE-MATERIAIS.xlsx      # Seed de materiais_poste (ferragens gerais + item 36 "Viga tipo U")
+> │   ├── PARAFUSOS POR ESTRUTURA.xlsx   # Seed de parafusos_receita (abas TIPICAS/ESPECIAIS/TE)
+> │   ├── CALCULADORA PARAFUSO 2.0.xlsx  # Calculadora geométrica original (34 abas) — só referência, não é lida pelo código
+> │   └── receita_alcas_lacos.csv        # Receita de alças/laços por TIPO·NÍVEL·DIREÇÃO
 > ├── data/
-> │   ├── config/               # Contém: "receita_alcas_lacos.csv"
-> │   ├── input/                # (pasta mantida, mas arquivos não são mais salvos aqui pelo servidor)
-> │   └── output/               # Recebe: "RMT_Output_Completo.xlsx", "Quantitativo_Postes_Isolado.xlsx", "Validacao_Alcas_Lacos.xlsx" (opcional)
+> │   ├── input/                # Não é mais usada pelo servidor (uploads vão direto pra memória)
+> │   ├── output/                # RMT_Output_Completo.xlsx, Quantitativo_Postes_Isolado.xlsx, Validacao_Alcas_Lacos.xlsx (opcional)
+> │   └── sistema.db             # Banco SQLite (gitignored) — materiais_poste + parafusos_receita
 > ├── src/
 > │   ├── __init__.py
-> │   ├── leitor_excel.py       # (OK) Empilha abas, limpa cabeçalhos, aceita caminho OU BytesIO.
+> │   ├── banco.py              # (OK) Schema + seed + CRUD de materiais_poste e parafusos_receita. Fonte única de verdade das receitas.
+> │   ├── leitor_excel.py       # (OK) Empilha abas, limpa cabeçalhos, aceita caminho OU BytesIO. Tem detectar_coluna_numero().
 > │   ├── motor_postes.py       # (OK) Separa Altura/Carga e formata string.
 > │   ├── motor_estais.py       # (OK) Soma global e multiplica por receita fixa.
-> │   ├── exportador.py         # (OK) Salva em .xlsx (requer openpyxl).
-> │   ├── motor_alcas_lacos.py  # (OK) Retorna tupla (df_resultado, avisos). Funções: calcular_alcas_lacos() e gerar_tabela_validacao().
+> │   ├── motor_alcas_lacos.py  # (OK) Retorna (df_resultado, avisos). Funções: calcular_alcas_lacos() e gerar_tabela_validacao().
+> │   ├── motor_ferragens.py    # (OK) Retorna (df_resultado, avisos), lê receita do banco. gerar_tabela_validacao_ferragens() pivotada.
+> │   ├── motor_parafusos.py    # (OK) identificar_estruturas_ambiguas() e calcular_parafusos(df, resolucoes) -> (df, incremento_item36, avisos).
+> │   ├── exportador.py         # (OK) Salva em .xlsx (requer openpyxl). Suporta múltiplas abas e abas lado-a-lado.
 > │   └── interface.py          # (OBSOLETO) Tkinter — não é mais usado, pode ser deletado.
 > ├── templates/
-> │   └── index.html            # (OK) Interface web completa. Seção "Opções adicionais" com checkbox para planilha de validação.
-> └── main.py                   # (OK) Servidor Flask: rotas /, /preview, /processar, /download.
+> │   ├── base.html             # (OK) Layout comum (header, estilos base, spinner).
+> │   ├── home.html             # (OK) Menu inicial com 3 cards.
+> │   ├── gerar.html            # (OK) Upload, preview, seleção de motores, cabos manuais, painel de ambiguidade C/I, log, downloads.
+> │   ├── materiais.html        # (OK) CRUD da receita de ferragens por TIPO.
+> │   └── parafusos.html        # (PLACEHOLDER) "Em construção" — tela de edição da receita de parafusos ainda não feita.
+> └── main.py                   # (OK) Servidor Flask: rotas /, /gerar, /materiais, /parafusos, /preview, /processar, /download, /materiais/api/*.
 
 ---
 
 ## 7. Próxima Tarefa Imediata
-Nenhuma pendência crítica identificada. O motor de Alças/Laços foi validado com dados reais e está correto. Possíveis evoluções futuras:
-* Avaliar a necessidade de incluir novos TIPOs de estrutura na `receita_alcas_lacos.csv` à medida que aparecerem avisos `⚠` em novos projetos.
-* Avaliar escopo de ferragens gerais e fibra óptica (descartados do MVP) para futuras fases.
+Nenhuma pendência crítica identificada. Possíveis evoluções futuras:
+* Construir a tela `/parafusos` como CRUD de edição da receita `parafusos_receita` (hoje só editável via re-seed do Excel), espelhando o padrão já usado em `/materiais`.
+* Avaliar a necessidade de incluir novos TIPOs de estrutura nas receitas (`receita_alcas_lacos.csv`, `materiais_poste`, `parafusos_receita`) à medida que aparecerem avisos `⚠` em novos projetos.
+* Avaliar escopo de fibra óptica (descartado do MVP) para futuras fases.
