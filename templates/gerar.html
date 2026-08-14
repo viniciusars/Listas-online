@@ -275,6 +275,12 @@
     let cabos = [];
     let resolucoesParafusos = {};
 
+    function esc(s) {
+        return (s === null || s === undefined ? '' : s).toString()
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     async function onFileSelected(input) {
         const file = input.files[0];
         if (!file) return;
@@ -298,25 +304,25 @@
             const texto = await resp.text();
             let data;
             try { data = JSON.parse(texto); } catch {
-                content.innerHTML = `<p style="color:#ef4444">Erro ao ler arquivo: ${texto.substring(0,200)}</p>`;
+                content.innerHTML = `<p style="color:#ef4444">Erro ao ler arquivo: ${esc(texto.substring(0,200))}</p>`;
                 return;
             }
             if (data.erro) {
-                content.innerHTML = `<p style="color:#ef4444">Erro: ${data.erro}</p>`;
+                content.innerHTML = `<p style="color:#ef4444">Erro: ${esc(data.erro)}</p>`;
                 return;
             }
             renderPreview(data.colunas, data.dados);
         } catch (e) {
-            content.innerHTML = `<p style="color:#ef4444">Falha de comunicação: ${e.message}</p>`;
+            content.innerHTML = `<p style="color:#ef4444">Falha de comunicação: ${esc(e.message)}</p>`;
         }
     }
 
     function renderPreview(colunas, dados) {
-        const thead = colunas.map(c => `<th>${c}</th>`).join('');
+        const thead = colunas.map(c => `<th>${esc(c)}</th>`).join('');
         const tbody = dados.map(row =>
             '<tr>' + colunas.map(c => {
                 const val = row[c] || '';
-                return `<td class="${val ? '' : 'vazio'}">${val || '—'}</td>`;
+                return `<td class="${val ? '' : 'vazio'}">${esc(val) || '—'}</td>`;
             }).join('') + '</tr>'
         ).join('');
 
@@ -353,7 +359,7 @@
     function renderCabos() {
         document.getElementById('cabo-list').innerHTML = cabos.map((c, i) => `
             <div class="cabo-tag">
-                <span>${c.Material} — ${c.Quantidade} m</span>
+                <span>${esc(c.Material)} — ${c.Quantidade} m</span>
                 <button onclick="removerCabo(${i})" title="Remover">✕</button>
             </div>
         `).join('');
@@ -442,12 +448,14 @@
     }
 
     function renderAmbiguidade(lista) {
+        // Nenhuma opção vem pré-marcada de propósito: a escolha C/I depende da
+        // planta perfil (DWG) e precisa ser feita conscientemente pelo usuário.
         document.getElementById('ambiguidade-lista').innerHTML = lista.map((a, i) => `
             <div class="ambiguidade-item">
-                <div class="info">Estrutura <strong>${a.numero}</strong> — Tipo <strong>${a.tipo}</strong></div>
+                <div class="info">Estrutura <strong>${esc(a.numero)}</strong> — Tipo <strong>${esc(a.tipo)}</strong></div>
                 <div class="ambiguidade-opcoes">
-                    <label><input type="radio" name="amb-${i}" value="C" data-numero="${a.numero}" checked> C — chega pelo 1º nível</label>
-                    <label><input type="radio" name="amb-${i}" value="I" data-numero="${a.numero}"> I — chega pelo nível inferior</label>
+                    <label><input type="radio" name="amb-${i}" value="C" data-numero="${esc(a.numero)}"> C — chega pelo 1º nível</label>
+                    <label><input type="radio" name="amb-${i}" value="I" data-numero="${esc(a.numero)}"> I — chega pelo nível inferior</label>
                 </div>
             </div>
         `).join('');
@@ -456,7 +464,13 @@
     }
 
     function confirmarAmbiguidade() {
-        document.querySelectorAll('#ambiguidade-lista input[type="radio"]:checked').forEach(input => {
+        const total = document.querySelectorAll('#ambiguidade-lista .ambiguidade-item').length;
+        const marcados = document.querySelectorAll('#ambiguidade-lista input[type="radio"]:checked');
+        if (marcados.length < total) {
+            alert('Confirme o sentido de chegada (C ou I) de todas as estruturas antes de continuar.');
+            return;
+        }
+        marcados.forEach(input => {
             resolucoesParafusos[input.dataset.numero] = input.value;
         });
         document.getElementById('ambiguidade-section').style.display = 'none';

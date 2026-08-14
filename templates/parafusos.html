@@ -2,22 +2,618 @@
 
 {% block title %}Cadastrar Parafusos — Sistema RMT{% endblock %}
 
-{% block content %}
-    <a class="back-link" href="/">← Início</a>
+{% block styles %}
+main { max-width: 1180px; }
 
-    <div class="card">
-        <div class="card-header">
-            <h2>Cadastrar Parafusos</h2>
-        </div>
-        <div class="card-body">
-            <p style="font-size:0.9rem;color:#475569;line-height:1.6">
-                Aqui ficará o cadastro da quantidade e do comprimento dos parafusos
-                (cabeça quadrada e rosca dupla) de cada estrutura, com conferência
-                contra o total dos Materiais por Poste.
-            </p>
-            <p style="font-size:0.85rem;color:#94a3b8;margin-top:12px">
-                ⏳ Em construção — o modelo de cadastro ainda será definido.
-            </p>
-        </div>
+.filtros {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.filtros label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+}
+.filtros select,
+.filtros input[type=text],
+.filtros input[type=number] {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    background: white;
+    color: #1e293b;
+}
+.filtros select:focus,
+.filtros input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+.filtros select { min-width: 190px; }
+.filtros input[type=number] { width: 100px; }
+
+/* ── Grade ───────────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; }
+
+table.grade {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+table.grade th {
+    background: #f8fafc;
+    padding: 7px 6px;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+table.grade th.col-spec { text-align: left; }
+table.grade td {
+    padding: 2px 3px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+table.grade tr:hover td { background: #f8fafc; }
+
+table.grade input {
+    width: 100%;
+    padding: 5px 6px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    background: transparent;
+    color: #1e293b;
+    font-family: inherit;
+    text-align: center;
+}
+table.grade input[data-campo] { text-align: left; }
+table.grade input:hover  { border-color: #cbd5e1; }
+table.grade input:focus  {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+table.grade .col-pos    { width: 100px; }
+table.grade .col-paraf  { width: 150px; }
+table.grade .col-classe { width: 64px; }
+table.grade .col-compr  { width: 52px; }
+table.grade .col-del    { width: 32px; text-align: center; }
+
+.btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.btn-del:hover { color: #ef4444; }
+
+/* ── Rodapé / ações ───────────────────────────────────────────── */
+.tbl-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0 4px;
+    flex-wrap: wrap;
+}
+.cruzeta-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 14px;
+}
+.cruzeta-box input { width: 70px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 5px; text-align: center; }
+
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-success { background: #16a34a; color: white; }
+.btn-success:hover { background: #15803d; }
+.btn-danger { background: #fee2e2; color: #991b1b; }
+.btn-danger:hover { background: #fecaca; }
+.btn-outline {
+    background: white;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.btn-outline:hover { background: #f1f5f9; }
+
+/* ── Novo card de criação ────────────────────────────────────── */
+.nova-estrutura {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.check-altura {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #475569;
+    padding-bottom: 8px;
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+#toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.ok   { background: #dcfce7; color: #166534; }
+#toast.err  { background: #fee2e2; color: #991b1b; }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">← Início</a>
+
+<!-- ── Card principal ───────────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header">
+        <h2>Cadastrar Parafusos</h2>
+        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="header-stats"></span>
     </div>
+    <div class="card-body">
+
+        <p style="font-size:0.85rem;color:#64748b;line-height:1.6;margin-bottom:16px">
+            Receita de parafusos (cabeça quadrada e rosca dupla) por comprimento comercial,
+            usada pelo motor de Parafusos. Selecione uma estrutura já cadastrada ou crie uma nova.
+            Para famílias cujo sentido de chegada dos cabos (C/I) altera a receita, use o
+            sufixo no TIPO — ex: <code>N3-3.C</code> / <code>N3-3.I</code>.
+        </p>
+
+        <!-- Seleção -->
+        <div class="filtros" style="margin-bottom:10px">
+            <label>Estrutura (TIPO)
+                <select id="sel-tipo" onchange="onTipoChange()" style="min-width:200px"></select>
+            </label>
+            <label>Esforço (kN)
+                <select id="sel-esforco" onchange="onEsforcoChange()" style="min-width:110px" disabled></select>
+            </label>
+            <label id="wrap-altura" style="display:none">Altura
+                <select id="sel-altura" onchange="carregarGrade()" style="min-width:100px"></select>
+            </label>
+            <button class="btn btn-outline" onclick="abrirNovaEstrutura()">+ Nova estrutura</button>
+        </div>
+
+        <!-- Form nova estrutura -->
+        <div class="card" id="card-nova" style="display:none;margin-bottom:16px;box-shadow:none;border:1.5px solid #93c5fd">
+            <div class="card-body nova-estrutura">
+                <label>TIPO
+                    <input type="text" id="novo-tipo" placeholder="Ex: N3-3.C" style="width:150px;text-transform:uppercase">
+                </label>
+                <label>Esforço (kN)
+                    <input type="number" id="novo-esforco" placeholder="1000" style="width:90px">
+                </label>
+                <span class="check-altura">
+                    <input type="checkbox" id="novo-tem-altura" onchange="document.getElementById('wrap-novo-altura').style.display = this.checked ? '' : 'none'">
+                    Depende de altura?
+                </span>
+                <label id="wrap-novo-altura" style="display:none">Altura
+                    <input type="number" id="novo-altura" placeholder="12" style="width:80px">
+                </label>
+                <button class="btn btn-success" onclick="criarEstrutura()">Criar</button>
+                <button class="btn btn-outline" onclick="fecharNovaEstrutura()">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- Grade -->
+        <div class="tbl-wrap">
+            <table class="grade" id="tbl">
+                <thead id="tbl-head" style="display:none"></thead>
+                <tbody id="tbl-body">
+                    <tr><td colspan="3" style="text-align:center;padding:40px;
+                            color:#94a3b8;font-size:0.88rem">
+                        Selecione uma estrutura acima ou crie uma nova para editar a receita.
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Cruzeta adicional -->
+        <div class="cruzeta-box" id="box-cruzeta" style="display:none">
+            <span>Cruzeta adicional (item 36 — Viga tipo U), por estrutura:</span>
+            <input type="number" id="cruzeta" min="0" step="any" value="0">
+            <span style="font-size:0.78rem;color:#94a3b8">un.</span>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="tbl-footer" id="tbl-footer" style="display:none">
+            <button class="btn btn-add" onclick="adicionarLinha()">+ Nova linha de especificação</button>
+            <div style="margin-left:auto;display:flex;gap:8px">
+                <button class="btn btn-danger" onclick="excluirEstrutura()">Excluir estrutura</button>
+                <button class="btn btn-outline" onclick="descartar()">Descartar</button>
+                <button class="btn btn-success" id="btn-salvar" onclick="salvar()">Salvar alterações</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Comprimentos comerciais padrão (mm) — colunas fixas da grade.
+const COMPRIMENTOS = [200,250,300,350,400,450,500,550,600,650,700,750,800,850,900];
+
+// ── Estado ──────────────────────────────────────────────────────────────────
+let estruturas   = [];   // [{tipo, esforco, altura}, ...] vindas do banco
+let comboAtual   = null; // {tipo, esforco, altura} da grade carregada
+let linhasAtual  = [];   // [{posicao, parafuso, esf_parafuso, comprimentos: {200: qtd, ...}}, ...]
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+carregarEstruturas();
+
+function carregarEstruturas() {
+    fetch('/parafusos/api/estruturas')
+        .then(r => r.json())
+        .then(dados => {
+            estruturas = dados;
+            const tiposUnicos = [...new Set(dados.map(e => e.tipo))];
+            const sel = document.getElementById('sel-tipo');
+            sel.innerHTML = '<option value="">— Selecione —</option>';
+            tiposUnicos.forEach(t => {
+                const o = document.createElement('option');
+                o.value = t; o.textContent = t;
+                sel.appendChild(o);
+            });
+            document.getElementById('header-stats').textContent =
+                tiposUnicos.length + ' tipos · ' + dados.length + ' combinações';
+        });
+}
+
+function onTipoChange() {
+    const tipo = document.getElementById('sel-tipo').value;
+    const selEsforco = document.getElementById('sel-esforco');
+    selEsforco.innerHTML = '';
+    esconderAltura();
+    renderVazio();
+
+    if (!tipo) { selEsforco.disabled = true; return; }
+
+    const esforcos = [...new Set(estruturas.filter(e => e.tipo === tipo).map(e => e.esforco))];
+    selEsforco.disabled = false;
+    selEsforco.innerHTML = '<option value="">— Selecione —</option>';
+    esforcos.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = v + ' kN';
+        selEsforco.appendChild(o);
+    });
+}
+
+function onEsforcoChange() {
+    esconderAltura();
+    renderVazio();
+    const tipo = document.getElementById('sel-tipo').value;
+    const esforco = parseFloat(document.getElementById('sel-esforco').value);
+    if (!tipo || isNaN(esforco)) return;
+
+    const alturas = estruturas.filter(e => e.tipo === tipo && e.esforco === esforco).map(e => e.altura);
+    if (alturas.length > 1 || (alturas.length === 1 && alturas[0] !== null)) {
+        const selAltura = document.getElementById('sel-altura');
+        selAltura.innerHTML = '';
+        alturas.forEach(a => {
+            const o = document.createElement('option');
+            o.value = a === null ? '' : a;
+            o.textContent = a === null ? '— (sem altura)' : a;
+            selAltura.appendChild(o);
+        });
+        document.getElementById('wrap-altura').style.display = '';
+        carregarGrade();
+    } else {
+        carregarGrade();
+    }
+}
+
+function esconderAltura() {
+    document.getElementById('wrap-altura').style.display = 'none';
+    document.getElementById('sel-altura').innerHTML = '';
+}
+
+function alturaSelecionada() {
+    const wrap = document.getElementById('wrap-altura');
+    if (wrap.style.display === 'none') return null;
+    const v = document.getElementById('sel-altura').value;
+    return v === '' ? null : parseFloat(v);
+}
+
+// ── Carregar grade ──────────────────────────────────────────────────────────
+function carregarGrade() {
+    const tipo = document.getElementById('sel-tipo').value;
+    const esforco = parseFloat(document.getElementById('sel-esforco').value);
+    if (!tipo || isNaN(esforco)) return;
+    const altura = alturaSelecionada();
+
+    let url = '/parafusos/api/grade?tipo=' + encodeURIComponent(tipo) + '&esforco=' + esforco;
+    if (altura !== null) url += '&altura=' + altura;
+
+    fetch(url)
+        .then(r => r.json())
+        .then(rows => {
+            comboAtual = { tipo, esforco, altura };
+            linhasAtual = agruparLinhas(rows);
+            const cruzeta = rows.length && rows[0].cruzeta_adicional != null ? rows[0].cruzeta_adicional : 0;
+            document.getElementById('cruzeta').value = cruzeta;
+            document.getElementById('box-cruzeta').style.display = '';
+            document.getElementById('tbl-footer').style.display = '';
+            renderGrade();
+        });
+}
+
+// Agrupa linhas planas (uma por comprimento) em specs (posicao+parafuso+classe)
+function agruparLinhas(rows) {
+    const specs = [];
+    const idx = {};
+    rows.forEach(r => {
+        const chave = r.posicao + '|' + r.parafuso + '|' + r.esf_parafuso;
+        if (!(chave in idx)) {
+            idx[chave] = specs.length;
+            specs.push({ posicao: r.posicao, parafuso: r.parafuso, esf_parafuso: r.esf_parafuso, comprimentos: {} });
+        }
+        specs[idx[chave]].comprimentos[r.comprimento] = r.quantidade;
+    });
+    return specs;
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+function renderVazio() {
+    comboAtual = null;
+    linhasAtual = [];
+    document.getElementById('tbl-head').style.display = 'none';
+    document.getElementById('box-cruzeta').style.display = 'none';
+    document.getElementById('tbl-footer').style.display = 'none';
+    document.getElementById('tbl-body').innerHTML =
+        '<tr><td colspan="3" style="text-align:center;padding:40px;color:#94a3b8;font-size:0.88rem">' +
+        'Selecione uma estrutura acima ou crie uma nova para editar a receita.</td></tr>';
+}
+
+function renderGrade() {
+    const head = document.getElementById('tbl-head');
+    head.style.display = '';
+    let headHtml = '<tr><th class="col-spec col-pos">Posição</th><th class="col-spec col-paraf">Parafuso</th>' +
+                   '<th class="col-classe">Classe (kN)</th>';
+    COMPRIMENTOS.forEach(c => headHtml += '<th class="col-compr">' + c + '</th>');
+    headHtml += '<th class="col-del"></th></tr>';
+    head.innerHTML = headHtml;
+
+    const tbody = document.getElementById('tbl-body');
+    tbody.innerHTML = '';
+
+    linhasAtual.forEach((spec, idx) => {
+        const tr = document.createElement('tr');
+        tr.dataset.idx = idx;
+        let html =
+            '<td class="col-pos"><input type="text" value="' + esc(spec.posicao) + '" data-campo="posicao" placeholder="TOPO"></td>' +
+            '<td class="col-paraf"><input type="text" value="' + esc(spec.parafuso) + '" data-campo="parafuso" placeholder="CABEÇA QUADRADA"></td>' +
+            '<td class="col-classe"><input type="number" value="' + (spec.esf_parafuso ?? '') + '" data-campo="esf_parafuso" step="any"></td>';
+        COMPRIMENTOS.forEach(c => {
+            const v = spec.comprimentos[c];
+            html += '<td class="col-compr"><input type="number" value="' + (v != null ? v : '') +
+                    '" data-comprimento="' + c + '" min="0" step="any" placeholder="—"></td>';
+        });
+        html += '<td class="col-del"><button class="btn-del" title="Remover" onclick="removerLinha(this)">×</button></td>';
+        tr.innerHTML = html;
+
+        tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => sincronizar(tr)));
+        tbody.appendChild(tr);
+    });
+
+    if (!linhasAtual.length) {
+        tbody.innerHTML = '<tr><td colspan="' + (4 + COMPRIMENTOS.length) + '" style="text-align:center;padding:20px;' +
+            'color:#94a3b8">Nenhuma linha ainda — clique em "+ Nova linha de especificação".</td></tr>';
+    }
+}
+
+function sincronizar(tr) {
+    const idx = parseInt(tr.dataset.idx);
+    const spec = linhasAtual[idx];
+    tr.querySelectorAll('input[data-campo]').forEach(inp => {
+        const c = inp.dataset.campo;
+        spec[c] = c === 'esf_parafuso' ? (parseFloat(inp.value) || 0) : inp.value.toUpperCase();
+    });
+    tr.querySelectorAll('input[data-comprimento]').forEach(inp => {
+        const compr = inp.dataset.comprimento;
+        const v = parseFloat(inp.value);
+        if (isNaN(v) || v <= 0) delete spec.comprimentos[compr];
+        else spec.comprimentos[compr] = v;
+    });
+}
+
+// ── Adicionar / remover linha ────────────────────────────────────────────────
+function adicionarLinha() {
+    if (!comboAtual) return;
+    linhasAtual.push({ posicao: '', parafuso: '', esf_parafuso: 50, comprimentos: {} });
+    renderGrade();
+    const linhas = document.querySelectorAll('#tbl-body tr');
+    if (linhas.length) {
+        const inp = linhas[linhas.length - 1].querySelector('input[data-campo="posicao"]');
+        if (inp) inp.focus();
+    }
+}
+
+function removerLinha(btn) {
+    const tr = btn.closest('tr');
+    const idx = parseInt(tr.dataset.idx);
+    linhasAtual.splice(idx, 1);
+    renderGrade();
+}
+
+// ── Nova estrutura ───────────────────────────────────────────────────────────
+function abrirNovaEstrutura() {
+    document.getElementById('card-nova').style.display = '';
+    document.getElementById('novo-tipo').value = '';
+    document.getElementById('novo-esforco').value = '';
+    document.getElementById('novo-tem-altura').checked = false;
+    document.getElementById('novo-altura').value = '';
+    document.getElementById('wrap-novo-altura').style.display = 'none';
+    document.getElementById('novo-tipo').focus();
+}
+
+function fecharNovaEstrutura() {
+    document.getElementById('card-nova').style.display = 'none';
+}
+
+function criarEstrutura() {
+    const tipo = document.getElementById('novo-tipo').value.trim().toUpperCase();
+    const esforco = parseFloat(document.getElementById('novo-esforco').value);
+    const temAltura = document.getElementById('novo-tem-altura').checked;
+    const altura = temAltura ? parseFloat(document.getElementById('novo-altura').value) : null;
+
+    if (!tipo) { mostrarToast('Informe o TIPO da estrutura.', 'err'); return; }
+    if (isNaN(esforco)) { mostrarToast('Informe o esforço (kN).', 'err'); return; }
+    if (temAltura && isNaN(altura)) { mostrarToast('Informe a altura.', 'err'); return; }
+
+    const jaExiste = estruturas.some(e => e.tipo === tipo && e.esforco === esforco &&
+        (e.altura === altura || (e.altura == null && altura == null)));
+    if (jaExiste) { mostrarToast('Essa combinação já existe — selecione-a na lista acima.', 'err'); return; }
+
+    comboAtual = { tipo, esforco, altura };
+    linhasAtual = [];
+    fecharNovaEstrutura();
+
+    document.getElementById('cruzeta').value = 0;
+    document.getElementById('box-cruzeta').style.display = '';
+    document.getElementById('tbl-footer').style.display = '';
+    renderGrade();
+    mostrarToast('Estrutura pronta — adicione as linhas e salve.', 'ok');
+}
+
+// ── Descartar ────────────────────────────────────────────────────────────────
+function descartar() {
+    if (!comboAtual) return;
+    const c = comboAtual;
+    if (estruturas.some(e => e.tipo === c.tipo && e.esforco === c.esforco &&
+            (e.altura === c.altura || (e.altura == null && c.altura == null)))) {
+        carregarGrade();
+    } else {
+        renderVazio();
+    }
+    mostrarToast('Alterações descartadas.', 'ok');
+}
+
+// ── Salvar ───────────────────────────────────────────────────────────────────
+function salvar() {
+    if (!comboAtual) return;
+
+    const linhasFlat = [];
+    linhasAtual.forEach(spec => {
+        Object.keys(spec.comprimentos).forEach(compr => {
+            linhasFlat.push({
+                posicao: spec.posicao, parafuso: spec.parafuso, esf_parafuso: spec.esf_parafuso,
+                comprimento: compr, quantidade: spec.comprimentos[compr],
+            });
+        });
+    });
+
+    if (!linhasFlat.length) {
+        mostrarToast('Preencha ao menos uma quantidade antes de salvar.', 'err');
+        return;
+    }
+
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Salvando…';
+
+    fetch('/parafusos/api/salvar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            tipo: comboAtual.tipo, esforco: comboAtual.esforco, altura: comboAtual.altura,
+            cruzeta_adicional: parseFloat(document.getElementById('cruzeta').value) || 0,
+            linhas: linhasFlat,
+        })
+    })
+    .then(r => r.json())
+    .then(resp => {
+        btn.disabled = false;
+        btn.innerHTML = 'Salvar alterações';
+        if (resp.ok) {
+            mostrarToast('✓ ' + resp.count + ' linhas salvas.', 'ok');
+            carregarEstruturas();
+        } else {
+            mostrarToast('Erro: ' + (resp.erro || '?'), 'err');
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Salvar alterações';
+        mostrarToast('Erro de rede.', 'err');
+    });
+}
+
+// ── Excluir estrutura ────────────────────────────────────────────────────────
+function excluirEstrutura() {
+    if (!comboAtual) return;
+    const rotulo = comboAtual.tipo + ' · ' + comboAtual.esforco + 'kN' +
+        (comboAtual.altura != null ? ' · altura ' + comboAtual.altura : '');
+    if (!confirm('Excluir toda a receita de "' + rotulo + '"?\n\nEsta ação não pode ser desfeita.')) return;
+
+    fetch('/parafusos/api/excluir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(comboAtual)
+    })
+    .then(r => r.json())
+    .then(resp => {
+        if (resp.ok) {
+            mostrarToast('✓ Estrutura excluída.', 'ok');
+            document.getElementById('sel-tipo').value = '';
+            onTipoChange();
+            carregarEstruturas();
+        } else {
+            mostrarToast('Erro: ' + (resp.erro || '?'), 'err');
+        }
+    })
+    .catch(() => mostrarToast('Erro de rede.', 'err'));
+}
+
+// ── Utilitários ──────────────────────────────────────────────────────────────
+function esc(s) {
+    return (s || '').toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function mostrarToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + tipo;
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => { t.className = ''; }, 3200);
+}
+</script>
 {% endblock %}

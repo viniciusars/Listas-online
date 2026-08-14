@@ -1,6 +1,7 @@
 import pandas as pd
 
 from src import banco
+from src.leitor_excel import formatar_numeros_postes, numeros_por_tipo
 
 
 def _ler_receita():
@@ -102,7 +103,10 @@ def calcular_ferragens(df_locacao):
     }
 
     for t in sorted(tipos_dados - tipos_receita):
-        avisos.append(f"Estrutura '{t}' não encontrada na receita de ferragens — ignorada")
+        onde = formatar_numeros_postes(numeros_por_tipo(df_locacao, t))
+        sufixo_onde = f" [{onde}]" if onde else ''
+        avisos.append(f"Estrutura '{t}' não encontrada na receita de ferragens "
+                      f"— ignorada{sufixo_onde}")
 
     for tipo, count in contagem_tipos.items():
         tipo = tipo.strip()

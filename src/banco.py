@@ -171,6 +171,7 @@ def _parse_xlsx_parafusos(caminho):
 
     Cada linha da planilha original tem uma coluna por comprimento comercial
     (200, 250, ... 900mm); aqui cada célula preenchida vira uma linha própria.
+    
     Quando a coluna COMECO estiver preenchida ('C' ou 'I'), ela é incorporada
     ao TIPO (ex: 'N3-3' + 'C' -> 'N3-3.C'), pois essa variação só é visível na
     planta perfil (DWG) e precisa ser escolhida manualmente na Locação.
@@ -330,6 +331,103 @@ def listar_tipos_ambiguos_parafusos():
         if tipo.endswith(SUFIXOS_PARAFUSOS_AMBIGUOS):
             bases.add(tipo[:-2])
     return bases
+
+
+# ---------------------------------------------------------------------------
+# CRUD para a tela "Cadastrar Parafusos"
+# ---------------------------------------------------------------------------
+def listar_estruturas_parafusos():
+    """Lista os combos distintos (tipo, esforco, altura) cadastrados, ordenados.
+
+    Cada combo representa uma "grade" editável na tela de parafusos.
+    """
+    conn = conectar()
+    try:
+        rows = conn.execute(
+            "SELECT DISTINCT tipo, esforco, altura FROM parafusos_receita "
+            "ORDER BY tipo, esforco, altura"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [{'tipo': r['tipo'], 'esforco': r['esforco'], 'altura': r['altura']} for r in rows]
+
+
+def obter_grade_parafusos(tipo, esforco, altura=None):
+    """Retorna as linhas de receita de um combo tipo+esforço+altura.
+
+    Cada linha: {posicao, parafuso, esf_parafuso, comprimento, quantidade, cruzeta_adicional}.
+    """
+    conn = conectar()
+    try:
+        if altura is None:
+            rows = conn.execute(
+                "SELECT posicao, parafuso, esf_parafuso, comprimento, quantidade, cruzeta_adicional "
+                "FROM parafusos_receita WHERE tipo = ? AND esforco = ? AND altura IS NULL",
+                (tipo, esforco)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT posicao, parafuso, esf_parafuso, comprimento, quantidade, cruzeta_adicional "
+                "FROM parafusos_receita WHERE tipo = ? AND esforco = ? AND altura = ?",
+                (tipo, esforco, altura)
+            ).fetchall()
+    finally:
+        conn.close()
+    return [dict(r) for r in rows]
+
+
+def salvar_grade_parafusos(tipo, esforco, altura, cruzeta_adicional, linhas):
+    """Substitui todas as linhas de um combo tipo+esforço+altura pelas fornecidas.
+
+    linhas: lista de dicts {posicao, parafuso, esf_parafuso, comprimento, quantidade}.
+    cruzeta_adicional é gravado repetido em cada linha (mesmo padrão do seed original).
+    Retorna o número de linhas gravadas.
+    """
+    conn = conectar()
+    try:
+        if altura is None:
+            conn.execute(
+                "DELETE FROM parafusos_receita WHERE tipo = ? AND esforco = ? AND altura IS NULL",
+                (tipo, esforco)
+            )
+        else:
+            conn.execute(
+                "DELETE FROM parafusos_receita WHERE tipo = ? AND esforco = ? AND altura = ?",
+                (tipo, esforco, altura)
+            )
+        for l in linhas:
+            conn.execute(
+                "INSERT INTO parafusos_receita "
+                "(tipo, esforco, altura, posicao, parafuso, esf_parafuso, comprimento, quantidade, cruzeta_adicional) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (tipo, esforco, altura, l['posicao'], l['parafuso'], l['esf_parafuso'],
+                 l['comprimento'], l['quantidade'], cruzeta_adicional)
+            )
+        conn.commit()
+    finally:
+        conn.close()
+    return len(linhas)
+
+
+def excluir_estrutura_parafusos(tipo, esforco, altura=None):
+    """Remove todas as linhas de um combo tipo+esforço+altura. Retorna linhas afetadas."""
+    conn = conectar()
+    try:
+        if altura is None:
+            conn.execute(
+                "DELETE FROM parafusos_receita WHERE tipo = ? AND esforco = ? AND altura IS NULL",
+                (tipo, esforco)
+            )
+        else:
+            conn.execute(
+                "DELETE FROM parafusos_receita WHERE tipo = ? AND esforco = ? AND altura = ?",
+                (tipo, esforco, altura)
+            )
+        affected = conn.execute("SELECT changes()").fetchone()[0]
+        conn.commit()
+    finally:
+        conn.close()
+    return affected
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 
+from src.leitor_excel import formatar_numeros_postes, numeros_por_tipo
+
 
 def _is_valid_cabo(val):
     s = str(val).strip().lower()
@@ -102,7 +104,12 @@ def calcular_alcas_lacos(df_locacao):
     tipos_receita  = set(receita['TIPO'].astype(str).str.strip())
     tipos_dados    = set(df['TIPO'].astype(str).str.strip()) - {'', 'nan', 'none', 'NaN', 'None'}
     tipos_ausentes = sorted(tipos_dados - tipos_receita)
-    avisos = [f"Estrutura '{t}' não encontrada na receita — ignorada no cálculo" for t in tipos_ausentes]
+    avisos = []
+    for t in tipos_ausentes:
+        onde = formatar_numeros_postes(numeros_por_tipo(df, t))
+        sufixo_onde = f" [{onde}]" if onde else ''
+        avisos.append(f"Estrutura '{t}' não encontrada na receita "
+                      f"— ignorada no cálculo{sufixo_onde}")
 
     if not lista_materiais:
         return pd.DataFrame(columns=['Material', 'Unidade', 'Quantidade']), avisos

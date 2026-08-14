@@ -3,7 +3,8 @@ import io
 import json
 import webbrowser
 import traceback
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import Flask, request, jsonify, render_template, send_from_directory
+from werkzeug.exceptions import HTTPException
 import pandas as pd
 
 # Garante que caminhos relativos dos motores resolvem corretamente
@@ -13,7 +14,9 @@ os.chdir(BASE_DIR)
 from src import banco
 from src.banco import (listar_tipos_ferragens, obter_materiais,
                         obter_todos_materiais, substituir_materiais,
-                        substituir_campo_global)
+                        substituir_campo_global, listar_estruturas_parafusos,
+                        obter_grade_parafusos, salvar_grade_parafusos,
+                        excluir_estrutura_parafusos)
 from src.leitor_excel import consolidar_tabela_locacao
 from src.motor_postes import calcular_quantitativo_postes
 from src.motor_estais import calcular_quantitativo_estais
@@ -30,6 +33,9 @@ banco.inicializar()
 
 @app.errorhandler(Exception)
 def handle_exception(e):
+    # Erros HTTP legítimos (404, 400, ...) passam adiante com o status correto
+    if isinstance(e, HTTPException):
+        return e
     print(traceback.format_exc())
     return jsonify({'log': [f'✗ ERRO inesperado: {str(e)}'], 'erro': str(e)}), 500
 
@@ -122,6 +128,87 @@ def api_mat_substituir():
     return jsonify({'ok': True, 'count': count})
 
 
+# ── API: Cadastrar Parafusos ───────────────────────────────────────────────
+
+def _parse_altura(valor):
+    """Converte string do query/body em float ou None ('', '-', ausente -> None)."""
+    if valor in (None, '', '-'):
+        return None
+    return float(valor)
+
+
+@app.route('/parafusos/api/estruturas')
+def api_paraf_estruturas():
+    return jsonify(listar_estruturas_parafusos())
+
+
+@app.route('/parafusos/api/grade')
+def api_paraf_grade():
+    tipo = request.args.get('tipo', '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Parâmetro "tipo" é obrigatório.'}), 400
+    try:
+        esforco = float(request.args.get('esforco', ''))
+        altura = _parse_altura(request.args.get('altura'))
+    except (TypeError, ValueError):
+        return jsonify({'erro': 'Parâmetros "esforco"/"altura" inválidos.'}), 400
+    return jsonify(obter_grade_parafusos(tipo, esforco, altura))
+
+
+@app.route('/parafusos/api/salvar', methods=['POST'])
+def api_paraf_salvar():
+    data = request.get_json(force=True)
+    tipo = (data.get('tipo') or '').strip().upper()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    try:
+        esforco = float(data.get('esforco'))
+        altura = _parse_altura(data.get('altura'))
+    except (TypeError, ValueError):
+        return jsonify({'erro': 'Campos "esforco"/"altura" inválidos.'}), 400
+
+    cruzeta = data.get('cruzeta_adicional')
+    cruzeta = float(cruzeta) if cruzeta not in (None, '') else None
+
+    linhas_in = data.get('linhas', [])
+    linhas = []
+    for l in linhas_in:
+        posicao = str(l.get('posicao', '')).strip().upper()
+        parafuso = str(l.get('parafuso', '')).strip().upper()
+        if not posicao or not parafuso:
+            continue
+        try:
+            esf_parafuso = float(l['esf_parafuso'])
+            comprimento = int(float(l['comprimento']))
+            quantidade = float(l['quantidade'])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if quantidade <= 0:
+            continue
+        linhas.append({
+            'posicao': posicao, 'parafuso': parafuso, 'esf_parafuso': esf_parafuso,
+            'comprimento': comprimento, 'quantidade': quantidade,
+        })
+
+    count = salvar_grade_parafusos(tipo, esforco, altura, cruzeta, linhas)
+    return jsonify({'ok': True, 'count': count})
+
+
+@app.route('/parafusos/api/excluir', methods=['POST'])
+def api_paraf_excluir():
+    data = request.get_json(force=True)
+    tipo = (data.get('tipo') or '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    try:
+        esforco = float(data.get('esforco'))
+        altura = _parse_altura(data.get('altura'))
+    except (TypeError, ValueError):
+        return jsonify({'erro': 'Campos "esforco"/"altura" inválidos.'}), 400
+    count = excluir_estrutura_parafusos(tipo, esforco, altura)
+    return jsonify({'ok': True, 'count': count})
+
+
 @app.route('/processar', methods=['POST'])
 def processar():
     log = []
@@ -159,17 +246,21 @@ def processar():
 
         if 'postes' in motores:
             log.append("Calculando Postes...")
-            df = calcular_quantitativo_postes(df_base)
+            df, avisos = calcular_quantitativo_postes(df_base)
             if not df.empty:
                 abas['Postes'] = df
                 resultados['postes'] = df
+            for aviso in avisos:
+                log.append(f"⚠ {aviso}")
             log.append(f"✓ {len(df)} tipos de poste encontrados.")
 
         if 'estais' in motores:
             log.append("Calculando Estais...")
-            df = calcular_quantitativo_estais(df_base)
+            df, avisos = calcular_quantitativo_estais(df_base)
             if not df.empty:
                 abas['Estais'] = df
+            for aviso in avisos:
+                log.append(f"⚠ {aviso}")
             log.append("✓ Estais calculados.")
 
         if 'alcas_lacos' in motores:
@@ -198,7 +289,7 @@ def processar():
 
         if 'parafusos' in motores:
             log.append("Calculando Parafusos...")
-            df, incremento_item36, avisos = calcular_parafusos(df_base, resolucoes)
+            df, incremento_item36, avisos, detalhe_cruzeta = calcular_parafusos(df_base, resolucoes)
             if not df.empty:
                 abas['Parafusos'] = df
             for aviso in avisos:
@@ -227,6 +318,9 @@ def processar():
                         'Unidade': unidade36, 'Quantidade': incremento_item36,
                     }])
                 log.append(f"✓ +{incremento_item36:g} un. de '{descricao36}' (cruzeta adicional) somadas ao item 36.")
+                for det in detalhe_cruzeta:
+                    log.append(f"⚠ Cruzeta adicional: poste {det['numero']} "
+                               f"(estrutura '{det['tipo']}') → +{det['quantidade']:g} un. do item 36.")
 
         if cabos:
             log.append(f"Adicionando {len(cabos)} cabo(s) manual(is)...")
@@ -248,6 +342,8 @@ def processar():
 
     except Exception as e:
         log.append(f"✗ ERRO: {str(e)}")
+        if isinstance(e, PermissionError):
+            log.append("⚠ A planilha de saída provavelmente está aberta no Excel — feche-a e execute novamente.")
         print(traceback.format_exc())
         return jsonify({'log': log, 'erro': str(e)}), 500
 
@@ -314,8 +410,9 @@ def preview():
 
 @app.route('/download/<nome_arquivo>')
 def download(nome_arquivo):
-    caminho = os.path.join(BASE_DIR, 'data', 'output', nome_arquivo)
-    return send_file(caminho, as_attachment=True)
+    # send_from_directory valida o nome e impede path traversal (../ e ..\)
+    return send_from_directory(os.path.join(BASE_DIR, 'data', 'output'),
+                               nome_arquivo, as_attachment=True)
 
 
 if __name__ == '__main__':

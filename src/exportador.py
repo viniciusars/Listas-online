@@ -54,3 +54,4 @@ def exportar_para_excel(df_final, nome_arquivo="RMT_Gerada.xlsx"):
     except Exception as e:
         print(f"[ERRO] Falha ao salvar a planilha: {e}")
         print("Dica: Se a planilha já estiver aberta no Excel, feche-a e rode novamente.")
+        raise

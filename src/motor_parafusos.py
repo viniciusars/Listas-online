@@ -1,7 +1,7 @@
 import pandas as pd
 
 from src import banco
-from src.leitor_excel import detectar_coluna_numero
+from src.leitor_excel import detectar_coluna_numero, formatar_numeros_postes
 
 CODIGO_VIGA_U = '36'
 
@@ -41,20 +41,25 @@ def calcular_parafusos(df_locacao, resolucoes=None):
     comprimento comercial e classe (kN), a partir da receita cadastrada no banco.
 
     resolucoes: dict {numero_estrutura: 'C'|'I'} para estruturas de TIPO ambíguo.
-    Retorna (df_resultado, incremento_item_36, avisos).
+    Retorna (df_resultado, incremento_item_36, avisos, detalhe_cruzeta).
+
+    detalhe_cruzeta: lista de {'numero': str, 'tipo': str, 'quantidade': float}
+    indicando de quais postes (número + TIPO) veio a cruzeta adicional somada ao
+    item 36. A soma das quantidades é igual a incremento_item_36.
     """
     resolucoes = resolucoes or {}
     avisos = []
+    detalhe_cruzeta = {}
     colunas_saida = ['Parafuso', 'Classe (kN)', 'Comprimento (mm)', 'Quantidade']
 
     receita = banco.ler_receita_parafusos_df()
     if receita.empty:
         avisos.append("Receita de parafusos não cadastrada — nada foi calculado.")
-        return pd.DataFrame(columns=colunas_saida), 0.0, avisos
+        return pd.DataFrame(columns=colunas_saida), 0.0, avisos, []
 
     if 'TIPO' not in df_locacao.columns or 'ALTURA / CARGA' not in df_locacao.columns:
         avisos.append("Colunas TIPO / ALTURA-CARGA não encontradas na Locação.")
-        return pd.DataFrame(columns=colunas_saida), 0.0, avisos
+        return pd.DataFrame(columns=colunas_saida), 0.0, avisos, []
 
     bases_ambiguas = banco.listar_tipos_ambiguos_parafusos()
     col_num = detectar_coluna_numero(df_locacao)
@@ -76,34 +81,39 @@ def calcular_parafusos(df_locacao, resolucoes=None):
     df['_altura']  = [a for a, _ in alturas_esforcos]
     df['_esforco'] = [e for _, e in alturas_esforcos]
     df['_posicao'] = df[col_posicao].astype(str).str.strip().str.upper() if col_posicao else ''
+    df['_numero']  = df[col_num].astype(str).str.strip() if col_num else ''
 
     contagem = (
         df.groupby(['_tipo_parafuso', '_esforco', '_altura', '_posicao'], dropna=False)
-        .size()
-        .reset_index(name='CONTAGEM')
+        .agg(CONTAGEM=('_numero', 'size'), NUMEROS=('_numero', list))
+        .reset_index()
     )
 
     tipos_receita = set(receita['tipo'])
     itens = []
     incremento_item36 = 0.0
+    # TIPO sem nenhuma receita: acumula os números pra emitir um aviso único por TIPO,
+    # em vez de repetir a mesma mensagem em cada combinação de esforço/altura/posição.
+    tipos_sem_receita = {}
 
     for _, row in contagem.iterrows():
-        tipo, esforco, altura, posicao, count = (
-            row['_tipo_parafuso'], row['_esforco'], row['_altura'], row['_posicao'], row['CONTAGEM']
+        tipo, esforco, altura, posicao, count, numeros = (
+            row['_tipo_parafuso'], row['_esforco'], row['_altura'],
+            row['_posicao'], row['CONTAGEM'], row['NUMEROS']
         )
         if tipo.lower() in ('', 'nan', 'none'):
             continue
         if tipo not in tipos_receita:
-            if tipo in bases_ambiguas:
-                avisos.append(f"Estrutura '{tipo}' com sentido de chegada dos cabos não "
-                               "confirmado — parafusos não calculados.")
-            else:
-                avisos.append(f"Estrutura '{tipo}' não encontrada na receita de parafusos — ignorada")
+            tipos_sem_receita.setdefault(tipo, []).extend(numeros)
             continue
+
+        onde = formatar_numeros_postes(numeros)
+        sufixo_onde = f" [{onde}]" if onde else ''
 
         sub_tipo_esforco = receita[(receita['tipo'] == tipo) & (receita['esforco'] == esforco)]
         if sub_tipo_esforco.empty:
-            avisos.append(f"Receita de parafusos não cadastrada para '{tipo}' com esforço {esforco:g} — ignorada")
+            avisos.append(f"Receita de parafusos não cadastrada para '{tipo}' com esforço "
+                          f"{esforco:g} — ignorada{sufixo_onde}")
             continue
 
         depende_altura = sub_tipo_esforco['altura'].notna().any()
@@ -115,7 +125,7 @@ def calcular_parafusos(df_locacao, resolucoes=None):
         sub = sub[sub['posicao'] == posicao]
         if sub.empty:
             avisos.append(f"Receita de parafusos incompleta para '{tipo}' "
-                           f"(esforço {esforco:g}, posição {posicao}) — ignorada")
+                          f"(esforço {esforco:g}, posição {posicao}) — ignorada{sufixo_onde}")
             continue
 
         for _, mat in sub.iterrows():
@@ -128,10 +138,33 @@ def calcular_parafusos(df_locacao, resolucoes=None):
 
         cruzeta_vals = sub['cruzeta_adicional'].dropna().unique()
         if len(cruzeta_vals):
-            incremento_item36 += float(cruzeta_vals[0]) * count
+            valor_unit = float(cruzeta_vals[0])
+            incremento_item36 += valor_unit * count
+            for numero in numeros:
+                num = str(numero).strip()
+                if num.lower() in ('', 'nan', 'none'):
+                    num = '(sem número)'
+                chave = (num, tipo)
+                acc = detalhe_cruzeta.get(chave, 0.0) + valor_unit
+                detalhe_cruzeta[chave] = acc
+
+    for tipo, numeros in tipos_sem_receita.items():
+        onde = formatar_numeros_postes(numeros)
+        sufixo_onde = f" [{onde}]" if onde else ''
+        if tipo in bases_ambiguas:
+            avisos.append(f"Estrutura '{tipo}' com sentido de chegada dos cabos não "
+                          f"confirmado — parafusos não calculados{sufixo_onde}")
+        else:
+            avisos.append(f"Estrutura '{tipo}' não encontrada na receita de parafusos "
+                          f"— ignorada{sufixo_onde}")
+
+    detalhe_lista = [
+        {'numero': num, 'tipo': tipo, 'quantidade': q}
+        for (num, tipo), q in detalhe_cruzeta.items() if q > 0
+    ]
 
     if not itens:
-        return pd.DataFrame(columns=colunas_saida), incremento_item36, avisos
+        return pd.DataFrame(columns=colunas_saida), incremento_item36, avisos, detalhe_lista
 
     df_resultado = pd.DataFrame(itens)
     df_agrupado = (
@@ -142,4 +175,4 @@ def calcular_parafusos(df_locacao, resolucoes=None):
         .sort_values(['Parafuso', 'Classe (kN)', 'Comprimento (mm)'])
         .reset_index(drop=True)
     )
-    return df_agrupado, incremento_item36, avisos
+    return df_agrupado, incremento_item36, avisos, detalhe_lista
