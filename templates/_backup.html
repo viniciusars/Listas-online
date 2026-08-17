@@ -1,0 +1,151 @@
+{# Bloco de baixar/importar .xlsx, incluído pelas telas de receita.
+   Espera a variável `receita` (chave em planilhas.RECEITAS) definida antes do include. #}
+<div class="card" id="card-backup">
+    <div class="card-header">
+        <h2>Baixar / Importar planilha</h2>
+    </div>
+    <div class="card-body">
+        <p class="bk-texto">
+            O arquivo baixado tem o mesmo formato dos originais de <code>config/</code>:
+            baixe, edite no Excel e suba de volta. Ao importar,
+            <b>o que está no arquivo substitui o que está cadastrado</b>; o que não
+            está no arquivo permanece intacto. Para apagar uma estrutura, use o botão
+            de excluir da tela — não basta tirá-la do arquivo.
+        </p>
+
+        <div class="bk-acoes">
+            <button class="btn btn-outline" onclick="baixarReceita()">⤓ Baixar .xlsx</button>
+            <button class="btn btn-outline" onclick="document.getElementById('bk-file').click()">
+                ⤒ Importar .xlsx
+            </button>
+            <input type="file" id="bk-file" accept=".xlsx,.xls" style="display:none"
+                   onchange="importarReceita(this)">
+            <span class="bk-parque">
+                {% if parque_ativo %}parque <b>{{ parque_ativo.nome }}</b>{% endif %}
+            </span>
+        </div>
+
+        <div id="bk-resultado"></div>
+    </div>
+</div>
+
+<style>
+.bk-texto {
+    font-size: 0.83rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+.bk-texto b { color: #475569; }
+.bk-texto code {
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+.bk-acoes { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+.bk-parque { font-size: 0.8rem; color: #94a3b8; margin-left: auto; }
+.bk-parque b { color: #64748b; }
+
+#bk-resultado:empty { display: none; }
+#bk-resultado {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    line-height: 1.6;
+}
+#bk-resultado.ok  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+#bk-resultado.err { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+#bk-resultado ul { margin: 7px 0 0 18px; }
+#bk-resultado li { margin-bottom: 2px; }
+#bk-resultado .aviso { color: #92400e; }
+#bk-resultado .unidades {
+    margin-top: 7px;
+    font-size: 0.79rem;
+    opacity: 0.85;
+    word-break: break-word;
+}
+</style>
+
+<script>
+const BK_RECEITA = '{{ receita }}';
+
+function bkEsc(s) {
+    return (s === null || s === undefined ? '' : s).toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function bkMostrar(html, classe) {
+    const el = document.getElementById('bk-resultado');
+    el.className = classe;
+    el.innerHTML = html;
+}
+
+async function baixarReceita() {
+    const r = await fetch(`/receitas/api/exportar/${BK_RECEITA}`);
+    if (!r.ok) {
+        let msg = 'Falha ao gerar o arquivo.';
+        try { msg = (await r.json()).erro || msg; } catch (e) {}
+        bkMostrar(bkEsc(msg), 'err');
+        return;
+    }
+    // Nome do arquivo vem do Content-Disposition montado pelo servidor
+    const cd = r.headers.get('Content-Disposition') || '';
+    let nome = `${BK_RECEITA}.xlsx`;
+    const m = cd.match(/filename\*=UTF-8''([^;]+)/) || cd.match(/filename="([^"]+)"/);
+    if (m) nome = decodeURIComponent(m[1]);
+
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    bkMostrar(`Arquivo <b>${bkEsc(nome)}</b> baixado.`, 'ok');
+}
+
+async function importarReceita(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!confirm(`Importar "${file.name}"?\n\n` +
+                 `As estruturas presentes no arquivo serão substituídas no parque em uso. ` +
+                 `As que não estiverem no arquivo continuam como estão.`)) {
+        input.value = '';
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('arquivo', file);
+    bkMostrar('Importando…', 'ok');
+
+    try {
+        const r = await fetch(`/receitas/api/importar/${BK_RECEITA}`,
+                              {method: 'POST', body: fd});
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao importar.');
+
+        const s = j.resumo;
+        let html = `<b>${bkEsc(s.rotulo)}</b>: ${s.unidades.length} ` +
+                   `${bkEsc(s.rotulo_unidade)}(s) e ${s.linhas} linhas gravadas ` +
+                   `no parque <b>${bkEsc(s.parque)}</b>.`;
+        html += `<div class="unidades">${bkEsc(s.unidades.join(' · '))}</div>`;
+        if (s.avisos && s.avisos.length) {
+            html += `<ul>` + s.avisos.map(a =>
+                `<li class="aviso">⚠ ${bkEsc(a)}</li>`).join('') + `</ul>`;
+        }
+        bkMostrar(html, 'ok');
+        // A tela precisa refletir o que acabou de entrar no banco
+        setTimeout(() => location.reload(), 1800);
+    } catch (e) {
+        bkMostrar(bkEsc(e.message), 'err');
+    } finally {
+        input.value = '';
+    }
+}
+</script>

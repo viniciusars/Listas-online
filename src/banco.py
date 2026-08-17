@@ -1169,6 +1169,82 @@ def substituir_estais(linhas, parque_id=None):
 
 
 # ---------------------------------------------------------------------------
+# Importação em lote (consumida por src/planilhas.py)
+#
+# Semântica combinada com o usuário: o que está no arquivo apaga e regrava a
+# unidade correspondente; o que não está no arquivo permanece intacto. Por isso
+# nenhuma destas funções faz DELETE global — só das unidades recebidas.
+# Cada uma grava tudo numa transação só: ou entra inteiro, ou não entra nada.
+# ---------------------------------------------------------------------------
+def importar_ferragens(por_tipo, parque_id=None):
+    """Substitui a receita de ferragens dos TIPOs recebidos. por_tipo: {tipo: [materiais]}."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        for tipo, materiais in por_tipo.items():
+            conn.execute("DELETE FROM materiais_poste WHERE parque_id = ? AND tipo = ?",
+                         (parque_id, tipo))
+            for ordem, mat in enumerate(materiais):
+                conn.execute(
+                    "INSERT INTO materiais_poste "
+                    "(parque_id, tipo, ordem, codigo, descricao, unidade, quantidade) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (parque_id, tipo, ordem, mat['codigo'], mat['descricao'],
+                     mat['unidade'], mat['qtd'])
+                )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def importar_parafusos(por_combo, parque_id=None):
+    """Substitui a receita de parafusos dos combos recebidos.
+
+    por_combo: {(tipo, esforco, altura): [linhas]}, onde cada linha tem
+    posicao, parafuso, esf_parafuso, comprimento, quantidade e cruzeta_adicional.
+    """
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        for (tipo, esforco, altura), linhas in por_combo.items():
+            _excluir_combo_parafusos(conn, parque_id, tipo, esforco, altura)
+            for l in linhas:
+                conn.execute(
+                    "INSERT INTO parafusos_receita "
+                    "(parque_id, tipo, esforco, altura, posicao, parafuso, esf_parafuso, "
+                    "comprimento, quantidade, cruzeta_adicional) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (parque_id, tipo, esforco, altura, l['posicao'], l['parafuso'],
+                     l['esf_parafuso'], l['comprimento'], l['quantidade'],
+                     l['cruzeta_adicional'])
+                )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def importar_alcas(por_tipo, parque_id=None):
+    """Substitui a receita de alças/laços dos TIPOs recebidos. por_tipo: {tipo: [linhas]}."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        for tipo, linhas in por_tipo.items():
+            conn.execute("DELETE FROM alcas_lacos_receita WHERE parque_id = ? AND tipo = ?",
+                         (parque_id, tipo))
+            for l in linhas:
+                conn.execute(
+                    "INSERT INTO alcas_lacos_receita "
+                    "(parque_id, tipo, nivel, direcao, qtd_alcas, qtd_lacos) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (parque_id, tipo, l['nivel'], l['direcao'],
+                     l['qtd_alcas'], l['qtd_lacos'])
+                )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
 # Exportação (backup em Excel)
 # ---------------------------------------------------------------------------
 def _tipo_para_aba(tipo):

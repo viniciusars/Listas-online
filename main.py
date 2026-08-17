@@ -3,7 +3,8 @@ import io
 import json
 import webbrowser
 import traceback
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import (Flask, request, jsonify, render_template,
+                   send_file, send_from_directory)
 from werkzeug.exceptions import HTTPException
 import pandas as pd
 
@@ -12,6 +13,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
 from src import banco
+from src import planilhas
+from src.planilhas import ErroPlanilha
 from src.banco import (listar_tipos_ferragens, obter_materiais,
                         obter_todos_materiais, substituir_materiais,
                         substituir_campo_global, listar_estruturas_parafusos,
@@ -401,6 +404,60 @@ def api_paraf_excluir():
         return jsonify({'erro': 'Campos "esforco"/"altura" inválidos.'}), 400
     count = excluir_estrutura_parafusos(tipo, esforco, altura, _parque_ativo_id())
     return jsonify({'ok': True, 'count': count})
+
+
+# ── Baixar / Importar receitas (.xlsx) ─────────────────────────────────────
+
+def _nome_arquivo_receita(rotulo, parque):
+    """Ex.: 'Ferragens - Dom Inocêncio.xlsx'. '/' e '\\' quebrariam o nome do arquivo."""
+    nome_parque = (parque['nome'] if parque else 'sem parque')
+    limpo = ''.join(ch for ch in f"{rotulo} - {nome_parque}" if ch not in '\\/:*?"<>|')
+    return f"{limpo}.xlsx"
+
+
+@app.route('/receitas/api/exportar/<receita>')
+def api_receita_exportar(receita):
+    config = planilhas.RECEITAS.get(receita)
+    if not config:
+        return jsonify({'erro': f"Receita desconhecida: {receita}"}), 404
+
+    parque = banco.obter_parque_ativo()
+    if parque is None:
+        return jsonify({'erro': 'Nenhum parque cadastrado.'}), 400
+
+    try:
+        buffer = config['exportar'](parque['id'])
+    except ErroPlanilha as e:
+        return jsonify({'erro': str(e)}), 400
+
+    return send_file(
+        buffer,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=_nome_arquivo_receita(config['rotulo'], parque))
+
+
+@app.route('/receitas/api/importar/<receita>', methods=['POST'])
+def api_receita_importar(receita):
+    config = planilhas.RECEITAS.get(receita)
+    if not config:
+        return jsonify({'erro': f"Receita desconhecida: {receita}"}), 404
+
+    if 'arquivo' not in request.files or not request.files['arquivo'].filename:
+        return jsonify({'erro': 'Nenhum arquivo enviado.'}), 400
+
+    parque = banco.obter_parque_ativo()
+    if parque is None:
+        return jsonify({'erro': 'Nenhum parque cadastrado.'}), 400
+
+    try:
+        resumo = config['importar'](request.files['arquivo'], parque['id'])
+    except ErroPlanilha as e:
+        return jsonify({'erro': str(e)}), 400
+
+    resumo['parque'] = parque['nome']
+    resumo['rotulo'] = config['rotulo']
+    return jsonify({'ok': True, 'resumo': resumo})
 
 
 @app.route('/processar', methods=['POST'])
