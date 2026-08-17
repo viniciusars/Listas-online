@@ -21,6 +21,8 @@ O projeto consiste em um sistema web local desenvolvido em Python para gerar lis
 
 * **Fase 13: Avisos ⚠ com o número do poste:** Os avisos de receita ausente/incompleta passaram a informar **quais postes** foram ignorados, no formato `... — ignorada [postes 10/1A, 11/1A]`. Foram criados dois helpers compartilhados em `src/leitor_excel.py`: `formatar_numeros_postes(numeros)` (dedup + rótulo singular/plural + fallback `(sem número)`) e `numeros_por_tipo(df, tipo)` (lista os números de um TIPO na Locação). Aplicados nos 3 motores de receita: Parafusos (as 4 mensagens — tipo ausente, ambiguidade não confirmada, esforço não cadastrado, posição/altura incompleta), Ferragens e Alças/Laços. No motor de parafusos, o `groupby` já agregava `NUMEROS`, então os números saem direto do agrupamento; o aviso de "TIPO sem nenhuma receita" passou a ser **acumulado e emitido uma vez por TIPO** (antes repetia a mesma frase em cada combinação de esforço/altura/posição, o que ficaria muito verboso com a lista de postes anexada).
 
+* **Fase 14: Multi-parque e Import/Export das Receitas:** O usuário levantou duas necessidades: (1) tudo que estava no banco era do parque **Dom Inocêncio**, e materiais/premissas variam conforme cliente e projeto, então as receitas precisavam ser separadas por obra; (2) poder baixar as receitas cadastradas em arquivo e cadastrar a partir de um arquivo. Decisões fechadas em três rodadas de perguntas: as **4 receitas** ficam por parque (Ferragens, Parafusos, Alças/Laços e Estais); seleção por **dropdown global no header**, persistida entre reinícios; parque novo pode **começar vazio ou copiar as receitas de outro**; cadastro guarda nome + cliente + observações + datas; formato **.xlsx, um arquivo por receita**. Semântica da importação, nas palavras do usuário: *"subo uma estrutura existente, ele apaga tudo dessa estrutura e cadastra conforme o arquivo passado, porém não deve fazer nenhuma alteração das estruturas já existentes"* — ou seja, substituição por unidade, com o resto intacto. A unidade é o TIPO (Ferragens e Alças/Laços), o combo TIPO+ESFORÇO+ALTURA (Parafusos) ou a lista inteira (Estais). Consequência aceita: **não se exclui estrutura subindo arquivo** — uma unidade que chegue sem linhas aproveitáveis é ignorada com aviso, nunca apagada. Implementado em 5 etapas, uma commit cada: (1) banco — tabela `parques`, `app_estado` (parque ativo), `parque_id` com FK `ON DELETE CASCADE` em tudo, tabelas novas `alcas_lacos_receita` e `estais_receita`, e migração versionada por `PRAGMA user_version` que recria as duas tabelas legadas (SQLite não permite `ADD COLUMN NOT NULL` com FK) atribuindo tudo ao Dom Inocêncio; (2) motores lendo a receita do parque — `motor_estais` deixou o dicionário fixo e `motor_alcas_lacos` deixou de ler o CSV, ambos agora vêm do banco, e o `main.py` resolve o parque **uma vez por requisição** para que uma troca no meio do processamento não misture obras; (3) seletor no header + tela `/parques`; (4) telas `/alcas` e `/estais`; (5) `src/planilhas.py` com as 4 exportações/importações + `templates/_backup.html` incluído pelas 4 telas de receita. `parque_id` é **opcional** em todas as funções de `banco.py` e resolve para o parque ativo quando omitido — foi assim que as etapas puderam ser entregues uma a uma sem nunca deixar o sistema quebrado.
+
 ---
 
 ## 3. Alternativas Consideradas e Descartadas
@@ -35,6 +37,8 @@ O projeto consiste em um sistema web local desenvolvido em Python para gerar lis
 * **Erro de Concatenação (`FutureWarning` no `pd.concat`):** A causa era tentar concatenar DataFrames vazios (ex: quando nenhum cabo manual era inserido). A correção foi implementar um filtro de validação usando list comprehension antes do método concat.
 * **Erro de Omissão de Colunas nas Alças/Laços:** A causa foi o código buscar por colunas literais como "NÍVEL SUPERIOR RÉ", que não existiam nativamente na Tabela de Locação devido ao formato do Excel. Esse módulo foi descartado e refeito com a abordagem do CSV de receita.
 * **Erro `ERR_UPLOAD_FILE_CHANGED` (browser bloqueava o envio):** A causa era a rota `/preview` salvar o arquivo enviado em `data/input/` com o mesmo nome do arquivo original. Quando o usuário clicava em "Executar", o browser tentava reler o arquivo do disco para reenviá-lo, detectava que o timestamp havia mudado (o servidor sobrescreveu) e bloqueava o upload. A correção foi eliminar o salvamento em disco nas rotas `/preview` e `/processar`, lendo o arquivo direto para memória com `io.BytesIO(arquivo.read())` e passando o objeto para `pd.ExcelFile()`, que aceita tanto caminhos quanto file-like objects.
+* **Erro de linhas duplicadas na exportação de Parafusos (`NaN` como chave de agrupamento):** A exportação agrupa as linhas da receita por especificação (TIPO, ESFORÇO, ALTURA, POSIÇÃO, PARAFUSO, ESF_PARAFUSO, COMECO) para montar uma linha com uma coluna por comprimento. Como `altura` nula vem do banco via `read_sql` como `NaN`, e `NaN` nunca é igual a si mesmo, cada linha de receita sem altura gerava uma chave nova no dicionário — a tabela saía com uma linha por comprimento em vez de uma por especificação. A correção foi normalizar `altura` e `cruzeta_adicional` para `None` (via `pd.isna`) antes de montar a chave. Mesma família do erro de `None` nas alças/laços: valor nulo que não se comporta como esperado numa comparação.
+
 * **Erro de `None` espúrio nas Alças/Laços (contagens incorretas):** O uso de `groupby().transform(lambda s: s.astype(str).shift(1))` gerava Python `None` (não `numpy.NaN`) como fill do primeiro elemento de cada grupo. `str(None)` resulta em `'None'`, que passava pelo filtro `cabo.lower() == 'nan'` e criava itens fantasma no quantitativo. A correção foi inverter a ordem: `df.groupby('_letra_circuito')[col].shift(1)` nos valores originais antes de qualquer conversão para string, garantindo que o fill seja `NaN` → coberto pelo filtro `in ('nan', 'none', '<na>')`.
 
 ---
@@ -48,43 +52,61 @@ O projeto consiste em um sistema web local desenvolvido em Python para gerar lis
 ---
 
 ## 6. Estado Atual do Projeto
-O sistema roda como servidor web Flask local, multi-página. Todos os motores (Postes, Estais, Alças/Laços, Ferragens, Parafusos) estão implementados e integrados na tela `/gerar`. O banco SQLite (`data/sistema.db`) é a fonte de verdade das receitas de Ferragens e Parafusos, semeado automaticamente dos arquivos de `config/` na primeira execução. O motor de Parafusos foi validado com dados reais (arquivo de exemplo `LOCACAO - EDIV 14 - 0B.xlsx`) via teste HTTP ponta a ponta: detecção de ambiguidade C/I, resolução manual, cálculo de comprimentos/classes e incremento do item 36 — todos corretos. A tela `/parafusos` agora é um CRUD completo (grade estilo planilha) para editar/cadastrar estruturas na receita `parafusos_receita`, testado ponta a ponta via HTTP.
+O sistema roda como servidor web Flask local, multi-página. Todos os motores (Postes, Estais, Alças/Laços, Ferragens, Parafusos) estão implementados e integrados na tela `/gerar`. O banco SQLite (`data/sistema.db`) é a fonte única de verdade das **4 receitas** (Ferragens, Parafusos, Alças/Laços e Estais), semeado dos arquivos de `config/` só quando o banco está vazio.
+
+As receitas são separadas por **parque** (obra/cliente), escolhido num seletor no header presente em todas as telas e persistido no banco. Cada receita tem sua tela de cadastro (`/materiais`, `/parafusos`, `/alcas`, `/estais`) e botões de baixar/importar `.xlsx`; a tela `/parques` gerencia as obras, criando-as vazias ou copiando as receitas de outra. Postes é o único motor que não depende de receita, então sai igual em qualquer parque.
+
+**Atenção:** os arquivos de `config/` são apenas seed de banco vazio. Editá-los não altera nada num banco já criado — o cadastro é pelas telas ou pela importação de `.xlsx`.
 
 **Árvore de Diretórios:**
 > sistema_quantitativos/
-> ├── config/                        # Seeds do banco (lidos só na 1ª execução, se as tabelas estiverem vazias)
+> ├── config/                        # Seeds do banco (lidos SÓ quando o banco está vazio; editar não afeta banco existente)
 > │   ├── QUANTIDADE-MATERIAIS.xlsx      # Seed de materiais_poste (ferragens gerais + item 36 "Viga tipo U")
 > │   ├── PARAFUSOS POR ESTRUTURA.xlsx   # Seed de parafusos_receita (abas TIPICAS/ESPECIAIS/TE)
 > │   ├── CALCULADORA PARAFUSO 2.0.xlsx  # Calculadora geométrica original (34 abas) — só referência, não é lida pelo código
-> │   └── receita_alcas_lacos.csv        # Receita de alças/laços por TIPO·NÍVEL·DIREÇÃO
+> │   ├── receita_alcas_lacos.csv        # Seed de alcas_lacos_receita (TIPO·NÍVEL·DIREÇÃO)
+> │   └── receita_estais.csv             # Seed de estais_receita (saiu do dicionário fixo do motor_estais)
 > ├── data/
 > │   ├── output/                # RMT_Output_Completo.xlsx, Quantitativo_Postes_Isolado.xlsx, Validacao_Alcas_Lacos.xlsx (opcional)
-> │   └── sistema.db             # Banco SQLite (gitignored) — materiais_poste + parafusos_receita
+> │   └── sistema.db             # Banco SQLite (gitignored) — parques, app_estado e as 4 receitas com parque_id
 > │                              # (a antiga data/input/ foi removida — uploads vão direto pra memória)
 > ├── src/
 > │   ├── __init__.py
-> │   ├── banco.py              # (OK) Schema + seed + CRUD de materiais_poste e parafusos_receita. Fonte única de verdade das receitas.
+> │   ├── banco.py              # (OK) Schema, migração (user_version), seed, CRUD das 4 receitas e dos parques. parque_id opcional = parque ativo.
+> │   ├── planilhas.py          # (OK) Exporta/importa as 4 receitas em .xlsx. Registro RECEITAS usado pelas rotas genéricas.
 > │   ├── leitor_excel.py       # (OK) Empilha abas, limpa cabeçalhos, aceita caminho OU BytesIO. Tem detectar_coluna_numero().
-> │   ├── motor_postes.py       # (OK) Separa Altura/Carga e formata string.
-> │   ├── motor_estais.py       # (OK) Soma global e multiplica por receita fixa.
-> │   ├── motor_alcas_lacos.py  # (OK) Retorna (df_resultado, avisos). Funções: calcular_alcas_lacos() e gerar_tabela_validacao().
-> │   ├── motor_ferragens.py    # (OK) Retorna (df_resultado, avisos), lê receita do banco. gerar_tabela_validacao_ferragens() pivotada.
-> │   ├── motor_parafusos.py    # (OK) identificar_estruturas_ambiguas() e calcular_parafusos(df, resolucoes) -> (df, incremento_item36, avisos).
-> │   ├── exportador.py         # (OK) Salva em .xlsx (requer openpyxl). Suporta múltiplas abas e abas lado-a-lado.
+> │   ├── motor_postes.py       # (OK) Separa Altura/Carga e formata string. Único motor sem receita — não depende de parque.
+> │   ├── motor_estais.py       # (OK) Soma a coluna ESTAIS e multiplica pela receita do parque (estais_receita).
+> │   ├── motor_alcas_lacos.py  # (OK) Retorna (df_resultado, avisos). Lê alcas_lacos_receita do banco (não mais o CSV).
+> │   ├── motor_ferragens.py    # (OK) Retorna (df_resultado, avisos), lê receita do parque. gerar_tabela_validacao_ferragens() pivotada.
+> │   ├── motor_parafusos.py    # (OK) identificar_estruturas_ambiguas() e calcular_parafusos(df, resolucoes, parque_id).
+> │   ├── exportador.py         # (OK) Salva os RESULTADOS em .xlsx (requer openpyxl). Múltiplas abas e abas lado-a-lado.
 > │   └── interface.py          # (OBSOLETO) Tkinter — não é mais usado, pode ser deletado.
 > ├── templates/
-> │   ├── base.html             # (OK) Layout comum (header, estilos base, spinner).
-> │   ├── home.html             # (OK) Menu inicial com 3 cards.
+> │   ├── base.html             # (OK) Layout comum + seletor de parque no header (presente em todas as telas).
+> │   ├── _backup.html          # (OK) Bloco de baixar/importar .xlsx, incluído pelas 4 telas de receita via {% set receita = '...' %}.
+> │   ├── home.html             # (OK) Menu inicial com 6 cards.
 > │   ├── gerar.html            # (OK) Upload, preview, seleção de motores, cabos manuais, painel de ambiguidade C/I, log, downloads.
+> │   ├── parques.html          # (OK) CRUD de obras: criar (vazio ou copiando), editar, usar e excluir (cascade).
 > │   ├── materiais.html        # (OK) CRUD da receita de ferragens por TIPO.
-> │   └── parafusos.html        # (OK) CRUD em grade (posição/parafuso/classe × comprimento) da receita de parafusos.
+> │   ├── parafusos.html        # (OK) CRUD em grade (posição/parafuso/classe × comprimento) da receita de parafusos.
+> │   ├── alcas.html            # (OK) CRUD em grade por nível (alças/laços × vante/ré). Achata as 2 direções numa linha só.
+> │   └── estais.html           # (OK) CRUD da lista de materiais de um estai.
 > ├── requirements.txt           # flask, pandas, openpyxl
-> └── main.py                   # (OK) Servidor Flask: rotas /, /gerar, /materiais, /parafusos, /preview, /processar, /download, /materiais/api/*, /parafusos/api/*.
+> └── main.py                   # (OK) Servidor Flask. Resolve o parque ativo 1x por requisição (_parque_ativo_id) e injeta no header
+>                               # via context processor. Rotas: /, /gerar, /materiais, /parafusos, /alcas, /estais, /parques,
+>                               # /preview, /processar, /download, e as APIs /materiais/api/*, /parafusos/api/*, /alcas/api/*,
+>                               # /estais/api/*, /parques/api/*, /receitas/api/{exportar,importar}/<receita>.
 
 ---
 
 ## 7. Próxima Tarefa Imediata
 Nenhuma pendência crítica identificada. Possíveis evoluções futuras:
-* Usar a nova tela `/parafusos` em uma obra real para cadastrar os TIPOs que hoje só geram aviso ⚠ (validar o formato de grade com dados de verdade, não só com a receita original re-seedada).
-* Avaliar a necessidade de incluir novos TIPOs de estrutura nas demais receitas (`receita_alcas_lacos.csv`, `materiais_poste`) à medida que aparecerem avisos `⚠` em novos projetos.
+* Usar o multi-parque numa obra real de outro cliente: criar o parque copiando o Dom Inocêncio e ajustar o que muda, validando na prática se a granularidade de substituição da importação (TIPO / TIPO+ESFORÇO+ALTURA) é a certa.
+* Usar a tela `/parafusos` em uma obra real para cadastrar os TIPOs que hoje só geram aviso ⚠ (validar o formato de grade com dados de verdade, não só com a receita original re-seedada).
 * Avaliar escopo de fibra óptica (descartado do MVP) para futuras fases.
+* Deletar `src/interface.py` (Tkinter obsoleto) e `teste.py` na raiz (cópia antiga e idêntica do `motor_ferragens.py`, nunca versionada).
+
+**Nota operacional:** nesta máquina `git` e `python` não estão no PATH — usar
+`C:\Users\vinicius.araujo\AppData\Local\Programs\Git\cmd\git.exe` e
+`C:\Users\vinicius.araujo\AppData\Local\Programs\Python\Python312\python.exe`.
