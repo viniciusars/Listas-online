@@ -105,9 +105,119 @@ def parafusos():
     return render_template('parafusos.html')
 
 
+@app.route('/alcas')
+def alcas():
+    pid = _parque_ativo_id()
+    tipos = banco.listar_tipos_alcas(pid)
+    total_linhas = len(banco.obter_todas_alcas_lacos(pid))
+    return render_template('alcas.html',
+                           total_tipos=len(tipos),
+                           total_linhas=total_linhas)
+
+
+@app.route('/estais')
+def estais():
+    return render_template('estais.html')
+
+
 @app.route('/parques')
 def parques():
     return render_template('parques.html')
+
+
+# ── API: Alças e Laços ─────────────────────────────────────────────────────
+
+DIRECOES_ALCAS = ('VANTE', 'RE')
+
+
+@app.route('/alcas/api/tipos')
+def api_alcas_tipos():
+    return jsonify(banco.listar_tipos_alcas(_parque_ativo_id()))
+
+
+@app.route('/alcas/api/resumo')
+def api_alcas_resumo():
+    """Contagem de tipos e linhas, para o cabeçalho da tela se atualizar após salvar."""
+    pid = _parque_ativo_id()
+    return jsonify({
+        'tipos': len(banco.listar_tipos_alcas(pid)),
+        'linhas': len(banco.obter_todas_alcas_lacos(pid)),
+    })
+
+
+@app.route('/alcas/api/receita')
+def api_alcas_receita():
+    tipo = request.args.get('tipo', '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Parâmetro "tipo" é obrigatório.'}), 400
+    return jsonify(banco.obter_alcas_lacos(tipo, _parque_ativo_id()))
+
+
+@app.route('/alcas/api/salvar', methods=['POST'])
+def api_alcas_salvar():
+    data = request.get_json(force=True)
+    tipo = (data.get('tipo') or '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+
+    linhas = []
+    for l in data.get('linhas', []):
+        direcao = str(l.get('direcao', '')).strip().upper()
+        if direcao not in DIRECOES_ALCAS:
+            continue
+        try:
+            nivel = int(l['nivel'])
+            qtd_alcas = float(l['qtd_alcas'])
+            qtd_lacos = float(l['qtd_lacos'])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if nivel <= 0 or qtd_alcas < 0 or qtd_lacos < 0:
+            continue
+        linhas.append({'nivel': nivel, 'direcao': direcao,
+                       'qtd_alcas': qtd_alcas, 'qtd_lacos': qtd_lacos})
+
+    count = banco.substituir_alcas_lacos(tipo, linhas, _parque_ativo_id())
+    return jsonify({'ok': True, 'count': count})
+
+
+@app.route('/alcas/api/excluir', methods=['POST'])
+def api_alcas_excluir():
+    data = request.get_json(force=True)
+    tipo = (data.get('tipo') or '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    count = banco.excluir_tipo_alcas_lacos(tipo, _parque_ativo_id())
+    return jsonify({'ok': True, 'count': count})
+
+
+# ── API: Estais ────────────────────────────────────────────────────────────
+
+@app.route('/estais/api/receita')
+def api_estais_receita():
+    return jsonify(banco.ler_receita_estais(_parque_ativo_id()))
+
+
+@app.route('/estais/api/salvar', methods=['POST'])
+def api_estais_salvar():
+    data = request.get_json(force=True)
+
+    linhas = []
+    for l in data.get('linhas', []):
+        material = str(l.get('material', '')).strip()
+        if not material:
+            continue
+        try:
+            qtd = float(l['qtd_por_estai'])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if qtd < 0:
+            continue
+        linhas.append({'material': material,
+                       'unidade': str(l.get('unidade', '') or '').strip(),
+                       'qtd_por_estai': qtd})
+
+    count = banco.substituir_estais(linhas, _parque_ativo_id())
+    return jsonify({'ok': True, 'count': count})
 
 
 # ── API: Parques ───────────────────────────────────────────────────────────

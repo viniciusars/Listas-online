@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Estais — Sistema RMT{% endblock %}
+
+{% block styles %}
+main { max-width: 940px; }
+
+.nota {
+    background: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.55;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 16px;
+}
+.nota b { color: #475569; }
+
+.tbl-wrap { overflow-x: auto; }
+
+table.est { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.est th {
+    background: #f8fafc;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+table.est td {
+    padding: 3px 4px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+table.est tr:hover td { background: #f8fafc; }
+
+table.est input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 0.86rem;
+    font-family: inherit;
+    background: transparent;
+    color: #1e293b;
+}
+table.est input:hover { border-color: #cbd5e1; }
+table.est input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+table.est input.num { text-align: right; }
+table.est .col-ordem {
+    width: 34px;
+    text-align: right;
+    color: #cbd5e1;
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    padding-right: 8px;
+}
+table.est .col-unid { width: 80px; }
+table.est .col-qtd  { width: 96px; }
+table.est .col-del  { width: 38px; text-align: center; }
+
+.btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.btn-del:hover { color: #ef4444; }
+
+.tbl-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0 2px;
+    flex-wrap: wrap;
+}
+.counter { font-size: 0.8rem; color: #94a3b8; }
+
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
+.btn-outline:hover { background: #f1f5f9; }
+
+.vazio { padding: 26px; text-align: center; color: #94a3b8; font-size: 0.88rem; }
+
+#toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.ok   { background: #dcfce7; color: #166534; }
+#toast.err  { background: #fee2e2; color: #991b1b; }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">← Início</a>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Estais</h2>
+        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="header-stats"></span>
+    </div>
+    <div class="card-body">
+
+        <div class="nota">
+            Esta é a lista de materiais de <b>um</b> estai. Ao processar, cada quantidade é
+            multiplicada pelo <b>total da coluna ESTAIS</b> da Tabela de Locação — a receita
+            não varia por tipo de estrutura.
+        </div>
+
+        <div class="tbl-wrap">
+            <table class="est">
+                <thead>
+                    <tr>
+                        <th class="col-ordem"></th>
+                        <th>Material</th>
+                        <th class="col-unid">Unidade</th>
+                        <th class="col-qtd">Qtd. por estai</th>
+                        <th class="col-del"></th>
+                    </tr>
+                </thead>
+                <tbody id="corpo"></tbody>
+            </table>
+        </div>
+
+        <div class="vazio" id="vazio" style="display:none">
+            Nenhum material cadastrado. Adicione os itens que compõem um estai.
+        </div>
+
+        <div class="tbl-footer">
+            <button class="btn btn-add" onclick="adicionar()">+ Material</button>
+            <span class="counter" id="contador"></span>
+            <span style="flex:1"></span>
+            <button class="btn btn-outline" onclick="carregar()">Descartar alterações</button>
+            <button class="btn btn-primary" id="btn-salvar" onclick="salvar()">Salvar</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let LINHAS = [];
+
+function esc(s) {
+    return (s === null || s === undefined ? '' : s).toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function mostrarToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + (tipo || 'ok');
+    setTimeout(() => { t.className = ''; }, 3000);
+}
+
+async function carregar() {
+    const r = await fetch('/estais/api/receita');
+    LINHAS = (await r.json()).map(l => ({
+        material: l.material, unidade: l.unidade, qtd: l.qtd_por_estai
+    }));
+    render();
+}
+
+function render() {
+    document.getElementById('corpo').innerHTML = LINHAS.map((l, i) => `
+        <tr>
+            <td class="col-ordem">${i + 1}</td>
+            <td><input type="text" value="${esc(l.material)}"
+                       placeholder="Descrição do material"
+                       onchange="alterar(${i}, 'material', this.value)"></td>
+            <td class="col-unid"><input type="text" value="${esc(l.unidade)}"
+                       placeholder="Pç"
+                       onchange="alterar(${i}, 'unidade', this.value)"></td>
+            <td class="col-qtd"><input type="number" class="num" min="0" step="any"
+                       value="${Number(l.qtd)}"
+                       onchange="alterarQtd(${i}, this)"></td>
+            <td class="col-del">
+                <button class="btn-del" title="Remover material" onclick="remover(${i})">×</button>
+            </td>
+        </tr>`).join('');
+
+    document.getElementById('vazio').style.display = LINHAS.length ? 'none' : 'block';
+    document.getElementById('contador').textContent =
+        LINHAS.length + (LINHAS.length === 1 ? ' material' : ' materiais');
+    document.getElementById('header-stats').textContent =
+        LINHAS.length + (LINHAS.length === 1 ? ' material por estai' : ' materiais por estai');
+}
+
+function alterar(idx, campo, valor) {
+    LINHAS[idx][campo] = valor;
+}
+
+function alterarQtd(idx, input) {
+    const v = parseFloat(input.value);
+    LINHAS[idx].qtd = (isNaN(v) || v < 0) ? 0 : v;
+    input.value = LINHAS[idx].qtd;
+}
+
+function adicionar() {
+    LINHAS.push({material: '', unidade: 'Pç', qtd: 1});
+    render();
+    // Foca o campo de descrição da linha recém-criada
+    const inputs = document.querySelectorAll('#corpo tr:last-child input');
+    if (inputs.length) inputs[0].focus();
+}
+
+function remover(idx) {
+    LINHAS.splice(idx, 1);
+    render();
+}
+
+async function salvar() {
+    const semDescricao = LINHAS.filter(l => !l.material.trim()).length;
+    const linhas = LINHAS
+        .filter(l => l.material.trim())
+        .map(l => ({material: l.material.trim(), unidade: l.unidade.trim(),
+                    qtd_por_estai: l.qtd}));
+
+    if (!linhas.length && !confirm(
+        'Nenhum material informado. Salvar deixa a receita de estais vazia neste parque, ' +
+        'e o cálculo de estais passa a só emitir aviso. Continuar?')) return;
+
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    try {
+        const r = await fetch('/estais/api/salvar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({linhas: linhas})
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao salvar.');
+        await carregar();
+        let msg = `${j.count} materiais salvos.`;
+        if (semDescricao) msg += ` ${semDescricao} linha(s) sem descrição foram descartadas.`;
+        mostrarToast(msg, semDescricao ? 'err' : 'ok');
+    } catch (e) {
+        mostrarToast(e.message, 'err');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+carregar();
+</script>
+{% endblock %}

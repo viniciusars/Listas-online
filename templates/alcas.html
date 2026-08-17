@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}Alças e Laços — Sistema RMT{% endblock %}
+
+{% block styles %}
+main { max-width: 900px; }
+
+.filtros { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.filtros select {
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    background: white;
+    color: #1e293b;
+    min-width: 260px;
+}
+.filtros select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+/* ── Explicação do modelo ────────────────────────────────────── */
+.nota {
+    background: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.55;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 16px;
+}
+.nota b { color: #475569; }
+
+/* ── Grade ───────────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; }
+
+table.grade { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.grade th {
+    background: #f8fafc;
+    padding: 8px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+    text-align: center;
+}
+table.grade th.grupo {
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.72rem;
+}
+table.grade th.sep-esq, table.grade td.sep-esq { border-left: 2px solid #e2e8f0; }
+table.grade th:first-child { text-align: left; }
+
+table.grade td {
+    padding: 4px 5px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+}
+table.grade tr:hover td { background: #f8fafc; }
+table.grade td.nivel {
+    text-align: left;
+    font-weight: 700;
+    color: #334155;
+    white-space: nowrap;
+    padding-left: 10px;
+}
+table.grade input {
+    width: 74px;
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 0.86rem;
+    font-family: inherit;
+    text-align: center;
+    color: #1e293b;
+    background: white;
+}
+table.grade input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+table.grade input.zero { color: #cbd5e1; }
+table.grade .col-del { width: 40px; }
+
+.btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.btn-del:hover { color: #ef4444; }
+
+.tbl-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0 2px;
+    flex-wrap: wrap;
+}
+.counter { font-size: 0.8rem; color: #94a3b8; }
+
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
+.btn-outline:hover { background: #f1f5f9; }
+.btn-danger { background: white; color: #b91c1c; border: 1px solid #fca5a5; }
+.btn-danger:hover { background: #fee2e2; }
+
+.vazio { padding: 30px; text-align: center; color: #94a3b8; font-size: 0.88rem; }
+
+/* ── Novo tipo ───────────────────────────────────────────────── */
+#form-novo { display: none; margin-bottom: 16px; }
+#form-novo .linha { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+#form-novo label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+}
+#form-novo input {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    min-width: 220px;
+    color: #1e293b;
+}
+#form-novo input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+#toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.ok   { background: #dcfce7; color: #166534; }
+#toast.err  { background: #fee2e2; color: #991b1b; }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">← Início</a>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Alças e Laços</h2>
+        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="header-stats">
+            {{ total_tipos }} tipos · {{ total_linhas }} linhas
+        </span>
+    </div>
+    <div class="card-body">
+
+        <div class="nota">
+            A quantidade é aplicada <b>por cabo encontrado</b> em cada nível da estrutura.
+            <b>Vante</b> é o cabo que sai da estrutura (a própria linha da Locação) e
+            <b>Ré</b> é o que chega nela (a linha anterior do mesmo circuito).
+            Um tipo cadastrado só com zeros não gera material, mas também não aparece
+            no aviso de “estrutura não encontrada na receita”.
+        </div>
+
+        <!-- Novo tipo -->
+        <div id="form-novo">
+            <div class="linha">
+                <label>Tipo de estrutura
+                    <input type="text" id="in-novo-tipo" placeholder="Ex.: N4/N3-3" maxlength="60">
+                </label>
+                <button class="btn btn-primary" onclick="criarTipo()">Criar</button>
+                <button class="btn btn-outline" onclick="fecharNovo()">Cancelar</button>
+            </div>
+        </div>
+
+        <div class="filtros" style="margin-bottom:16px">
+            <select id="sel-tipo" onchange="carregarTipo()">
+                <option value="">— Selecione um tipo de estrutura —</option>
+            </select>
+            <button class="btn btn-add" onclick="abrirNovo()">+ Novo tipo</button>
+        </div>
+
+        <div id="area-grade" style="display:none">
+            <div class="tbl-wrap">
+                <table class="grade">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Nível</th>
+                            <th class="grupo sep-esq" colspan="2">Vante (cabo que sai)</th>
+                            <th class="grupo sep-esq" colspan="2">Ré (cabo que chega)</th>
+                            <th rowspan="2"></th>
+                        </tr>
+                        <tr>
+                            <th class="sep-esq">Alças</th>
+                            <th>Laços</th>
+                            <th class="sep-esq">Alças</th>
+                            <th>Laços</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpo"></tbody>
+                </table>
+            </div>
+
+            <div class="tbl-footer">
+                <button class="btn btn-add" onclick="adicionarNivel()">+ Nível</button>
+                <span class="counter" id="contador"></span>
+                <span style="flex:1"></span>
+                <button class="btn btn-danger" onclick="excluirTipo()">Excluir tipo</button>
+                <button class="btn btn-primary" id="btn-salvar" onclick="salvar()">Salvar</button>
+            </div>
+        </div>
+
+        <div class="vazio" id="vazio">
+            Selecione um tipo de estrutura para ver e editar a receita de alças e laços.
+        </div>
+
+    </div>
+</div>
+
+<div id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let TIPOS = [];
+let LINHAS = [];   // [{nivel, vante: {alcas, lacos}, re: {alcas, lacos}}]
+
+function esc(s) {
+    return (s === null || s === undefined ? '' : s).toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function mostrarToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + (tipo || 'ok');
+    setTimeout(() => { t.className = ''; }, 3000);
+}
+
+async function carregarTipos(selecionar) {
+    const r = await fetch('/alcas/api/tipos');
+    TIPOS = await r.json();
+    const sel = document.getElementById('sel-tipo');
+    sel.innerHTML = '<option value="">— Selecione um tipo de estrutura —</option>' +
+        TIPOS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+    if (selecionar) sel.value = selecionar;
+}
+
+async function carregarTipo() {
+    const tipo = document.getElementById('sel-tipo').value;
+    if (!tipo) {
+        document.getElementById('area-grade').style.display = 'none';
+        document.getElementById('vazio').style.display = 'block';
+        return;
+    }
+    const r = await fetch('/alcas/api/receita?tipo=' + encodeURIComponent(tipo));
+    const flat = await r.json();
+
+    // O banco guarda uma linha por direção; a grade mostra uma linha por nível
+    const porNivel = {};
+    flat.forEach(l => {
+        const n = porNivel[l.nivel] || (porNivel[l.nivel] =
+            {nivel: l.nivel, vante: {alcas: 0, lacos: 0}, re: {alcas: 0, lacos: 0}});
+        const alvo = l.direcao === 'RE' ? n.re : n.vante;
+        alvo.alcas = l.qtd_alcas;
+        alvo.lacos = l.qtd_lacos;
+    });
+    LINHAS = Object.values(porNivel).sort((a, b) => a.nivel - b.nivel);
+    if (!LINHAS.length) LINHAS = [novoNivel(1)];
+
+    document.getElementById('area-grade').style.display = 'block';
+    document.getElementById('vazio').style.display = 'none';
+    render();
+}
+
+function novoNivel(n) {
+    return {nivel: n, vante: {alcas: 0, lacos: 0}, re: {alcas: 0, lacos: 0}};
+}
+
+function campo(idx, direcao, chave, valor) {
+    const cls = Number(valor) === 0 ? 'zero' : '';
+    const sep = chave === 'alcas' ? 'sep-esq' : '';
+    return `<td class="${sep}"><input type="number" min="0" step="1" class="${cls}"
+            value="${Number(valor)}"
+            onchange="alterar(${idx}, '${direcao}', '${chave}', this)"></td>`;
+}
+
+function render() {
+    document.getElementById('corpo').innerHTML = LINHAS.map((l, i) => `
+        <tr>
+            <td class="nivel">Nível ${Number(l.nivel)}</td>
+            ${campo(i, 'vante', 'alcas', l.vante.alcas)}
+            ${campo(i, 'vante', 'lacos', l.vante.lacos)}
+            ${campo(i, 're', 'alcas', l.re.alcas)}
+            ${campo(i, 're', 'lacos', l.re.lacos)}
+            <td class="col-del">
+                <button class="btn-del" title="Remover nível" onclick="removerNivel(${i})">×</button>
+            </td>
+        </tr>`).join('');
+
+    const total = LINHAS.reduce((s, l) =>
+        s + l.vante.alcas + l.vante.lacos + l.re.alcas + l.re.lacos, 0);
+    document.getElementById('contador').textContent =
+        LINHAS.length + (LINHAS.length === 1 ? ' nível' : ' níveis') +
+        ' · ' + total + ' peças por estrutura';
+}
+
+function alterar(idx, direcao, chave, input) {
+    const v = parseFloat(input.value);
+    LINHAS[idx][direcao][chave] = (isNaN(v) || v < 0) ? 0 : v;
+    input.value = LINHAS[idx][direcao][chave];
+    input.classList.toggle('zero', LINHAS[idx][direcao][chave] === 0);
+    render();
+}
+
+function adicionarNivel() {
+    const maior = LINHAS.reduce((m, l) => Math.max(m, Number(l.nivel)), 0);
+    LINHAS.push(novoNivel(maior + 1));
+    render();
+}
+
+function removerNivel(idx) {
+    LINHAS.splice(idx, 1);
+    render();
+}
+
+async function salvar() {
+    const tipo = document.getElementById('sel-tipo').value;
+    if (!tipo) return;
+
+    // Reexpande a grade em uma linha por direção, como o banco guarda
+    const linhas = [];
+    LINHAS.forEach(l => {
+        linhas.push({nivel: l.nivel, direcao: 'VANTE',
+                     qtd_alcas: l.vante.alcas, qtd_lacos: l.vante.lacos});
+        linhas.push({nivel: l.nivel, direcao: 'RE',
+                     qtd_alcas: l.re.alcas, qtd_lacos: l.re.lacos});
+    });
+
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    try {
+        const r = await fetch('/alcas/api/salvar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({tipo: tipo, linhas: linhas})
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao salvar.');
+        mostrarToast(`Receita de "${tipo}" salva.`, 'ok');
+        atualizarStats();
+    } catch (e) {
+        mostrarToast(e.message, 'err');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function excluirTipo() {
+    const tipo = document.getElementById('sel-tipo').value;
+    if (!tipo) return;
+    if (!confirm(`Excluir toda a receita de alças e laços de "${tipo}"?\n\n` +
+                 `A partir daí, estruturas desse tipo passam a gerar aviso de ` +
+                 `"não encontrada na receita" ao processar.`)) return;
+    try {
+        const r = await fetch('/alcas/api/excluir', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({tipo: tipo})
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao excluir.');
+        await carregarTipos();
+        document.getElementById('sel-tipo').value = '';
+        carregarTipo();
+        mostrarToast(`Receita de "${tipo}" excluída.`, 'ok');
+        atualizarStats();
+    } catch (e) {
+        mostrarToast(e.message, 'err');
+    }
+}
+
+function abrirNovo() {
+    document.getElementById('form-novo').style.display = 'block';
+    document.getElementById('in-novo-tipo').value = '';
+    document.getElementById('in-novo-tipo').focus();
+}
+
+function fecharNovo() {
+    document.getElementById('form-novo').style.display = 'none';
+}
+
+function criarTipo() {
+    const tipo = document.getElementById('in-novo-tipo').value.trim();
+    if (!tipo) { mostrarToast('Informe o tipo de estrutura.', 'err'); return; }
+    if (TIPOS.includes(tipo)) {
+        mostrarToast('Esse tipo já está cadastrado.', 'err');
+        document.getElementById('sel-tipo').value = tipo;
+        fecharNovo();
+        carregarTipo();
+        return;
+    }
+    // Só existe no banco depois de salvar; até lá é uma grade em branco
+    const sel = document.getElementById('sel-tipo');
+    sel.innerHTML += `<option value="${esc(tipo)}">${esc(tipo)}</option>`;
+    sel.value = tipo;
+    LINHAS = [novoNivel(1)];
+    document.getElementById('area-grade').style.display = 'block';
+    document.getElementById('vazio').style.display = 'none';
+    render();
+    fecharNovo();
+    mostrarToast('Preencha as quantidades e clique em Salvar.', 'ok');
+}
+
+async function atualizarStats() {
+    const j = await (await fetch('/alcas/api/resumo')).json();
+    document.getElementById('header-stats').textContent =
+        `${j.tipos} tipos · ${j.linhas} linhas`;
+}
+
+carregarTipos();
+</script>
+{% endblock %}
