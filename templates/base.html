@@ -26,7 +26,50 @@
 
         header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
         header h1 a { color: inherit; text-decoration: none; }
-        header span { font-size: 0.82rem; opacity: 0.5; }
+        header > span { font-size: 0.82rem; opacity: 0.5; }
+
+        /* ---- Seletor de parque (contexto de todas as telas) ---- */
+        .parque-seletor {
+            margin-left: auto;
+            align-self: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .parque-seletor label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.5;
+        }
+        .parque-seletor select {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 6px;
+            padding: 5px 9px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            max-width: 240px;
+        }
+        .parque-seletor select:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.6);
+        }
+        /* sem isto o dropdown nativo do Windows renderiza branco sobre branco */
+        .parque-seletor select option { color: #1e293b; background: white; }
+        .parque-seletor a.gerir {
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            font-size: 0.95rem;
+            line-height: 1;
+            padding: 5px 6px;
+            border-radius: 5px;
+        }
+        .parque-seletor a.gerir:hover { color: white; background: rgba(255,255,255,0.12); }
 
         main {
             max-width: 840px;
@@ -160,11 +203,45 @@
 <header>
     <h1><a href="/">Sistema de Quantitativos RMT</a></h1>
     <span>Redes de Média Tensão</span>
+    {% if parque_ativo %}
+    <div class="parque-seletor">
+        <label for="hdr-parque">Parque</label>
+        <select id="hdr-parque" onchange="trocarParqueAtivo(this.value)"
+                title="Define de qual obra vêm as receitas de materiais e parafusos">
+            {% for p in parques_resumo %}
+            <option value="{{ p.id }}" {% if p.id == parque_ativo.id %}selected{% endif %}>{{ p.nome }}</option>
+            {% endfor %}
+        </select>
+        <a class="gerir" href="/parques" title="Gerenciar parques">⚙</a>
+    </div>
+    {% endif %}
 </header>
 
 <main>
     {% block content %}{% endblock %}
 </main>
+
+<script>
+// Troca o parque em uso e recarrega: as telas mostram dados do parque ativo,
+// então continuar na página com os dados antigos seria enganoso.
+async function trocarParqueAtivo(id) {
+    const sel = document.getElementById('hdr-parque');
+    sel.disabled = true;
+    try {
+        const r = await fetch('/parques/api/ativo', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: Number(id)})
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao trocar de parque.');
+        location.reload();
+    } catch (e) {
+        sel.disabled = false;
+        alert(e.message);
+    }
+}
+</script>
 
 {% block scripts %}{% endblock %}
 

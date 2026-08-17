@@ -46,8 +46,11 @@ def _parque_ativo_id():
 
 @app.context_processor
 def injetar_parque_ativo():
-    """Deixa o parque ativo disponível em todos os templates (header)."""
-    return {'parque_ativo': banco.obter_parque_ativo()}
+    """Deixa o parque ativo e a lista de parques disponíveis no header de todas as telas."""
+    return {
+        'parque_ativo': banco.obter_parque_ativo(),
+        'parques_resumo': banco.listar_parques_resumo(),
+    }
 
 
 @app.errorhandler(Exception)
@@ -100,6 +103,66 @@ def materiais():
 @app.route('/parafusos')
 def parafusos():
     return render_template('parafusos.html')
+
+
+@app.route('/parques')
+def parques():
+    return render_template('parques.html')
+
+
+# ── API: Parques ───────────────────────────────────────────────────────────
+
+@app.route('/parques/api/listar')
+def api_parques_listar():
+    ativo = banco.obter_parque_ativo()
+    return jsonify({
+        'parques': banco.listar_parques(),
+        'ativo': ativo['id'] if ativo else None,
+    })
+
+
+@app.route('/parques/api/ativo', methods=['POST'])
+def api_parques_ativo():
+    data = request.get_json(force=True)
+    try:
+        banco.definir_parque_ativo(int(data.get('id')))
+    except (TypeError, ValueError) as e:
+        return jsonify({'erro': str(e)}), 400
+    return jsonify({'ok': True})
+
+
+@app.route('/parques/api/criar', methods=['POST'])
+def api_parques_criar():
+    data = request.get_json(force=True)
+    copiar_de = data.get('copiar_de')
+    try:
+        copiar_de = int(copiar_de) if copiar_de not in (None, '', 'null') else None
+        novo_id = banco.criar_parque(
+            data.get('nome'), data.get('cliente'), data.get('observacoes'), copiar_de)
+    except (TypeError, ValueError) as e:
+        return jsonify({'erro': str(e)}), 400
+    return jsonify({'ok': True, 'id': novo_id})
+
+
+@app.route('/parques/api/atualizar', methods=['POST'])
+def api_parques_atualizar():
+    data = request.get_json(force=True)
+    try:
+        banco.atualizar_parque(int(data.get('id')), data.get('nome'),
+                               data.get('cliente'), data.get('observacoes'))
+    except (TypeError, ValueError) as e:
+        return jsonify({'erro': str(e)}), 400
+    return jsonify({'ok': True})
+
+
+@app.route('/parques/api/excluir', methods=['POST'])
+def api_parques_excluir():
+    data = request.get_json(force=True)
+    try:
+        banco.excluir_parque(int(data.get('id')))
+    except (TypeError, ValueError) as e:
+        return jsonify({'erro': str(e)}), 400
+    return jsonify({'ok': True})
 
 
 # ── API: Materiais por Poste ───────────────────────────────────────────────

@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+
+{% block title %}Parques — Sistema RMT{% endblock %}
+
+{% block styles %}
+main { max-width: 1000px; }
+
+/* ── Tabela de parques ───────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; }
+
+table.parques {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+}
+table.parques th {
+    background: #f8fafc;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+table.parques td {
+    padding: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+}
+table.parques tr:hover td { background: #f8fafc; }
+table.parques tr.ativo td { background: #eff6ff; }
+table.parques tr.ativo:hover td { background: #dbeafe; }
+
+.nome-parque { font-weight: 700; color: #1e293b; }
+.obs {
+    display: block;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 3px;
+    max-width: 260px;
+    line-height: 1.45;
+}
+.badge-ativo {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1d4ed8;
+    background: #dbeafe;
+    padding: 2px 7px;
+    border-radius: 99px;
+    margin-left: 7px;
+    vertical-align: middle;
+}
+
+/* chips com a contagem de cada receita */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+    font-size: 0.72rem;
+    color: #475569;
+    background: #f1f5f9;
+    border-radius: 5px;
+    padding: 2px 7px;
+    white-space: nowrap;
+}
+.chip.zero { color: #cbd5e1; background: #f8fafc; }
+
+.datas { font-size: 0.76rem; color: #94a3b8; white-space: nowrap; line-height: 1.6; }
+
+.acoes { display: flex; gap: 6px; justify-content: flex-end; }
+.btn-mini {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 5px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #475569;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-mini:hover { background: #f1f5f9; }
+.btn-mini.usar { border-color: #93c5fd; color: #1d4ed8; }
+.btn-mini.usar:hover { background: #eff6ff; }
+.btn-mini.excluir:hover { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.btn-mini:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Formulário ──────────────────────────────────────────────── */
+#form-parque { display: none; }
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+.campo { display: flex; flex-direction: column; gap: 5px; }
+.campo label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+}
+.campo input, .campo textarea, .campo select {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    background: white;
+    color: #1e293b;
+}
+.campo textarea { resize: vertical; min-height: 62px; }
+.campo input:focus, .campo textarea:focus, .campo select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+.origem { margin-top: 16px; }
+.origem > span {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    margin-bottom: 8px;
+}
+.opcao {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+.opcao:hover { border-color: #cbd5e1; background: #f8fafc; }
+.opcao.marcada { border-color: #3b82f6; background: #eff6ff; }
+.opcao input[type=radio] { margin-top: 3px; cursor: pointer; }
+.opcao .txt { font-size: 0.87rem; font-weight: 600; }
+.opcao .txt small {
+    display: block;
+    font-weight: 400;
+    color: #64748b;
+    font-size: 0.79rem;
+    margin-top: 2px;
+    line-height: 1.45;
+}
+/* alinhado com o texto da opção (recuo do radio), visível só quando ela é escolhida */
+#sel-copiar {
+    display: none;
+    margin: -2px 0 8px 33px;
+    width: 100%;
+    max-width: 320px;
+    padding: 7px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.87rem;
+    font-family: inherit;
+    background: white;
+    color: #1e293b;
+}
+#sel-copiar:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+.form-acoes {
+    display: flex;
+    gap: 9px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
+.btn-outline:hover { background: #f1f5f9; }
+
+.vazio { padding: 26px; text-align: center; color: #94a3b8; font-size: 0.88rem; }
+
+/* ── Toast ───────────────────────────────────────────────────── */
+#toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.ok   { background: #dcfce7; color: #166534; }
+#toast.err  { background: #fee2e2; color: #991b1b; }
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">← Início</a>
+
+<!-- ── Formulário (novo / edição) ───────────────────────────────────── -->
+<div class="card" id="form-parque">
+    <div class="card-header">
+        <h2 id="form-titulo">Novo parque</h2>
+    </div>
+    <div class="card-body">
+        <input type="hidden" id="edit-id" value="">
+
+        <div class="form-grid">
+            <div class="campo">
+                <label for="in-nome">Nome do parque *</label>
+                <input type="text" id="in-nome" placeholder="Ex.: Dom Inocêncio II" maxlength="120">
+            </div>
+            <div class="campo">
+                <label for="in-cliente">Cliente</label>
+                <input type="text" id="in-cliente" placeholder="Ex.: Enel" maxlength="120">
+            </div>
+        </div>
+
+        <div class="campo" style="margin-top:14px">
+            <label for="in-obs">Observações</label>
+            <textarea id="in-obs" placeholder="Premissas da obra, particularidades do cliente…"></textarea>
+        </div>
+
+        <!-- Só aparece na criação: um parque existente não muda de origem -->
+        <div class="origem" id="bloco-origem">
+            <span>Receitas iniciais</span>
+
+            <label class="opcao marcada" id="op-vazio">
+                <input type="radio" name="origem" value="vazio" checked onchange="marcarOrigem()">
+                <span class="txt">Começar vazio
+                    <small>Nenhuma receita cadastrada. Você preenche pelas telas ou importando um arquivo.</small>
+                </span>
+            </label>
+
+            <label class="opcao" id="op-copiar">
+                <input type="radio" name="origem" value="copiar" onchange="marcarOrigem()">
+                <span class="txt">Copiar de um parque existente
+                    <small>Duplica ferragens, parafusos, alças/laços e estais. Depois é só ajustar o que muda.</small>
+                </span>
+            </label>
+            <!-- fora do <label> de propósito: dentro dele o clique no select
+                 acionaria o radio e atrapalharia a abertura do dropdown -->
+            <select id="sel-copiar"></select>
+        </div>
+
+        <div class="form-acoes">
+            <button class="btn btn-primary" id="btn-salvar" onclick="salvar()">Salvar</button>
+            <button class="btn btn-outline" onclick="fecharForm()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Lista ────────────────────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header">
+        <h2>Parques</h2>
+        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="contador"></span>
+        <button class="btn btn-add" onclick="abrirNovo()">+ Novo parque</button>
+    </div>
+    <div class="card-body">
+        <div class="tbl-wrap">
+            <table class="parques">
+                <thead>
+                    <tr>
+                        <th>Parque</th>
+                        <th>Cliente</th>
+                        <th>Receitas cadastradas</th>
+                        <th>Datas</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="corpo"></tbody>
+            </table>
+        </div>
+        <div class="vazio" id="vazio" style="display:none">Nenhum parque cadastrado.</div>
+    </div>
+</div>
+
+<div id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let PARQUES = [];
+let ATIVO = null;
+
+function esc(s) {
+    return (s === null || s === undefined ? '' : s).toString()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function mostrarToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + (tipo || 'ok');
+    setTimeout(() => { t.className = ''; }, 3000);
+}
+
+async function carregar() {
+    const r = await fetch('/parques/api/listar');
+    const j = await r.json();
+    PARQUES = j.parques || [];
+    ATIVO = j.ativo;
+    render();
+}
+
+function chip(valor, rotulo) {
+    const cls = valor > 0 ? 'chip' : 'chip zero';
+    return `<span class="${cls}">${valor} ${esc(rotulo)}</span>`;
+}
+
+function render() {
+    const corpo = document.getElementById('corpo');
+    document.getElementById('contador').textContent =
+        PARQUES.length + (PARQUES.length === 1 ? ' parque' : ' parques');
+    document.getElementById('vazio').style.display = PARQUES.length ? 'none' : 'block';
+
+    const unico = PARQUES.length <= 1;
+
+    corpo.innerHTML = PARQUES.map(p => {
+        const ehAtivo = p.id === ATIVO;
+        const c = p.contagens;
+        return `
+        <tr class="${ehAtivo ? 'ativo' : ''}">
+            <td>
+                <span class="nome-parque">${esc(p.nome)}</span>
+                ${ehAtivo ? '<span class="badge-ativo">em uso</span>' : ''}
+                ${p.observacoes ? `<small class="obs">${esc(p.observacoes)}</small>` : ''}
+            </td>
+            <td>${esc(p.cliente || '—')}</td>
+            <td>
+                <div class="chips">
+                    ${chip(c.ferragens, 'tipos de ferragens')}
+                    ${chip(c.parafusos, 'tipos de parafusos')}
+                    ${chip(c.alcas_lacos, 'linhas de alças/laços')}
+                    ${chip(c.estais, 'materiais de estai')}
+                </div>
+            </td>
+            <td class="datas">
+                criado ${esc(p.criado_em || '—')}<br>
+                alterado ${esc(p.atualizado_em || '—')}
+            </td>
+            <td>
+                <div class="acoes">
+                    ${ehAtivo ? '' :
+                      `<button class="btn-mini usar" onclick="ativar(${p.id})">Usar</button>`}
+                    <button class="btn-mini" onclick="abrirEdicao(${p.id})">Editar</button>
+                    <button class="btn-mini excluir" onclick="excluir(${p.id})"
+                            ${unico ? 'disabled title="O sistema precisa de ao menos um parque"' : ''}>Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function marcarOrigem() {
+    const copiar = document.querySelector('input[name=origem][value=copiar]').checked;
+    document.getElementById('op-vazio').classList.toggle('marcada', !copiar);
+    document.getElementById('op-copiar').classList.toggle('marcada', copiar);
+    document.getElementById('sel-copiar').style.display = copiar ? 'block' : 'none';
+}
+
+function abrirNovo() {
+    document.getElementById('form-titulo').textContent = 'Novo parque';
+    document.getElementById('edit-id').value = '';
+    document.getElementById('in-nome').value = '';
+    document.getElementById('in-cliente').value = '';
+    document.getElementById('in-obs').value = '';
+
+    // Opção de copiar só faz sentido se houver de onde copiar
+    const bloco = document.getElementById('bloco-origem');
+    bloco.style.display = PARQUES.length ? 'block' : 'none';
+    document.querySelector('input[name=origem][value=vazio]').checked = true;
+    marcarOrigem();
+
+    document.getElementById('sel-copiar').innerHTML = PARQUES.map(p =>
+        `<option value="${p.id}" ${p.id === ATIVO ? 'selected' : ''}>${esc(p.nome)}</option>`
+    ).join('');
+
+    document.getElementById('form-parque').style.display = 'block';
+    document.getElementById('in-nome').focus();
+}
+
+function abrirEdicao(id) {
+    const p = PARQUES.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('form-titulo').textContent = 'Editar parque';
+    document.getElementById('edit-id').value = p.id;
+    document.getElementById('in-nome').value = p.nome || '';
+    document.getElementById('in-cliente').value = p.cliente || '';
+    document.getElementById('in-obs').value = p.observacoes || '';
+    document.getElementById('bloco-origem').style.display = 'none';
+    document.getElementById('form-parque').style.display = 'block';
+    document.getElementById('in-nome').focus();
+}
+
+function fecharForm() {
+    document.getElementById('form-parque').style.display = 'none';
+}
+
+async function salvar() {
+    const id = document.getElementById('edit-id').value;
+    const nome = document.getElementById('in-nome').value.trim();
+    if (!nome) { mostrarToast('Informe o nome do parque.', 'err'); return; }
+
+    const corpo = {
+        nome: nome,
+        cliente: document.getElementById('in-cliente').value.trim(),
+        observacoes: document.getElementById('in-obs').value.trim(),
+    };
+
+    let url = '/parques/api/criar';
+    if (id) {
+        url = '/parques/api/atualizar';
+        corpo.id = Number(id);
+    } else {
+        const copiar = document.querySelector('input[name=origem][value=copiar]').checked;
+        corpo.copiar_de = copiar ? Number(document.getElementById('sel-copiar').value) : null;
+    }
+
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    try {
+        const r = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(corpo)
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao salvar.');
+        fecharForm();
+        await carregar();
+        mostrarToast(id ? 'Parque atualizado.' : 'Parque criado.', 'ok');
+        if (!id) recarregarHeader();
+    } catch (e) {
+        mostrarToast(e.message, 'err');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function ativar(id) {
+    try {
+        const r = await fetch('/parques/api/ativo', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: id})
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao trocar de parque.');
+        location.reload();
+    } catch (e) {
+        mostrarToast(e.message, 'err');
+    }
+}
+
+async function excluir(id) {
+    const p = PARQUES.find(x => x.id === id);
+    if (!p) return;
+    const c = p.contagens;
+    const total = c.ferragens + c.parafusos + c.alcas_lacos + c.estais;
+    let msg = `Excluir o parque "${p.nome}"?`;
+    if (total > 0) {
+        msg += `\n\nIsso apaga junto todas as receitas dele:\n` +
+               `• ${c.ferragens} tipos de ferragens\n` +
+               `• ${c.parafusos} tipos de parafusos\n` +
+               `• ${c.alcas_lacos} linhas de alças/laços\n` +
+               `• ${c.estais} materiais de estai`;
+    }
+    msg += `\n\nEsta ação não pode ser desfeita.`;
+    if (!confirm(msg)) return;
+
+    try {
+        const r = await fetch('/parques/api/excluir', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: id})
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.erro || 'Falha ao excluir.');
+        // Se o parque excluído era o ativo, outro assumiu — recarrega a tela toda
+        if (id === ATIVO) { location.reload(); return; }
+        await carregar();
+        recarregarHeader();
+        mostrarToast('Parque excluído.', 'ok');
+    } catch (e) {
+        mostrarToast(e.message, 'err');
+    }
+}
+
+// O seletor do header é renderizado pelo servidor; após criar/excluir ele fica
+// desatualizado, então atualizamos as opções sem recarregar a página inteira.
+function recarregarHeader() {
+    const sel = document.getElementById('hdr-parque');
+    if (!sel) return;
+    sel.innerHTML = PARQUES.map(p =>
+        `<option value="${p.id}" ${p.id === ATIVO ? 'selected' : ''}>${esc(p.nome)}</option>`
+    ).join('');
+}
+
+carregar();
+</script>
+{% endblock %}

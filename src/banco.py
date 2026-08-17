@@ -361,6 +361,21 @@ def listar_parques():
         conn.close()
 
 
+def listar_parques_resumo():
+    """Lista apenas id e nome dos parques — versão leve para o seletor do header.
+
+    Roda em toda página renderizada, por isso evita as contagens de listar_parques().
+    """
+    conn = conectar()
+    try:
+        rows = conn.execute(
+            "SELECT id, nome FROM parques ORDER BY nome COLLATE NOCASE"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [{'id': r['id'], 'nome': r['nome']} for r in rows]
+
+
 def obter_parque(parque_id):
     """Retorna os dados de um parque, ou None se não existir."""
     conn = conectar()
