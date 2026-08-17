@@ -1,6 +1,6 @@
 import pandas as pd
-import os
 
+from src import banco
 from src.leitor_excel import formatar_numeros_postes, numeros_por_tipo
 
 
@@ -9,14 +9,13 @@ def _is_valid_cabo(val):
     return bool(s) and s not in ('nan', 'none', '<na>')
 
 
-def _preparar_df(df_locacao):
+def _preparar_df(df_locacao, parque_id=None):
     """Prepara df com colunas de ré (via shift) e efetivas (preenchimento cruzado vante↔ré).
 
     Regra: se uma estrutura tiver cabo em apenas um dos lados, o lado vazio recebe
     o valor do lado preenchido (ex: ponto final de circuito só tem cabo no vante).
     """
-    caminho_receita = os.path.join('config', 'receita_alcas_lacos.csv')
-    receita = pd.read_csv(caminho_receita)
+    receita = banco.ler_receita_alcas_df(parque_id)
 
     df = df_locacao.copy()
     df.columns = df.columns.astype(str).str.strip()
@@ -56,10 +55,15 @@ def _preparar_df(df_locacao):
     return df, receita, col_map
 
 
-def calcular_alcas_lacos(df_locacao):
+def calcular_alcas_lacos(df_locacao, parque_id=None):
     print("Processando quantitativo de Alças e Laços...")
 
-    df, receita, col_map = _preparar_df(df_locacao)
+    df, receita, col_map = _preparar_df(df_locacao, parque_id)
+
+    if receita.empty:
+        return (pd.DataFrame(columns=['Material', 'Unidade', 'Quantidade']),
+                ["Receita de alças/laços não cadastrada neste parque — "
+                 "alças e laços não calculados."])
 
     lista_materiais = []
 
@@ -119,9 +123,14 @@ def calcular_alcas_lacos(df_locacao):
     return df_agrupado, avisos
 
 
-def gerar_tabela_validacao(df_locacao):
+def gerar_tabela_validacao(df_locacao, parque_id=None):
     """Retorna tabela detalhada: TIPO | NIVEL | DIRECAO | CABO | COUNT | QTD_ALCAS | QTD_LACOS | TOTAL_ALCAS | TOTAL_LACOS"""
-    df, receita, col_map = _preparar_df(df_locacao)
+    df, receita, col_map = _preparar_df(df_locacao, parque_id)
+
+    colunas_vazias = ['TIPO', 'NIVEL', 'DIRECAO', 'CABO', 'COUNT',
+                      'QTD_ALCAS', 'QTD_LACOS', 'TOTAL_ALCAS', 'TOTAL_LACOS']
+    if receita.empty:
+        return pd.DataFrame(columns=colunas_vazias)
 
     linhas = []
     for (nivel, direcao), col in col_map.items():
@@ -135,8 +144,6 @@ def gerar_tabela_validacao(df_locacao):
                 'CABO':    str(row[col]).strip()
             })
 
-    colunas_vazias = ['TIPO', 'NIVEL', 'DIRECAO', 'CABO', 'COUNT',
-                      'QTD_ALCAS', 'QTD_LACOS', 'TOTAL_ALCAS', 'TOTAL_LACOS']
     if not linhas:
         return pd.DataFrame(columns=colunas_vazias)
 

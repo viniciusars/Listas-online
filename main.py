@@ -31,6 +31,25 @@ app = Flask(__name__)
 banco.inicializar()
 
 
+def _parque_ativo_id():
+    """Id do parque em uso, resolvido uma vez por requisição.
+
+    Todas as receitas (ferragens, parafusos, alças/laços e estais) são separadas
+    por parque; resolver uma vez só evita que uma troca de parque no meio de um
+    processamento misture premissas de obras diferentes.
+    """
+    parque = banco.obter_parque_ativo()
+    if parque is None:
+        raise ValueError("Nenhum parque cadastrado.")
+    return parque['id']
+
+
+@app.context_processor
+def injetar_parque_ativo():
+    """Deixa o parque ativo disponível em todos os templates (header)."""
+    return {'parque_ativo': banco.obter_parque_ativo()}
+
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     # Erros HTTP legítimos (404, 400, ...) passam adiante com o status correto
@@ -70,8 +89,9 @@ def gerar():
 
 @app.route('/materiais')
 def materiais():
-    tipos = banco.listar_tipos_ferragens()
-    total_materiais = sum(len(banco.obter_materiais(t)) for t in tipos)
+    pid = _parque_ativo_id()
+    tipos = banco.listar_tipos_ferragens(pid)
+    total_materiais = sum(len(banco.obter_materiais(t, pid)) for t in tipos)
     return render_template('materiais.html',
                            total_tipos=len(tipos),
                            total_materiais=total_materiais)
@@ -86,7 +106,7 @@ def parafusos():
 
 @app.route('/materiais/api/tipos')
 def api_mat_tipos():
-    return jsonify(listar_tipos_ferragens())
+    return jsonify(listar_tipos_ferragens(_parque_ativo_id()))
 
 
 @app.route('/materiais/api/materiais')
@@ -94,12 +114,12 @@ def api_mat_por_tipo():
     tipo = request.args.get('tipo', '').strip()
     if not tipo:
         return jsonify({'erro': 'Parâmetro "tipo" é obrigatório.'}), 400
-    return jsonify(obter_materiais(tipo))
+    return jsonify(obter_materiais(tipo, _parque_ativo_id()))
 
 
 @app.route('/materiais/api/todos')
 def api_mat_todos():
-    return jsonify(obter_todos_materiais())
+    return jsonify(obter_todos_materiais(_parque_ativo_id()))
 
 
 @app.route('/materiais/api/salvar', methods=['POST'])
@@ -109,7 +129,7 @@ def api_mat_salvar():
     materiais = data.get('materiais', [])
     if not tipo:
         return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
-    substituir_materiais(tipo, materiais)
+    substituir_materiais(tipo, materiais, _parque_ativo_id())
     return jsonify({'ok': True, 'count': len(materiais)})
 
 
@@ -122,7 +142,7 @@ def api_mat_substituir():
     if not campo or de == '':
         return jsonify({'erro': 'Campos "campo" e "de" são obrigatórios.'}), 400
     try:
-        count = substituir_campo_global(campo, de, para)
+        count = substituir_campo_global(campo, de, para, _parque_ativo_id())
     except ValueError as e:
         return jsonify({'erro': str(e)}), 400
     return jsonify({'ok': True, 'count': count})
@@ -139,7 +159,7 @@ def _parse_altura(valor):
 
 @app.route('/parafusos/api/estruturas')
 def api_paraf_estruturas():
-    return jsonify(listar_estruturas_parafusos())
+    return jsonify(listar_estruturas_parafusos(_parque_ativo_id()))
 
 
 @app.route('/parafusos/api/grade')
@@ -152,7 +172,7 @@ def api_paraf_grade():
         altura = _parse_altura(request.args.get('altura'))
     except (TypeError, ValueError):
         return jsonify({'erro': 'Parâmetros "esforco"/"altura" inválidos.'}), 400
-    return jsonify(obter_grade_parafusos(tipo, esforco, altura))
+    return jsonify(obter_grade_parafusos(tipo, esforco, altura, _parque_ativo_id()))
 
 
 @app.route('/parafusos/api/salvar', methods=['POST'])
@@ -190,7 +210,8 @@ def api_paraf_salvar():
             'comprimento': comprimento, 'quantidade': quantidade,
         })
 
-    count = salvar_grade_parafusos(tipo, esforco, altura, cruzeta, linhas)
+    count = salvar_grade_parafusos(tipo, esforco, altura, cruzeta, linhas,
+                                   _parque_ativo_id())
     return jsonify({'ok': True, 'count': count})
 
 
@@ -205,7 +226,7 @@ def api_paraf_excluir():
         altura = _parse_altura(data.get('altura'))
     except (TypeError, ValueError):
         return jsonify({'erro': 'Campos "esforco"/"altura" inválidos.'}), 400
-    count = excluir_estrutura_parafusos(tipo, esforco, altura)
+    count = excluir_estrutura_parafusos(tipo, esforco, altura, _parque_ativo_id())
     return jsonify({'ok': True, 'count': count})
 
 
@@ -225,13 +246,20 @@ def processar():
         cabos = json.loads(request.form.get('cabos', '[]'))
         gerar_validacao = request.form.get('gerar_validacao', 'false') == 'true'
         resolucoes = json.loads(request.form.get('resolucoes', '{}'))
+
+        parque = banco.obter_parque_ativo()
+        if parque is None:
+            return jsonify({'erro': 'Nenhum parque cadastrado.'}), 400
+        pid = parque['id']
+        log.append(f"Parque: {parque['nome']}")
+
         log.append(f"Lendo arquivo: {arquivo.filename}...")
         conteudo = io.BytesIO(arquivo.read())
         df_base = consolidar_tabela_locacao(conteudo)
         log.append(f"✓ {len(df_base)} estruturas lidas.")
 
         if 'parafusos' in motores:
-            ambiguos = identificar_estruturas_ambiguas(df_base)
+            ambiguos = identificar_estruturas_ambiguas(df_base, pid)
             pendentes = [a for a in ambiguos if resolucoes.get(a['numero']) not in ('C', 'I')]
             if pendentes:
                 vistos, unicos = set(), []
@@ -256,31 +284,33 @@ def processar():
 
         if 'estais' in motores:
             log.append("Calculando Estais...")
-            df, avisos = calcular_quantitativo_estais(df_base)
+            df, avisos = calcular_quantitativo_estais(df_base, pid)
             if not df.empty:
                 abas['Estais'] = df
             for aviso in avisos:
                 log.append(f"⚠ {aviso}")
-            log.append("✓ Estais calculados.")
+            if not df.empty:
+                log.append("✓ Estais calculados.")
 
         if 'alcas_lacos' in motores:
             log.append("Calculando Alças e Laços...")
-            df, avisos = calcular_alcas_lacos(df_base)
+            df, avisos = calcular_alcas_lacos(df_base, pid)
             if not df.empty:
                 abas['Alças e Laços'] = df
             for aviso in avisos:
                 log.append(f"⚠ {aviso}")
             log.append(f"✓ {len(df)} itens de alças/laços calculados.")
             if gerar_validacao:
-                df_val = gerar_tabela_validacao(df_base)
-                exportar_para_excel(df_val, "Validacao_Alcas_Lacos.xlsx")
-                arquivos_gerados.append("Validacao_Alcas_Lacos.xlsx")
-                log.append("✓ Tabela de validação de alças/laços gerada.")
+                df_val = gerar_tabela_validacao(df_base, pid)
+                if not df_val.empty:
+                    exportar_para_excel(df_val, "Validacao_Alcas_Lacos.xlsx")
+                    arquivos_gerados.append("Validacao_Alcas_Lacos.xlsx")
+                    log.append("✓ Tabela de validação de alças/laços gerada.")
 
         if 'ferragens' in motores:
             log.append("Calculando Ferragens...")
-            df, avisos = calcular_ferragens(df_base)
-            df_val = gerar_tabela_validacao_ferragens(df_base)
+            df, avisos = calcular_ferragens(df_base, pid)
+            df_val = gerar_tabela_validacao_ferragens(df_base, pid)
             if not df.empty:
                 abas['Ferragens'] = (df, df_val, 1)
             for aviso in avisos:
@@ -289,7 +319,8 @@ def processar():
 
         if 'parafusos' in motores:
             log.append("Calculando Parafusos...")
-            df, incremento_item36, avisos, detalhe_cruzeta = calcular_parafusos(df_base, resolucoes)
+            df, incremento_item36, avisos, detalhe_cruzeta = calcular_parafusos(
+                df_base, resolucoes, pid)
             if not df.empty:
                 abas['Parafusos'] = df
             for aviso in avisos:
@@ -297,7 +328,8 @@ def processar():
             log.append(f"✓ {len(df)} itens de parafusos calculados.")
 
             if incremento_item36 > 0:
-                info36 = next((m for m in obter_todos_materiais() if str(m['codigo']).strip() == '36'), None)
+                info36 = next((m for m in obter_todos_materiais(pid)
+                               if str(m['codigo']).strip() == '36'), None)
                 descricao36 = info36['descricao'] if info36 else 'Viga tipo U (Cruzeta metálica)'
                 unidade36   = info36['unidade'] if info36 else 'un.'
 

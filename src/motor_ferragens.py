@@ -4,15 +4,15 @@ from src import banco
 from src.leitor_excel import formatar_numeros_postes, numeros_por_tipo
 
 
-def _ler_receita():
+def _ler_receita(parque_id=None):
     """Receita de ferragens vinda do banco: {tipo: [{codigo, descricao, unidade, qtd}, ...]}."""
-    return banco.ler_receita_ferragens()
+    return banco.ler_receita_ferragens(parque_id)
 
 
-def gerar_tabela_validacao_ferragens(df_locacao):
+def gerar_tabela_validacao_ferragens(df_locacao, parque_id=None):
     """Retorna tabela pivotada: linhas = materiais, colunas = TIPOs (com contagem no cabeçalho).
     Ex: coluna 'N4 (×64)' contém a quantidade por estrutura daquele material para o tipo N4."""
-    receita = _ler_receita()
+    receita = _ler_receita(parque_id)
 
     contagem_tipos = (
         df_locacao['TIPO']
@@ -81,10 +81,14 @@ def gerar_tabela_validacao_ferragens(df_locacao):
     )
 
 
-def calcular_ferragens(df_locacao):
+def calcular_ferragens(df_locacao, parque_id=None):
     print("Processando quantitativo de ferragens...")
 
-    receita = _ler_receita()
+    receita = _ler_receita(parque_id)
+    if not receita:
+        return (pd.DataFrame(columns=['Código', 'Material', 'Unidade', 'Quantidade']),
+                ["Receita de ferragens não cadastrada neste parque — "
+                 "ferragens não calculadas."])
 
     contagem_tipos = (
         df_locacao['TIPO']

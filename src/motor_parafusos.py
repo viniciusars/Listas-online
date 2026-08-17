@@ -18,11 +18,11 @@ def _split_altura_carga(valor):
         return None, None
 
 
-def identificar_estruturas_ambiguas(df_locacao):
+def identificar_estruturas_ambiguas(df_locacao, parque_id=None):
     """Retorna as estruturas cujo TIPO está numa família ambígua (ex: N3-3) e ainda
     não foi digitado com o sufixo .C/.I na Locação — precisam de confirmação manual,
     pois essa informação só é visível na planta perfil (DWG)."""
-    bases = banco.listar_tipos_ambiguos_parafusos()
+    bases = banco.listar_tipos_ambiguos_parafusos(parque_id)
     if not bases or 'TIPO' not in df_locacao.columns:
         return []
 
@@ -36,7 +36,7 @@ def identificar_estruturas_ambiguas(df_locacao):
     return ambiguos
 
 
-def calcular_parafusos(df_locacao, resolucoes=None):
+def calcular_parafusos(df_locacao, resolucoes=None, parque_id=None):
     """Calcula o quantitativo de parafusos (cabeça quadrada e rosca dupla) por
     comprimento comercial e classe (kN), a partir da receita cadastrada no banco.
 
@@ -52,16 +52,16 @@ def calcular_parafusos(df_locacao, resolucoes=None):
     detalhe_cruzeta = {}
     colunas_saida = ['Parafuso', 'Classe (kN)', 'Comprimento (mm)', 'Quantidade']
 
-    receita = banco.ler_receita_parafusos_df()
+    receita = banco.ler_receita_parafusos_df(parque_id)
     if receita.empty:
-        avisos.append("Receita de parafusos não cadastrada — nada foi calculado.")
+        avisos.append("Receita de parafusos não cadastrada neste parque — nada foi calculado.")
         return pd.DataFrame(columns=colunas_saida), 0.0, avisos, []
 
     if 'TIPO' not in df_locacao.columns or 'ALTURA / CARGA' not in df_locacao.columns:
         avisos.append("Colunas TIPO / ALTURA-CARGA não encontradas na Locação.")
         return pd.DataFrame(columns=colunas_saida), 0.0, avisos, []
 
-    bases_ambiguas = banco.listar_tipos_ambiguos_parafusos()
+    bases_ambiguas = banco.listar_tipos_ambiguos_parafusos(parque_id)
     col_num = detectar_coluna_numero(df_locacao)
     col_posicao = next((c for c in df_locacao.columns if c.strip().upper() == 'POSIÇÃO'), None)
 
