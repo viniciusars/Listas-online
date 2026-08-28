@@ -98,14 +98,47 @@ As receitas são separadas por **parque** (obra/cliente), escolhido num seletor 
 >                               # /preview, /processar, /download, e as APIs /materiais/api/*, /parafusos/api/*, /alcas/api/*,
 >                               # /estais/api/*, /parques/api/*, /receitas/api/{exportar,importar}/<receita>.
 
+* **Fase 15: Preparação para Nuvem (Render + Turso):** O usuário solicitou que o sistema rodasse 100% na web. A arquitetura escolhida foi a hospedagem contínua no **Render** com banco de dados **Turso** (LibSQL gerenciado na nuvem). Adaptações implementadas: (1) `src/banco.py` ganhou detecção automática de `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN` conectando via `libsql` com wrappers `LibSqlConnection`, `LibSqlCursor` e `LibSqlRow` que mantêm compatibilidade com a interface `sqlite3.Row` e evitam avisos do Pandas; se as variáveis não forem informadas, recai no SQLite local `data/sistema.db`; (2) `requirements.txt` atualizado com `gunicorn>=21.0` e `libsql>=0.1.0`; (3) criado `render.yaml` (manifesto de infraestrutura como código para deploy automático); (4) criado `scripts/testar_turso.py` para validação rápida da conexão com a nuvem antes do deploy.
+
+---
+
+## 3. Alternativas Consideradas e Descartadas
+* **Vercel vs. Render:** A Vercel foi considerada para rodar o backend Python como Serverless Function (AWS Lambda). Foi descartada em favor do Render devido ao overhead de cold-starts frequentes com Pandas/NumPy, limites de timeout curto (10-15s) e sistema de arquivos stateless/efêmero que exigiria reestruturar a exportação para streaming exclusivo em memória. O Render provê execução nativa WSGI contínua sem cold-starts.
+
+---
+
+## 6. Estado Atual do Projeto
+O sistema está preparado tanto para execução local quanto para deploy 100% na nuvem no Render com banco Turso. Todos os motores (Postes, Estais, Alças/Laços, Ferragens, Parafusos) e rotas web estão operantes e testados.
+
+**Árvore de Diretórios:**
+> sistema_quantitativos/
+> ├── config/                        # Seeds do banco (lidos SÓ quando o banco está vazio)
+> ├── data/
+> │   ├── output/                # RMT_Output_Completo.xlsx, Quantitativo_Postes_Isolado.xlsx, etc.
+> │   └── sistema.db             # Banco SQLite local (fallback caso TURSO_* não esteja configurado)
+> ├── scripts/
+> │   └── testar_turso.py        # Validação da conexão Turso na nuvem
+> ├── src/
+> │   ├── banco.py              # (OK) Suporte híbrido SQLite local + Turso Cloud (LibSQL)
+> │   ├── planilhas.py          # (OK) Exporta/importa as 4 receitas em .xlsx
+> │   ├── leitor_excel.py       # (OK) Empilha abas, limpa cabeçalhos
+> │   ├── motor_postes.py       # (OK) Separa Altura/Carga e formata string
+> │   ├── motor_estais.py       # (OK) Quantitativo de estais
+> │   ├── motor_alcas_lacos.py  # (OK) Alças e laços
+> │   ├── motor_ferragens.py    # (OK) Ferragens por tipo
+> │   ├── motor_parafusos.py    # (OK) Parafusos por comprimento
+> │   ├── exportador.py         # (OK) Salva relatórios em .xlsx
+> │   └── consolidador.py       # (OK) Consolidação de materiais
+> ├── templates/               # (OK) Templates Jinja2
+> ├── requirements.txt         # flask, pandas, openpyxl, gunicorn, libsql
+> ├── render.yaml              # Manifesto de deploy no Render
+> └── main.py                  # Servidor Flask / WSGI app para Gunicorn
+
 ---
 
 ## 7. Próxima Tarefa Imediata
-Nenhuma pendência crítica identificada. Possíveis evoluções futuras:
-* Usar o multi-parque numa obra real de outro cliente: criar o parque copiando o Dom Inocêncio e ajustar o que muda, validando na prática se a granularidade de substituição da importação (TIPO / TIPO+ESFORÇO+ALTURA) é a certa.
-* Usar a tela `/parafusos` em uma obra real para cadastrar os TIPOs que hoje só geram aviso ⚠ (validar o formato de grade com dados de verdade, não só com a receita original re-seedada).
-* Avaliar escopo de fibra óptica (descartado do MVP) para futuras fases.
-* Deletar `src/interface.py` (Tkinter obsoleto) e `teste.py` na raiz (cópia antiga e idêntica do `motor_ferragens.py`, nunca versionada).
+* Criar conta e banco no Turso e configurar `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN` no Render.
+* Conectar repositório GitHub ao Render e executar o primeiro deploy.
 
 **Nota operacional:** nesta máquina `git` e `python` não estão no PATH — usar
 `C:\Users\vinicius.araujo\AppData\Local\Programs\Git\cmd\git.exe` e

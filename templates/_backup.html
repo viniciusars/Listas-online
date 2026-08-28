@@ -32,34 +32,35 @@
 <style>
 .bk-texto {
     font-size: 0.83rem;
-    color: #64748b;
+    color: var(--text-muted);
     line-height: 1.6;
     margin-bottom: 14px;
 }
-.bk-texto b { color: #475569; }
+.bk-texto b { color: var(--text-main); }
 .bk-texto code {
-    background: #f1f5f9;
+    background: var(--border-color);
+    color: var(--text-main);
     padding: 1px 5px;
     border-radius: 4px;
     font-size: 0.8rem;
 }
 .bk-acoes { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
-.bk-parque { font-size: 0.8rem; color: #94a3b8; margin-left: auto; }
-.bk-parque b { color: #64748b; }
+.bk-parque { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+.bk-parque b { color: var(--text-main); }
 
 #bk-resultado:empty { display: none; }
 #bk-resultado {
     margin-top: 14px;
     padding: 12px 14px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     font-size: 0.83rem;
     line-height: 1.6;
 }
-#bk-resultado.ok  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-#bk-resultado.err { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+#bk-resultado.ok  { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--success-color); }
+#bk-resultado.err { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger-color); }
 #bk-resultado ul { margin: 7px 0 0 18px; }
 #bk-resultado li { margin-bottom: 2px; }
-#bk-resultado .aviso { color: #92400e; }
+#bk-resultado .aviso { color: var(--warning-color); }
 #bk-resultado .unidades {
     margin-top: 7px;
     font-size: 0.79rem;
@@ -149,3 +150,4 @@ async function importarReceita(input) {
     }
 }
 </script>
+

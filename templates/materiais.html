@@ -15,16 +15,16 @@ main { max-width: 1080px; }
 .filtros select,
 .filtros input[type=text] {
     padding: 7px 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     font-size: 0.88rem;
-    background: white;
-    color: #1e293b;
+    background: var(--surface-color);
+    color: var(--text-main);
 }
 .filtros select:focus,
 .filtros input[type=text]:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
 }
 .filtros select    { min-width: 240px; }
@@ -39,23 +39,23 @@ table.mat {
     font-size: 0.855rem;
 }
 table.mat th {
-    background: #f8fafc;
+    background: var(--bg-color);
     padding: 8px 10px;
     text-align: left;
     font-size: 0.76rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.045em;
-    color: #64748b;
-    border-bottom: 2px solid #e2e8f0;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
     white-space: nowrap;
 }
 table.mat td {
     padding: 3px 4px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
-table.mat tr:hover td { background: #f8fafc; }
+table.mat tr:hover td { background: var(--bg-color); }
 
 /* inputs nas células */
 table.mat input {
@@ -65,14 +65,14 @@ table.mat input {
     border-radius: 4px;
     font-size: 0.855rem;
     background: transparent;
-    color: #1e293b;
+    color: var(--text-main);
     font-family: inherit;
 }
-table.mat input:hover  { border-color: #cbd5e1; }
+table.mat input:hover  { border-color: var(--border-color); }
 table.mat input:focus  {
     outline: none;
-    border-color: #3b82f6;
-    background: white;
+    border-color: var(--primary-color);
+    background: var(--surface-color);
     box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
 }
 table.mat .col-cod  { width: 110px; }
@@ -84,9 +84,10 @@ table.mat .col-del  { width: 36px; text-align: center; }
 table.mat td span {
     display: block;
     padding: 5px 8px;
+    color: var(--text-main);
 }
 table.mat td span.tipo-link {
-    color: #2563eb;
+    color: var(--primary-color);
     cursor: pointer;
     font-weight: 600;
 }
@@ -98,14 +99,14 @@ table.mat td.right span { text-align: right; }
     background: none;
     border: none;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--text-muted);
     font-size: 1.1rem;
     line-height: 1;
     padding: 4px 6px;
     border-radius: 4px;
     transition: color 0.1s;
 }
-.btn-del:hover { color: #ef4444; }
+.btn-del:hover { color: var(--danger-color); }
 
 /* ── Rodapé ───────────────────────────────────────────────────── */
 .tbl-footer {
@@ -115,19 +116,7 @@ table.mat td.right span { text-align: right; }
     padding: 12px 0 4px;
     flex-wrap: wrap;
 }
-.counter { font-size: 0.8rem; color: #94a3b8; }
-
-/* ── Botões ───────────────────────────────────────────────────── */
-.btn-primary { background: #2563eb; color: white; }
-.btn-primary:hover { background: #1d4ed8; }
-.btn-success { background: #16a34a; color: white; }
-.btn-success:hover { background: #15803d; }
-.btn-outline {
-    background: white;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-}
-.btn-outline:hover { background: #f1f5f9; }
+.counter { font-size: 0.8rem; color: var(--text-muted); }
 
 /* ── Substituição em massa ───────────────────────────────────── */
 .subst-row {
@@ -142,24 +131,24 @@ table.mat td.right span { text-align: right; }
     gap: 4px;
     font-size: 0.76rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.045em;
 }
 .subst-row input,
 .subst-row select {
     padding: 7px 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     font-size: 0.88rem;
-    background: white;
-    color: #1e293b;
+    background: var(--surface-color);
+    color: var(--text-main);
     min-width: 160px;
 }
 .subst-row input:focus,
 .subst-row select:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
 }
 
@@ -168,7 +157,7 @@ table.mat td.right span { text-align: right; }
     position: fixed;
     bottom: 24px; right: 24px;
     padding: 11px 20px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     font-size: 0.87rem;
     font-weight: 600;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -190,7 +179,7 @@ table.mat td.right span { text-align: right; }
 <div class="card">
     <div class="card-header">
         <h2>Materiais por Poste</h2>
-        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="header-stats">
+        <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted)" id="header-stats">
             {{ total_tipos }} tipos · {{ total_materiais }} materiais
         </span>
     </div>
@@ -215,7 +204,7 @@ table.mat td.right span { text-align: right; }
                 <thead id="tbl-head" style="display:none"></thead>
                 <tbody id="tbl-body">
                     <tr><td colspan="5" style="text-align:center;padding:40px;
-                            color:#94a3b8;font-size:0.88rem">
+                            color:var(--text-muted);font-size:0.88rem">
                         Selecione um tipo de estrutura acima para visualizar os materiais.
                     </td></tr>
                 </tbody>
@@ -242,7 +231,7 @@ table.mat td.right span { text-align: right; }
         <h2>Substituição em Massa</h2>
     </div>
     <div class="card-body">
-        <p style="font-size:0.85rem;color:#64748b;margin-bottom:16px;line-height:1.5">
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;line-height:1.5">
             Renomeia um valor em <strong>todos</strong> os tipos de estrutura de uma só vez.
             Busca por correspondência exata — ideal para padronizar descrições e códigos.
         </p>
@@ -342,7 +331,7 @@ function renderVazio() {
     document.getElementById('tbl-head').style.display = 'none';
     document.getElementById('contador').style.display = 'none';
     document.getElementById('tbl-body').innerHTML =
-        '<tr><td colspan="5" style="text-align:center;padding:40px;color:#94a3b8;font-size:0.88rem">' +
+        '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);font-size:0.88rem">' +
         'Selecione um tipo de estrutura acima para visualizar os materiais.</td></tr>';
 }
 
@@ -388,7 +377,7 @@ function renderEdicao(dados, textoBusca) {
 
     if (!filtrado.length) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;' +
-            'color:#94a3b8">Nenhum resultado para o filtro atual.</td></tr>';
+            'color:var(--text-muted)">Nenhum resultado para o filtro atual.</td></tr>';
     }
 
     atualizarContador(filtrado.length, dados.length);
@@ -432,7 +421,7 @@ function renderTodos(dados) {
 
     if (!filtrado.length) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;' +
-            'color:#94a3b8">Nenhum resultado.</td></tr>';
+            'color:var(--text-muted)">Nenhum resultado.</td></tr>';
     }
 
     atualizarContador(filtrado.length, dados.length);
@@ -563,3 +552,4 @@ function mostrarToast(msg, tipo) {
 }
 </script>
 {% endblock %}
+

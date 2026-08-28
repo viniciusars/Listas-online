@@ -14,31 +14,32 @@ table.parques {
     font-size: 0.86rem;
 }
 table.parques th {
-    background: #f8fafc;
+    background: var(--bg-color);
     padding: 8px 10px;
     text-align: left;
     font-size: 0.76rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.045em;
-    color: #64748b;
-    border-bottom: 2px solid #e2e8f0;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
     white-space: nowrap;
 }
 table.parques td {
     padding: 10px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
     vertical-align: top;
+    color: var(--text-main);
 }
-table.parques tr:hover td { background: #f8fafc; }
-table.parques tr.ativo td { background: #eff6ff; }
-table.parques tr.ativo:hover td { background: #dbeafe; }
+table.parques tr:hover td { background: var(--bg-color); }
+table.parques tr.ativo td { background: var(--primary-light); }
+table.parques tr.ativo:hover td { filter: brightness(0.95); }
 
-.nome-parque { font-weight: 700; color: #1e293b; }
+.nome-parque { font-weight: 700; color: var(--text-main); }
 .obs {
     display: block;
     font-size: 0.78rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     margin-top: 3px;
     max-width: 260px;
     line-height: 1.45;
@@ -49,8 +50,8 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #1d4ed8;
-    background: #dbeafe;
+    color: var(--primary-color);
+    background: var(--primary-light);
     padding: 2px 7px;
     border-radius: 99px;
     margin-left: 7px;
@@ -61,15 +62,15 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .chip {
     font-size: 0.72rem;
-    color: #475569;
-    background: #f1f5f9;
+    color: var(--text-main);
+    background: var(--border-color);
     border-radius: 5px;
     padding: 2px 7px;
     white-space: nowrap;
 }
-.chip.zero { color: #cbd5e1; background: #f8fafc; }
+.chip.zero { color: var(--text-muted); background: var(--bg-color); }
 
-.datas { font-size: 0.76rem; color: #94a3b8; white-space: nowrap; line-height: 1.6; }
+.datas { font-size: 0.76rem; color: var(--text-muted); white-space: nowrap; line-height: 1.6; }
 
 .acoes { display: flex; gap: 6px; justify-content: flex-end; }
 .btn-mini {
@@ -77,16 +78,16 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
     font-size: 0.78rem;
     font-weight: 600;
     border-radius: 5px;
-    border: 1px solid #cbd5e1;
-    background: white;
-    color: #475569;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-main);
     cursor: pointer;
     white-space: nowrap;
 }
-.btn-mini:hover { background: #f1f5f9; }
-.btn-mini.usar { border-color: #93c5fd; color: #1d4ed8; }
-.btn-mini.usar:hover { background: #eff6ff; }
-.btn-mini.excluir:hover { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.btn-mini:hover { background: var(--border-color); }
+.btn-mini.usar { border-color: var(--primary-color); color: var(--primary-color); }
+.btn-mini.usar:hover { background: var(--primary-light); }
+.btn-mini.excluir:hover { background: rgba(239, 68, 68, 0.15); color: var(--danger-color); border-color: var(--danger-color); }
 .btn-mini:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Formulário ──────────────────────────────────────────────── */
@@ -100,23 +101,23 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
 .campo label {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.045em;
 }
 .campo input, .campo textarea, .campo select {
     padding: 8px 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     font-size: 0.88rem;
     font-family: inherit;
-    background: white;
-    color: #1e293b;
+    background: var(--surface-color);
+    color: var(--text-main);
 }
 .campo textarea { resize: vertical; min-height: 62px; }
 .campo input:focus, .campo textarea:focus, .campo select:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
 }
 
@@ -125,7 +126,7 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
     display: block;
     font-size: 0.72rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.045em;
     margin-bottom: 8px;
@@ -135,19 +136,20 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
     align-items: flex-start;
     gap: 9px;
     padding: 10px 12px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     cursor: pointer;
     margin-bottom: 8px;
+    background: var(--surface-color);
 }
-.opcao:hover { border-color: #cbd5e1; background: #f8fafc; }
-.opcao.marcada { border-color: #3b82f6; background: #eff6ff; }
+.opcao:hover { border-color: var(--border-color); background: var(--bg-color); }
+.opcao.marcada { border-color: var(--primary-color); background: var(--primary-light); }
 .opcao input[type=radio] { margin-top: 3px; cursor: pointer; }
-.opcao .txt { font-size: 0.87rem; font-weight: 600; }
+.opcao .txt { font-size: 0.87rem; font-weight: 600; color: var(--text-main); }
 .opcao .txt small {
     display: block;
     font-weight: 400;
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 0.79rem;
     margin-top: 2px;
     line-height: 1.45;
@@ -159,16 +161,16 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
     width: 100%;
     max-width: 320px;
     padding: 7px 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
     font-size: 0.87rem;
     font-family: inherit;
-    background: white;
-    color: #1e293b;
+    background: var(--surface-color);
+    color: var(--text-main);
 }
 #sel-copiar:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
 }
 
@@ -177,21 +179,17 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
     gap: 9px;
     margin-top: 18px;
     padding-top: 16px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border-color);
 }
-.btn-primary { background: #2563eb; color: white; }
-.btn-primary:hover { background: #1d4ed8; }
-.btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
-.btn-outline:hover { background: #f1f5f9; }
 
-.vazio { padding: 26px; text-align: center; color: #94a3b8; font-size: 0.88rem; }
+.vazio { padding: 26px; text-align: center; color: var(--text-muted); font-size: 0.88rem; }
 
 /* ── Toast ───────────────────────────────────────────────────── */
 #toast {
     position: fixed;
     bottom: 24px; right: 24px;
     padding: 11px 20px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     font-size: 0.87rem;
     font-weight: 600;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -266,7 +264,7 @@ table.parques tr.ativo:hover td { background: #dbeafe; }
 <div class="card">
     <div class="card-header">
         <h2>Parques</h2>
-        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="contador"></span>
+        <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted)" id="contador"></span>
         <button class="btn btn-add" onclick="abrirNovo()">+ Novo parque</button>
     </div>
     <div class="card-body">
@@ -514,3 +512,4 @@ function recarregarHeader() {
 carregar();
 </script>
 {% endblock %}
+

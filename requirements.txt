@@ -1,3 +1,5 @@
 flask>=3.0
 pandas>=2.0
 openpyxl>=3.1
+gunicorn>=21.0
+libsql>=0.1.0

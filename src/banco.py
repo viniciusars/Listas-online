@@ -44,11 +44,114 @@ TABELAS_RECEITA = (
 )
 
 
-# ---------------------------------------------------------------------------
-# Conexão e schema
-# ---------------------------------------------------------------------------
+try:
+    import libsql
+except ImportError:
+    libsql = None
+
+
+class LibSqlRow:
+    """Emula o comportamento do sqlite3.Row para objetos vindos do driver libsql."""
+    def __init__(self, values, cols):
+        self._values = tuple(values)
+        self._mapping = {c: values[i] for i, c in enumerate(cols)}
+
+    def __getitem__(self, key):
+        if isinstance(key, (int, slice)):
+            return self._values[key]
+        return self._mapping[key]
+
+    def get(self, key, default=None):
+        return self._mapping.get(key, default)
+
+    def keys(self):
+        return self._mapping.keys()
+
+    def values(self):
+        return self._mapping.values()
+
+    def items(self):
+        return self._mapping.items()
+
+    def __iter__(self):
+        return iter(self._mapping.keys())
+
+    def __len__(self):
+        return len(self._values)
+
+    def __repr__(self):
+        return f"<Row {self._mapping}>"
+
+
+class LibSqlCursor:
+    """Cursor que encapsula os resultados do libsql em LibSqlRow."""
+    def __init__(self, cursor):
+        self._cur = cursor
+
+    def __getattr__(self, name):
+        return getattr(self._cur, name)
+
+    def __iter__(self):
+        return (self._wrap_row(r) for r in self._cur)
+
+    def _wrap_row(self, row):
+        if row is None or not self._cur.description:
+            return row
+        cols = [d[0] for d in self._cur.description]
+        return LibSqlRow(row, cols)
+
+    def fetchone(self):
+        row = self._cur.fetchone()
+        return self._wrap_row(row)
+
+    def fetchall(self):
+        rows = self._cur.fetchall()
+        if not self._cur.description:
+            return rows
+        cols = [d[0] for d in self._cur.description]
+        return [LibSqlRow(r, cols) for r in rows]
+
+
+class LibSqlConnection:
+    """Wrapper para a conexão do libsql para prover interface idêntica ao sqlite3."""
+    def __init__(self, conn):
+        self._conn = conn
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+    def execute(self, sql, params=()):
+        cur = self._conn.execute(sql, params)
+        return LibSqlCursor(cur)
+
+    def cursor(self):
+        return LibSqlCursor(self._conn.cursor())
+
+    def commit(self):
+        return self._conn.commit()
+
+    def rollback(self):
+        return self._conn.rollback()
+
+    def close(self):
+        return self._conn.close()
+
+
 def conectar():
-    """Abre conexão com row_factory e FKs ativas (para o CASCADE ao excluir parque)."""
+    """Abre conexão com o banco de dados.
+
+    Se as variáveis de ambiente TURSO_DATABASE_URL e TURSO_AUTH_TOKEN estiverem
+    configuradas, conecta ao Turso Cloud (LibSQL). Caso contrário, conecta ao
+    arquivo SQLite local data/sistema.db.
+    """
+    turso_url = os.environ.get('TURSO_DATABASE_URL') or os.environ.get('TURSO_URL')
+    turso_token = os.environ.get('TURSO_AUTH_TOKEN') or os.environ.get('TURSO_TOKEN')
+
+    if turso_url and libsql is not None:
+        raw_conn = libsql.connect(database=turso_url, auth_token=turso_token or "")
+        raw_conn.execute("PRAGMA foreign_keys = ON")
+        return LibSqlConnection(raw_conn)
+
     os.makedirs(os.path.dirname(CAMINHO_DB), exist_ok=True)
     conn = sqlite3.connect(CAMINHO_DB)
     conn.row_factory = sqlite3.Row
@@ -805,12 +908,15 @@ def ler_receita_parafusos_df(parque_id=None):
     parque_id = _pid(parque_id)
     conn = conectar()
     try:
-        df = pd.read_sql_query(
+        rows = conn.execute(
             "SELECT tipo, esforco, altura, posicao, parafuso, esf_parafuso, "
             "comprimento, quantidade, cruzeta_adicional FROM parafusos_receita "
             "WHERE parque_id = ?",
-            conn, params=(parque_id,)
-        )
+            (parque_id,)
+        ).fetchall()
+        cols = ['tipo', 'esforco', 'altura', 'posicao', 'parafuso', 'esf_parafuso',
+                'comprimento', 'quantidade', 'cruzeta_adicional']
+        df = pd.DataFrame([dict(r) for r in rows], columns=cols)
     finally:
         conn.close()
     return df
@@ -825,12 +931,14 @@ def ler_receita_alcas_df(parque_id=None):
     parque_id = _pid(parque_id)
     conn = conectar()
     try:
-        df = pd.read_sql_query(
+        rows = conn.execute(
             "SELECT tipo AS TIPO, nivel AS NIVEL, direcao AS DIRECAO, "
             "qtd_alcas AS QTD_ALCAS, qtd_lacos AS QTD_LACOS "
             "FROM alcas_lacos_receita WHERE parque_id = ? ORDER BY tipo, nivel, direcao",
-            conn, params=(parque_id,)
-        )
+            (parque_id,)
+        ).fetchall()
+        cols = ['TIPO', 'NIVEL', 'DIRECAO', 'QTD_ALCAS', 'QTD_LACOS']
+        df = pd.DataFrame([dict(r) for r in rows], columns=cols)
     finally:
         conn.close()
     return df

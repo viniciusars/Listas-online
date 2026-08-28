@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Consolidar Planilhas — Sistema RMT{% endblock %}
+
+{% block styles %}
+        .file-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            background: var(--bg-color);
+        }
+        .file-zone:hover, .file-zone.dragover { 
+            border-color: var(--primary-color); 
+            background: var(--primary-light); 
+        }
+        .file-zone input[type="file"] { display: none; }
+        .file-zone .icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+        .file-zone p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+        .file-list { margin-top: 16px; font-size: 0.85rem; color: var(--text-main); text-align: left; }
+        .file-list ul { padding-left: 20px; color: var(--primary-color); font-weight: 600; margin-top: 8px;}
+        .log-box {
+            background: #1e293b; color: #f8fafc; font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 0.85rem; padding: 16px; border-radius: var(--border-radius-sm);
+            min-height: 120px; max-height: 300px; overflow-y: auto; line-height: 1.6;
+        }
+        .log-box div { margin-bottom: 6px; }
+        .log-ok { color: #34d399; }
+        .log-err { color: #f87171; }
+        .log-info { color: #94a3b8; }
+{% endblock %}
+
+{% block content %}
+    <a class="back-link" href="/">← Início</a>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Consolidar Planilhas (RMT / TMA)</h2>
+        </div>
+        <div class="card-body">
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+                Selecione múltiplos arquivos <code>.xlsm</code> ou <code>.xlsx</code>. O sistema extrairá as abas RMT e TMA, 
+                somará as quantidades cruzando com os dois últimos dígitos do nome do arquivo, e gerará uma planilha consolidada.
+            </p>
+
+            <div class="file-zone" id="file-zone" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" accept=".xlsx,.xls,.xlsm" multiple onchange="onFilesSelected(this)">
+                <span class="icon">📂</span>
+                <p>Clique ou arraste para selecionar <strong>múltiplos arquivos</strong></p>
+                <div class="file-list" id="file-list" style="display:none;"></div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-consolidar" style="width: 100%; margin-top: 20px;" disabled onclick="consolidarArquivos()">
+                Gerar Consolidação
+            </button>
+        </div>
+    </div>
+
+    <!-- Log de execução -->
+    <div class="card" id="log-section" style="display:none">
+        <div class="card-header">
+            <h2>Log de Execução</h2>
+        </div>
+        <div class="card-body" style="padding: 14px 20px">
+            <div class="log-box" id="log-box"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let selectedFiles = [];
+
+    // Drag and drop events
+    const zone = document.getElementById('file-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.classList.remove('dragover'); });
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            document.getElementById('file-input').files = e.dataTransfer.files;
+            onFilesSelected(document.getElementById('file-input'));
+        }
+    });
+
+    function onFilesSelected(input) {
+        selectedFiles = Array.from(input.files);
+        const fl = document.getElementById('file-list');
+        const btn = document.getElementById('btn-consolidar');
+        
+        if (selectedFiles.length > 0) {
+            fl.style.display = 'block';
+            let listHtml = `Selecionados ${selectedFiles.length} arquivo(s):<ul>`;
+            // Mostra no máximo 5 arquivos na prévia
+            selectedFiles.slice(0, 5).forEach(f => {
+                listHtml += `<li>${f.name}</li>`;
+            });
+            if (selectedFiles.length > 5) {
+                listHtml += `<li>... e mais ${selectedFiles.length - 5} arquivo(s)</li>`;
+            }
+            listHtml += '</ul>';
+            fl.innerHTML = listHtml;
+            btn.disabled = false;
+        } else {
+            fl.style.display = 'none';
+            btn.disabled = true;
+        }
+    }
+
+    function addLog(html) {
+        const lb = document.getElementById('log-box');
+        lb.innerHTML += `<div>${html}</div>`;
+        lb.scrollTop = lb.scrollHeight;
+    }
+
+    async function consolidarArquivos() {
+        if (selectedFiles.length === 0) return;
+
+        const btn = document.getElementById('btn-consolidar');
+        const logSec = document.getElementById('log-section');
+        const logBox = document.getElementById('log-box');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Processando...';
+        logSec.style.display = 'block';
+        logBox.innerHTML = '';
+        addLog(`<span class="log-info">Iniciando o envio de ${selectedFiles.length} arquivo(s)...</span>`);
+
+        const formData = new FormData();
+        selectedFiles.forEach(f => formData.append('arquivos', f));
+
+        try {
+            const resp = await fetch('/consolidar/api/processar', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (resp.ok) {
+                // Sucesso: fazer o download do blob
+                addLog(`<span class="log-ok">✓ Processamento concluído. Iniciando download...</span>`);
+                const blob = await resp.blob();
+                
+                // Extrai o nome do arquivo do header Content-Disposition se disponível
+                let filename = "Materiais_Consolidados.xlsx";
+                const disposition = resp.headers.get('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) { 
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                addLog(`<span class="log-ok">✓ Arquivo baixado com sucesso.</span>`);
+            } else {
+                // Erro: parse do JSON
+                let erroMsg = "Erro desconhecido";
+                try {
+                    const errorData = await resp.json();
+                    erroMsg = errorData.erro || erroMsg;
+                } catch(e) {
+                    erroMsg = resp.statusText;
+                }
+                addLog(`<span class="log-err">✗ Erro: ${erroMsg}</span>`);
+            }
+        } catch (error) {
+            addLog(`<span class="log-err">✗ Erro de rede ou servidor: ${error.message}</span>`);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Gerar Consolidação';
+        }
+    }
+</script>
+{% endblock %}

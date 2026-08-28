@@ -27,6 +27,7 @@ from src.motor_alcas_lacos import calcular_alcas_lacos, gerar_tabela_validacao
 from src.motor_ferragens import calcular_ferragens, gerar_tabela_validacao_ferragens
 from src.motor_parafusos import calcular_parafusos, identificar_estruturas_ambiguas
 from src.exportador import exportar_para_excel, exportar_multiplas_abas
+from src.consolidador import processar_consolidacao
 
 app = Flask(__name__)
 
@@ -91,6 +92,31 @@ def gerar():
     return render_template('gerar.html',
                            motores=MOTORES_DISPONIVEIS,
                            cabos_padrao=CABOS_PADRAO)
+
+
+@app.route('/consolidar')
+def consolidar():
+    return render_template('consolidar.html')
+
+
+@app.route('/consolidar/api/processar', methods=['POST'])
+def api_consolidar_processar():
+    if 'arquivos' not in request.files:
+        return jsonify({'erro': 'Nenhum arquivo enviado.'}), 400
+    arquivos = request.files.getlist('arquivos')
+    if not arquivos or all(f.filename == '' for f in arquivos):
+        return jsonify({'erro': 'Nenhum arquivo válido selecionado.'}), 400
+        
+    try:
+        resultado_io = processar_consolidacao(arquivos)
+        return send_file(
+            resultado_io,
+            as_attachment=True,
+            download_name='Materiais_Consolidados_RMT_TMA.xlsx',
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 400
 
 
 @app.route('/materiais')

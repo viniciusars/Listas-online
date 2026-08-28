@@ -6,38 +6,38 @@
 main { max-width: 940px; }
 
 .nota {
-    background: #f8fafc;
-    border-left: 3px solid #cbd5e1;
+    background: var(--bg-color);
+    border-left: 3px solid var(--border-color);
     padding: 10px 14px;
     font-size: 0.82rem;
-    color: #64748b;
+    color: var(--text-muted);
     line-height: 1.55;
     border-radius: 0 6px 6px 0;
     margin-bottom: 16px;
 }
-.nota b { color: #475569; }
+.nota b { color: var(--text-main); }
 
 .tbl-wrap { overflow-x: auto; }
 
 table.est { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
 table.est th {
-    background: #f8fafc;
+    background: var(--bg-color);
     padding: 8px 10px;
     text-align: left;
     font-size: 0.74rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.045em;
-    color: #64748b;
-    border-bottom: 2px solid #e2e8f0;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
     white-space: nowrap;
 }
 table.est td {
     padding: 3px 4px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
-table.est tr:hover td { background: #f8fafc; }
+table.est tr:hover td { background: var(--bg-color); }
 
 table.est input {
     width: 100%;
@@ -47,20 +47,20 @@ table.est input {
     font-size: 0.86rem;
     font-family: inherit;
     background: transparent;
-    color: #1e293b;
+    color: var(--text-main);
 }
-table.est input:hover { border-color: #cbd5e1; }
+table.est input:hover { border-color: var(--border-color); }
 table.est input:focus {
     outline: none;
-    border-color: #3b82f6;
-    background: white;
+    border-color: var(--primary-color);
+    background: var(--surface-color);
     box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
 }
 table.est input.num { text-align: right; }
 table.est .col-ordem {
     width: 34px;
     text-align: right;
-    color: #cbd5e1;
+    color: var(--text-muted);
     font-size: 0.78rem;
     font-variant-numeric: tabular-nums;
     padding-right: 8px;
@@ -73,13 +73,13 @@ table.est .col-del  { width: 38px; text-align: center; }
     background: none;
     border: none;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--text-muted);
     font-size: 1.1rem;
     line-height: 1;
     padding: 4px 6px;
     border-radius: 4px;
 }
-.btn-del:hover { color: #ef4444; }
+.btn-del:hover { color: var(--danger-color); }
 
 .tbl-footer {
     display: flex;
@@ -88,20 +88,15 @@ table.est .col-del  { width: 38px; text-align: center; }
     padding: 14px 0 2px;
     flex-wrap: wrap;
 }
-.counter { font-size: 0.8rem; color: #94a3b8; }
+.counter { font-size: 0.8rem; color: var(--text-muted); }
 
-.btn-primary { background: #2563eb; color: white; }
-.btn-primary:hover { background: #1d4ed8; }
-.btn-outline { background: white; color: #475569; border: 1px solid #cbd5e1; }
-.btn-outline:hover { background: #f1f5f9; }
-
-.vazio { padding: 26px; text-align: center; color: #94a3b8; font-size: 0.88rem; }
+.vazio { padding: 26px; text-align: center; color: var(--text-muted); font-size: 0.88rem; }
 
 #toast {
     position: fixed;
     bottom: 24px; right: 24px;
     padding: 11px 20px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     font-size: 0.87rem;
     font-weight: 600;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -122,7 +117,7 @@ table.est .col-del  { width: 38px; text-align: center; }
 <div class="card">
     <div class="card-header">
         <h2>Estais</h2>
-        <span style="margin-left:auto;font-size:0.8rem;color:#94a3b8" id="header-stats"></span>
+        <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted)" id="header-stats"></span>
     </div>
     <div class="card-body">
 
@@ -276,3 +271,4 @@ async function salvar() {
 carregar();
 </script>
 {% endblock %}
+
