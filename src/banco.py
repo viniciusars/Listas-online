@@ -149,7 +149,6 @@ def conectar():
 
     if turso_url and libsql is not None:
         raw_conn = libsql.connect(database=turso_url, auth_token=turso_token or "")
-        raw_conn.execute("PRAGMA foreign_keys = ON")
         return LibSqlConnection(raw_conn)
 
     os.makedirs(os.path.dirname(CAMINHO_DB), exist_ok=True)
@@ -260,8 +259,11 @@ def _criar_indices(conn):
 
 
 def _tem_coluna(conn, tabela, coluna):
-    rows = conn.execute(f"PRAGMA table_info({tabela})").fetchall()
-    return any(r['name'] == coluna for r in rows)
+    try:
+        conn.execute(f"SELECT {coluna} FROM {tabela} LIMIT 0")
+        return True
+    except Exception:
+        return False
 
 
 def _tabela_existe(conn, tabela):
@@ -269,6 +271,32 @@ def _tabela_existe(conn, tabela):
         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (tabela,)
     ).fetchone()
     return row is not None
+
+
+def _ler_estado(conn, chave):
+    row = conn.execute("SELECT valor FROM app_estado WHERE chave = ?", (chave,)).fetchone()
+    return row['valor'] if row else None
+
+
+def _gravar_estado(conn, chave, valor):
+    conn.execute(
+        "INSERT INTO app_estado (chave, valor) VALUES (?, ?) "
+        "ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor",
+        (chave, str(valor))
+    )
+    conn.commit()
+
+
+def _obter_versao_schema(conn):
+    try:
+        val = _ler_estado(conn, 'schema_version')
+        return int(val) if val is not None else 0
+    except Exception:
+        return 0
+
+
+def _definir_versao_schema(conn, versao):
+    _gravar_estado(conn, 'schema_version', str(versao))
 
 
 # ---------------------------------------------------------------------------
@@ -335,11 +363,10 @@ def inicializar():
     try:
         _criar_schema(conn)
 
-        versao = conn.execute("PRAGMA user_version").fetchone()[0]
+        versao = _obter_versao_schema(conn)
         if versao < 1:
             _migrar_para_multi_parque(conn)
-            conn.execute(f"PRAGMA user_version = {VERSAO_SCHEMA}")
-            conn.commit()
+            _definir_versao_schema(conn, VERSAO_SCHEMA)
 
         _criar_indices(conn)
 
@@ -597,18 +624,6 @@ def excluir_parque(parque_id):
         conn.close()
 
 
-def _ler_estado(conn, chave):
-    row = conn.execute("SELECT valor FROM app_estado WHERE chave = ?", (chave,)).fetchone()
-    return row['valor'] if row else None
-
-
-def _gravar_estado(conn, chave, valor):
-    conn.execute(
-        "INSERT INTO app_estado (chave, valor) VALUES (?, ?) "
-        "ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor",
-        (chave, str(valor))
-    )
-    conn.commit()
 
 
 def _garantir_parque_ativo(conn):
