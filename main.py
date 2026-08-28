@@ -31,10 +31,24 @@ from src.consolidador import processar_consolidacao
 
 app = Flask(__name__)
 
-print("[MAIN] Inicializando aplicação Flask e banco de dados...", flush=True)
-banco.inicializar()
-print("[MAIN] Servidor Flask pronto para atender requisições!", flush=True)
+_banco_inicializado = False
 
+
+@app.before_request
+def _garantir_banco_inicializado():
+    global _banco_inicializado
+    if not _banco_inicializado:
+        try:
+            banco.inicializar()
+        except Exception as e:
+            print(f"[MAIN] Erro ao inicializar banco: {e}", flush=True)
+        _banco_inicializado = True
+
+
+@app.route('/healthz')
+def healthz():
+    """Health check rápido para o Render."""
+    return "OK", 200
 
 def _parque_ativo_id():
     """Id do parque em uso, resolvido uma vez por requisição.
@@ -52,10 +66,17 @@ def _parque_ativo_id():
 @app.context_processor
 def injetar_parque_ativo():
     """Deixa o parque ativo e a lista de parques disponíveis no header de todas as telas."""
-    return {
-        'parque_ativo': banco.obter_parque_ativo(),
-        'parques_resumo': banco.listar_parques_resumo(),
-    }
+    try:
+        return {
+            'parque_ativo': banco.obter_parque_ativo(),
+            'parques_resumo': banco.listar_parques_resumo(),
+        }
+    except Exception as e:
+        print(f"[MAIN] Aviso: não foi possível carregar parque ativo para o header: {e}", flush=True)
+        return {
+            'parque_ativo': None,
+            'parques_resumo': [],
+        }
 
 
 @app.errorhandler(Exception)
