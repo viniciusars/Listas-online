@@ -31,8 +31,9 @@ from src.consolidador import processar_consolidacao
 
 app = Flask(__name__)
 
-# Cria o schema e popula o banco a partir do xlsx na primeira execução
+print("[MAIN] Inicializando aplicação Flask e banco de dados...", flush=True)
 banco.inicializar()
+print("[MAIN] Servidor Flask pronto para atender requisições!", flush=True)
 
 
 def _parque_ativo_id():

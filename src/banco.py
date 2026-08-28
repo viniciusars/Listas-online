@@ -148,11 +148,11 @@ def conectar():
     configuradas, conecta ao Turso Cloud (LibSQL). Caso contrário, conecta ao
     arquivo SQLite local data/sistema.db.
     """
-    turso_url = os.environ.get('TURSO_DATABASE_URL') or os.environ.get('TURSO_URL')
-    turso_token = os.environ.get('TURSO_AUTH_TOKEN') or os.environ.get('TURSO_TOKEN')
+    turso_url = (os.environ.get('TURSO_DATABASE_URL') or os.environ.get('TURSO_URL') or '').strip().strip('"\'')
+    turso_token = (os.environ.get('TURSO_AUTH_TOKEN') or os.environ.get('TURSO_TOKEN') or '').strip().strip('"\'')
 
     if turso_url and libsql is not None:
-        raw_conn = libsql.connect(database=turso_url, auth_token=turso_token or "")
+        raw_conn = libsql.connect(database=turso_url, auth_token=turso_token)
         return LibSqlConnection(raw_conn)
 
     os.makedirs(os.path.dirname(CAMINHO_DB), exist_ok=True)
@@ -363,21 +363,36 @@ def _migrar_para_multi_parque(conn):
 
 def inicializar():
     """Cria o schema, aplica migrações pendentes e semeia um banco vazio."""
+    turso_url = (os.environ.get('TURSO_DATABASE_URL') or '').strip().strip('"\'')
+    modo = f"Turso Cloud ({turso_url[:30]}...)" if turso_url else f"SQLite Local ({CAMINHO_DB})"
+    print(f"[BANCO] Conectando ao banco de dados [{modo}]...", flush=True)
+
     conn = conectar()
     try:
+        print("[BANCO] Criando schema de tabelas...", flush=True)
         _criar_schema(conn)
 
+        print("[BANCO] Verificando versão de migração...", flush=True)
         versao = _obter_versao_schema(conn)
         if versao < 1:
+            print("[BANCO] Aplicando migração v1...", flush=True)
             _migrar_para_multi_parque(conn)
             _definir_versao_schema(conn, VERSAO_SCHEMA)
 
+        print("[BANCO] Criando índices...", flush=True)
         _criar_indices(conn)
 
-        if conn.execute("SELECT COUNT(*) FROM parques").fetchone()[0] == 0:
+        total_parques = conn.execute("SELECT COUNT(*) FROM parques").fetchone()[0]
+        print(f"[BANCO] Parques existentes: {total_parques}", flush=True)
+        if total_parques == 0:
+            print("[BANCO] Semeando dados iniciais no banco...", flush=True)
             _seed_banco_novo(conn)
 
         _garantir_parque_ativo(conn)
+        print("[BANCO] Banco de dados pronto e operacional!", flush=True)
+    except Exception as e:
+        print(f"[BANCO] ERRO durante inicialização: {e}", flush=True)
+        raise
     finally:
         conn.close()
 

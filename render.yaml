@@ -8,6 +8,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.3
+      - key: PYTHONUNBUFFERED
+        value: "1"
       - key: TURSO_DATABASE_URL
         sync: false
       - key: TURSO_AUTH_TOKEN
