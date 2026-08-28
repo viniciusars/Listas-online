@@ -706,11 +706,18 @@ def preview():
                 cabo_re = serie.shift(1).fillna('')
             preview_cols[f'N{nivel} Ré'] = cabo_re
 
-        df_prev = pd.DataFrame(preview_cols).replace('nan', '')
+        df_prev = pd.DataFrame(preview_cols)
+        dados = df_prev.fillna('').to_dict(orient='records')
+        for row in dados:
+            for k, v in row.items():
+                if pd.isna(v) or str(v).strip().lower() in ('nan', 'none', '<na>', 'null'):
+                    row[k] = ''
+                else:
+                    row[k] = str(v).strip()
 
         return jsonify({
             'colunas': list(df_prev.columns),
-            'dados':   df_prev.to_dict(orient='records')
+            'dados':   dados
         })
 
     except Exception as e:
