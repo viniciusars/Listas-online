@@ -124,6 +124,10 @@ class LibSqlConnection:
         cur = self._conn.execute(sql, params)
         return LibSqlCursor(cur)
 
+    def executemany(self, sql, params_list):
+        cur = self._conn.executemany(sql, params_list)
+        return LibSqlCursor(cur)
+
     def cursor(self):
         return LibSqlCursor(self._conn.cursor())
 
@@ -839,14 +843,18 @@ def _parse_xlsx_parafusos(caminho):
 def _gravar_receita_parafusos(conn, parque_id, linhas):
     """Substitui toda a receita de parafusos DO PARQUE pelo conteúdo de `linhas`."""
     conn.execute("DELETE FROM parafusos_receita WHERE parque_id = ?", (parque_id,))
-    for l in linhas:
-        conn.execute(
+    if linhas:
+        params = [
+            (parque_id, l['tipo'], l['esforco'], l['altura'], l['posicao'], l['parafuso'],
+             l['esf_parafuso'], l['comprimento'], l['quantidade'], l['cruzeta_adicional'])
+            for l in linhas
+        ]
+        conn.executemany(
             "INSERT INTO parafusos_receita "
             "(parque_id, tipo, esforco, altura, posicao, parafuso, esf_parafuso, "
             "comprimento, quantidade, cruzeta_adicional) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (parque_id, l['tipo'], l['esforco'], l['altura'], l['posicao'], l['parafuso'],
-             l['esf_parafuso'], l['comprimento'], l['quantidade'], l['cruzeta_adicional'])
+            params
         )
     conn.commit()
 
@@ -854,27 +862,36 @@ def _gravar_receita_parafusos(conn, parque_id, linhas):
 def _gravar_receita_ferragens(conn, parque_id, receita):
     """Substitui toda a receita de ferragens DO PARQUE pelo conteúdo de `receita`."""
     conn.execute("DELETE FROM materiais_poste WHERE parque_id = ?", (parque_id,))
+    params = []
     for tipo, materiais in receita.items():
         for ordem, mat in enumerate(materiais):
-            conn.execute(
-                "INSERT INTO materiais_poste "
-                "(parque_id, tipo, ordem, codigo, descricao, unidade, quantidade) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (parque_id, tipo, ordem, mat['codigo'], mat['descricao'],
-                 mat['unidade'], mat['qtd'])
-            )
+            params.append((
+                parque_id, tipo, ordem, mat['codigo'], mat['descricao'],
+                mat['unidade'], mat['qtd']
+            ))
+    if params:
+        conn.executemany(
+            "INSERT INTO materiais_poste "
+            "(parque_id, tipo, ordem, codigo, descricao, unidade, quantidade) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            params
+        )
     conn.commit()
 
 
 def _gravar_receita_alcas(conn, parque_id, linhas):
     """Substitui toda a receita de alças/laços DO PARQUE pelo conteúdo de `linhas`."""
     conn.execute("DELETE FROM alcas_lacos_receita WHERE parque_id = ?", (parque_id,))
-    for l in linhas:
-        conn.execute(
+    if linhas:
+        params = [
+            (parque_id, l['tipo'], l['nivel'], l['direcao'], l['qtd_alcas'], l['qtd_lacos'])
+            for l in linhas
+        ]
+        conn.executemany(
             "INSERT INTO alcas_lacos_receita "
             "(parque_id, tipo, nivel, direcao, qtd_alcas, qtd_lacos) "
             "VALUES (?, ?, ?, ?, ?, ?)",
-            (parque_id, l['tipo'], l['nivel'], l['direcao'], l['qtd_alcas'], l['qtd_lacos'])
+            params
         )
     conn.commit()
 
@@ -882,11 +899,15 @@ def _gravar_receita_alcas(conn, parque_id, linhas):
 def _gravar_receita_estais(conn, parque_id, linhas):
     """Substitui toda a receita de estais DO PARQUE pelo conteúdo de `linhas`."""
     conn.execute("DELETE FROM estais_receita WHERE parque_id = ?", (parque_id,))
-    for ordem, l in enumerate(linhas):
-        conn.execute(
+    if linhas:
+        params = [
+            (parque_id, ordem, l['material'], l['unidade'], l['qtd_por_estai'])
+            for ordem, l in enumerate(linhas)
+        ]
+        conn.executemany(
             "INSERT INTO estais_receita (parque_id, ordem, material, unidade, qtd_por_estai) "
             "VALUES (?, ?, ?, ?, ?)",
-            (parque_id, ordem, l['material'], l['unidade'], l['qtd_por_estai'])
+            params
         )
     conn.commit()
 
@@ -1042,14 +1063,18 @@ def salvar_grade_parafusos(tipo, esforco, altura, cruzeta_adicional, linhas, par
     conn = conectar()
     try:
         _excluir_combo_parafusos(conn, parque_id, tipo, esforco, altura)
-        for l in linhas:
-            conn.execute(
+        if linhas:
+            params = [
+                (parque_id, tipo, esforco, altura, l['posicao'], l['parafuso'],
+                 l['esf_parafuso'], l['comprimento'], l['quantidade'], cruzeta_adicional)
+                for l in linhas
+            ]
+            conn.executemany(
                 "INSERT INTO parafusos_receita "
                 "(parque_id, tipo, esforco, altura, posicao, parafuso, esf_parafuso, "
                 "comprimento, quantidade, cruzeta_adicional) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (parque_id, tipo, esforco, altura, l['posicao'], l['parafuso'],
-                 l['esf_parafuso'], l['comprimento'], l['quantidade'], cruzeta_adicional)
+                params
             )
         conn.commit()
     finally:
@@ -1126,13 +1151,17 @@ def substituir_materiais(tipo, materiais, parque_id=None):
             "DELETE FROM materiais_poste WHERE parque_id = ? AND tipo = ?",
             (parque_id, tipo)
         )
-        for ordem, mat in enumerate(materiais):
-            conn.execute(
+        if materiais:
+            params = [
+                (parque_id, tipo, ordem, mat.get('codigo', ''), mat['descricao'],
+                 mat.get('unidade', ''), float(mat['qtd']))
+                for ordem, mat in enumerate(materiais)
+            ]
+            conn.executemany(
                 "INSERT INTO materiais_poste "
                 "(parque_id, tipo, ordem, codigo, descricao, unidade, quantidade) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (parque_id, tipo, ordem, mat.get('codigo', ''), mat['descricao'],
-                 mat.get('unidade', ''), float(mat['qtd']))
+                params
             )
         conn.commit()
     finally:
@@ -1238,13 +1267,17 @@ def substituir_alcas_lacos(tipo, linhas, parque_id=None):
             "DELETE FROM alcas_lacos_receita WHERE parque_id = ? AND tipo = ?",
             (parque_id, tipo)
         )
-        for l in linhas:
-            conn.execute(
+        if linhas:
+            params = [
+                (parque_id, tipo, int(l['nivel']), str(l['direcao']).strip().upper(),
+                 float(l['qtd_alcas']), float(l['qtd_lacos']))
+                for l in linhas
+            ]
+            conn.executemany(
                 "INSERT INTO alcas_lacos_receita "
                 "(parque_id, tipo, nivel, direcao, qtd_alcas, qtd_lacos) "
                 "VALUES (?, ?, ?, ?, ?, ?)",
-                (parque_id, tipo, int(l['nivel']), str(l['direcao']).strip().upper(),
-                 float(l['qtd_alcas']), float(l['qtd_lacos']))
+                params
             )
         conn.commit()
     finally:
@@ -1307,13 +1340,17 @@ def importar_ferragens(por_tipo, parque_id=None):
         for tipo, materiais in por_tipo.items():
             conn.execute("DELETE FROM materiais_poste WHERE parque_id = ? AND tipo = ?",
                          (parque_id, tipo))
-            for ordem, mat in enumerate(materiais):
-                conn.execute(
+            if materiais:
+                params = [
+                    (parque_id, tipo, ordem, mat['codigo'], mat['descricao'],
+                     mat['unidade'], mat['qtd'])
+                    for ordem, mat in enumerate(materiais)
+                ]
+                conn.executemany(
                     "INSERT INTO materiais_poste "
                     "(parque_id, tipo, ordem, codigo, descricao, unidade, quantidade) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (parque_id, tipo, ordem, mat['codigo'], mat['descricao'],
-                     mat['unidade'], mat['qtd'])
+                    params
                 )
         conn.commit()
     finally:
@@ -1331,15 +1368,19 @@ def importar_parafusos(por_combo, parque_id=None):
     try:
         for (tipo, esforco, altura), linhas in por_combo.items():
             _excluir_combo_parafusos(conn, parque_id, tipo, esforco, altura)
-            for l in linhas:
-                conn.execute(
+            if linhas:
+                params = [
+                    (parque_id, tipo, esforco, altura, l['posicao'], l['parafuso'],
+                     l['esf_parafuso'], l['comprimento'], l['quantidade'],
+                     l['cruzeta_adicional'])
+                    for l in linhas
+                ]
+                conn.executemany(
                     "INSERT INTO parafusos_receita "
                     "(parque_id, tipo, esforco, altura, posicao, parafuso, esf_parafuso, "
                     "comprimento, quantidade, cruzeta_adicional) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (parque_id, tipo, esforco, altura, l['posicao'], l['parafuso'],
-                     l['esf_parafuso'], l['comprimento'], l['quantidade'],
-                     l['cruzeta_adicional'])
+                    params
                 )
         conn.commit()
     finally:
@@ -1354,13 +1395,17 @@ def importar_alcas(por_tipo, parque_id=None):
         for tipo, linhas in por_tipo.items():
             conn.execute("DELETE FROM alcas_lacos_receita WHERE parque_id = ? AND tipo = ?",
                          (parque_id, tipo))
-            for l in linhas:
-                conn.execute(
+            if linhas:
+                params = [
+                    (parque_id, tipo, l['nivel'], l['direcao'],
+                     l['qtd_alcas'], l['qtd_lacos'])
+                    for l in linhas
+                ]
+                conn.executemany(
                     "INSERT INTO alcas_lacos_receita "
                     "(parque_id, tipo, nivel, direcao, qtd_alcas, qtd_lacos) "
                     "VALUES (?, ?, ?, ?, ?, ?)",
-                    (parque_id, tipo, l['nivel'], l['direcao'],
-                     l['qtd_alcas'], l['qtd_lacos'])
+                    params
                 )
         conn.commit()
     finally:
