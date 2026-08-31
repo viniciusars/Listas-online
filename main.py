@@ -509,6 +509,18 @@ def api_dimensionar_excluir_padrao():
     return jsonify({'ok': True, 'count': count, 'tipo': tipo})
 
 
+@app.route('/dimensionar-parafusos/api/renomear-padrao-estrutura', methods=['POST'])
+def api_dimensionar_renomear_padrao():
+    data = request.get_json(force=True)
+    tipo_antigo = str(data.get('tipo_antigo', '')).strip().upper()
+    tipo_novo = str(data.get('tipo_novo', '')).strip().upper()
+    if not tipo_antigo or not tipo_novo:
+        return jsonify({'erro': 'Campos "tipo_antigo" e "tipo_novo" são obrigatórios.'}), 400
+    pid = _parque_ativo_id()
+    count = banco.renomear_estrutura_calculadora(tipo_antigo, tipo_novo, pid)
+    return jsonify({'ok': True, 'count': count, 'tipo_novo': tipo_novo})
+
+
 @app.route('/dimensionar-parafusos/api/padroes/salvar', methods=['POST'])
 def api_dimensionar_salvar_padrao_montagem():
     data = request.get_json(force=True)

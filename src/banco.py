@@ -1631,6 +1631,22 @@ def excluir_estrutura_calculadora(estrutura_nome, parque_id=None):
         conn.close()
 
 
+def renomear_estrutura_calculadora(tipo_antigo, tipo_novo, parque_id=None):
+    """Renomeia uma estrutura da calculadora no parque."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        conn.execute(
+            "UPDATE calculadora_estruturas SET estrutura = ? WHERE parque_id = ? AND estrutura = ?",
+            (tipo_novo, parque_id, tipo_antigo)
+        )
+        affected = conn.execute("SELECT changes()").fetchone()[0]
+        conn.commit()
+        return affected
+    finally:
+        conn.close()
+
+
 def listar_padroes_calculadora(parque_id=None):
     """Retorna os padrões de montagem cadastrados no parque como dicionário."""
     parque_id = _pid(parque_id)

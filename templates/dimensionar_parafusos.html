@@ -71,7 +71,10 @@ main {
             <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600; height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; min-width: 0; box-sizing: border-box;" onchange="aoMudarEstrutura()">
               <option value="">-- Selecione uma Estrutura --</option>
             </select>
-            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 44px; min-height: 44px; padding: 0 0.85rem; flex-shrink: 0; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+            <button class="btn btn-outline" id="btn-renomear-est" title="Renomear Estrutura Selecionada" onclick="renomearEstruturaAtual()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
+              ✏️
+            </button>
+            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
               ➕
             </button>
           </div>
@@ -981,6 +984,40 @@ async function excluirEstruturaParque() {
       await carregarDadosIniciais();
     } else {
       exibirAlerta(data.erro || 'Erro ao excluir estrutura', 'danger');
+    }
+  } catch (e) {
+    exibirAlerta('Erro de comunicação: ' + e.message, 'danger');
+  }
+}
+
+async function renomearEstruturaAtual() {
+  const selEst = document.getElementById('sel-estrutura');
+  const tipoAtual = selEst.value;
+  if (!tipoAtual || tipoAtual === '__NOVA__') {
+    exibirAlerta('Selecione uma estrutura existente para renomear.', 'warning');
+    return;
+  }
+
+  const novoNome = prompt(`Digite o novo nome para a estrutura "${tipoAtual}":`, tipoAtual);
+  if (!novoNome || novoNome.trim().toUpperCase() === tipoAtual) return;
+
+  const tipoNovo = novoNome.trim().toUpperCase();
+
+  try {
+    const res = await fetch('/dimensionar-parafusos/api/renomear-padrao-estrutura', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({tipo_antigo: tipoAtual, tipo_novo: tipoNovo})
+    });
+
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      exibirAlerta(`Estrutura "${tipoAtual}" renomeada para "${tipoNovo}" com sucesso!`, 'success');
+      await carregarDadosIniciais();
+      document.getElementById('sel-estrutura').value = tipoNovo;
+      await aoMudarEstrutura();
+    } else {
+      exibirAlerta(data.erro || 'Erro ao renomear estrutura', 'danger');
     }
   } catch (e) {
     exibirAlerta('Erro de comunicação: ' + e.message, 'danger');
