@@ -56,7 +56,7 @@ main {
     </div>
 
     <div style="padding: 1.25rem;">
-      <div style="display: grid; grid-template-columns: minmax(240px, 1.8fr) minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr); gap: 1rem; align-items: start;">
+      <div style="display: grid; grid-template-columns: minmax(320px, 2.4fr) minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr); gap: 1.25rem; align-items: start;">
         
         <!-- Campo: Tipo da Estrutura -->
         <div>
@@ -67,13 +67,13 @@ main {
             <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600; height: 38px; min-width: 0;" onchange="aoMudarEstrutura()">
               <option value="">-- Selecione uma Estrutura --</option>
             </select>
-            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 38px; padding: 0 0.6rem; flex-shrink: 0;">
+            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 38px; padding: 0 0.75rem; flex-shrink: 0; font-weight: 700;">
               ➕
             </button>
           </div>
           <!-- Input de Nome quando for Nova -->
           <div id="div-nome-custom" style="display: none; margin-top: 0.4rem;">
-            <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Digite o nome da nova estrutura" style="text-transform: uppercase; font-size: 0.85rem; height: 34px;" oninput="aoDigitarNomeCustom()">
+            <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Digite o nome da nova estrutura (ex: N4-NOVO)" style="text-transform: uppercase; font-size: 0.85rem; height: 36px; width: 100%;" oninput="aoDigitarNomeCustom()">
           </div>
         </div>
 
@@ -159,36 +159,36 @@ main {
           <col style="width: 6%;">   <!-- Ações -->
         </colgroup>
         <thead>
-          <!-- Linha 1 de Cabeçalho -->
-          <tr style="background: #1e293b; color: #f8fafc;">
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;">NÍVEL</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;">COTA (m)</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;">FACE</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle; background: #0f172a; color: #93c5fd;">
+          <!-- Linha 1 de Cabeçalho (Todos Centralizados) -->
+          <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">NÍVEL</th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">COTA (m)</th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">FACE</th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle; background: #0f172a; color: #93c5fd;">
               CRUZ.
             </th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 4px; background: #082f49; color: #38bdf8; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
+            <th colspan="5" style="border: 1px solid #334155; padding: 4px; text-align: center; background: #082f49; color: #38bdf8; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
               QUANTIDADE P/ MÁQUINA (50 kN)
             </th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 4px; background: #064e3b; color: #4ade80; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
+            <th colspan="5" style="border: 1px solid #334155; padding: 4px; text-align: center; background: #064e3b; color: #4ade80; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
               QUANTIDADE P/ ROSCA DUPLA (70 kN)
             </th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;"></th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;"></th>
           </tr>
-          <!-- Linha 2 de Cabeçalho -->
-          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.7rem;">
+          <!-- Linha 2 de Cabeçalho (Todos Centralizados) -->
+          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.7rem; text-align: center;">
             <!-- Máquina -->
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">PARAF</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">ARR</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">SOBRA</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">PARAF</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">PORCA</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">ARR</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">OLHAL</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">SOBRA</th>
             <!-- Rosca Dupla -->
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">PARAF</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">ARR</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">SOBRA</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">PARAF</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">PORCA</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">ARR</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">OLHAL</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">SOBRA</th>
           </tr>
         </thead>
         <tbody id="tbody-grid-niveis">
@@ -218,27 +218,27 @@ main {
       <div style="overflow-x: auto; margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px;">
         <table id="tabela-matriz-parafusos" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: center;">
           <thead>
-            <tr style="background: #1e293b; color: #f8fafc;">
-              <th style="padding: 8px 10px; text-align: left; min-width: 90px; border-right: 1px solid #334155;">POSIÇÃO</th>
-              <th style="padding: 8px 10px; text-align: left; min-width: 150px; border-right: 1px solid #334155;">PARAFUSO</th>
-              <th style="padding: 8px 10px; min-width: 85px; border-right: 1px solid #334155;">CLASSE (KN)</th>
+            <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
+              <th style="padding: 8px 10px; text-align: center; min-width: 100px; border-right: 1px solid #334155;">POSIÇÃO</th>
+              <th style="padding: 8px 10px; text-align: center; min-width: 160px; border-right: 1px solid #334155;">PARAFUSO</th>
+              <th style="padding: 8px 10px; text-align: center; min-width: 90px; border-right: 1px solid #334155;">CLASSE (KN)</th>
               <!-- Comprimentos fixos de 200 a 900 mm -->
-              <th style="padding: 8px 4px; min-width: 42px;">200</th>
-              <th style="padding: 8px 4px; min-width: 42px;">250</th>
-              <th style="padding: 8px 4px; min-width: 42px;">300</th>
-              <th style="padding: 8px 4px; min-width: 42px;">350</th>
-              <th style="padding: 8px 4px; min-width: 42px;">400</th>
-              <th style="padding: 8px 4px; min-width: 42px;">450</th>
-              <th style="padding: 8px 4px; min-width: 42px;">500</th>
-              <th style="padding: 8px 4px; min-width: 42px;">550</th>
-              <th style="padding: 8px 4px; min-width: 42px;">600</th>
-              <th style="padding: 8px 4px; min-width: 42px;">650</th>
-              <th style="padding: 8px 4px; min-width: 42px;">700</th>
-              <th style="padding: 8px 4px; min-width: 42px;">750</th>
-              <th style="padding: 8px 4px; min-width: 42px;">800</th>
-              <th style="padding: 8px 4px; min-width: 42px;">850</th>
-              <th style="padding: 8px 4px; min-width: 42px;">900</th>
-              <th style="padding: 8px 4px; width: 35px;"></th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">200</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">250</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">300</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">350</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">400</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">450</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">500</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">550</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">600</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">650</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">700</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">750</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">800</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">850</th>
+              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">900</th>
+              <th style="padding: 8px 4px; text-align: center; width: 35px;"></th>
             </tr>
           </thead>
           <tbody id="tbody-matriz-parafusos">
@@ -491,7 +491,7 @@ async function carregarDadosIniciais() {
 
     const optNova = document.createElement('option');
     optNova.value = '__NOVA__';
-    optNova.textContent = '➕ [Nova Estrutura Personalizada]';
+    optNova.textContent = '➕ [Nova Estrutura]';
     selEst.appendChild(optNova);
 
     // Seleciona N1 por padrão se existir
