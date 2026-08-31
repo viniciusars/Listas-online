@@ -13,6 +13,10 @@ main {
     max-width: 100% !important;
     width: 100% !important;
 }
+.card select, .card input[type="text"], .card input[type="number"] {
+    box-sizing: border-box !important;
+    line-height: normal !important;
+}
 {% endblock %}
 
 {% block content %}
@@ -56,33 +60,33 @@ main {
     </div>
 
     <div style="padding: 1.25rem;">
-      <div style="display: grid; grid-template-columns: minmax(320px, 2.4fr) minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr); gap: 1.25rem; align-items: start;">
+      <div style="display: grid; grid-template-columns: minmax(320px, 2.4fr) minmax(200px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr); gap: 1.25rem; align-items: start;">
         
         <!-- Campo: Tipo da Estrutura -->
         <div>
-          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
             Tipo da Estrutura:
           </label>
           <div style="display: flex; gap: 0.4rem; width: 100%;">
-            <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600; height: 38px; min-width: 0;" onchange="aoMudarEstrutura()">
+            <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600; height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; min-width: 0; box-sizing: border-box;" onchange="aoMudarEstrutura()">
               <option value="">-- Selecione uma Estrutura --</option>
             </select>
-            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 38px; padding: 0 0.75rem; flex-shrink: 0; font-weight: 700;">
+            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 44px; min-height: 44px; padding: 0 0.85rem; flex-shrink: 0; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
               ➕
             </button>
           </div>
           <!-- Input de Nome quando for Nova -->
-          <div id="div-nome-custom" style="display: none; margin-top: 0.4rem;">
-            <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Digite o nome da nova estrutura (ex: N4-NOVO)" style="text-transform: uppercase; font-size: 0.85rem; height: 36px; width: 100%;" oninput="aoDigitarNomeCustom()">
+          <div id="div-nome-custom" style="display: none; margin-top: 0.5rem;">
+            <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Digite o nome da nova estrutura (ex: N4-NOVO)" style="text-transform: uppercase; font-size: 0.9rem; height: 44px; min-height: 44px; padding: 6px 12px; width: 100%; box-sizing: border-box;" oninput="aoDigitarNomeCustom()">
           </div>
         </div>
 
         <!-- Campo: Esforço do Poste (daN) -->
         <div>
-          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
             Esforço do Poste (daN):
           </label>
-          <select id="sel-esforco" class="form-control" style="font-weight: 600; height: 38px; width: 100%;" onchange="calcularTudo()">
+          <select id="sel-esforco" class="form-control" style="font-weight: 600; height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; width: 100%; box-sizing: border-box;" onchange="calcularTudo()">
             <option value="600">600 daN (Fator 0.0)</option>
             <option value="1000" selected>1000 daN (Fator 1.5)</option>
             <option value="1500">1500 daN (Fator 3.0)</option>
@@ -94,19 +98,19 @@ main {
 
         <!-- Campo: Altura do Poste (m) -->
         <div>
-          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
             <span>Altura (m):</span>
-            <span id="badge-ch-req" style="display: none; color: var(--warning-color, #f59e0b); font-size: 0.7rem; font-weight: 700;">(Requerida)</span>
+            <span id="badge-ch-req" style="display: none; color: var(--warning-color, #f59e0b); font-size: 0.72rem; font-weight: 700;">(Requerida)</span>
           </label>
-          <input type="number" id="input-altura" class="form-control" placeholder="Opcional (ex: 12)" step="0.5" min="6" max="30" style="height: 38px; width: 100%;" oninput="calcularTudo()">
+          <input type="number" id="input-altura" class="form-control" placeholder="Opcional (ex: 12)" step="0.5" min="6" max="30" style="height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; width: 100%; box-sizing: border-box;" oninput="calcularTudo()">
         </div>
 
         <!-- Campo: Cruzeta Adicional (Item 36) -->
         <div>
-          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
             Cruzeta Adic. (Item 36):
           </label>
-          <input type="number" id="input-cruzeta-adic" class="form-control" placeholder="0" min="0" step="1" style="height: 38px; width: 100%;" oninput="calcularTudo()">
+          <input type="number" id="input-cruzeta-adic" class="form-control" placeholder="0" min="0" step="1" style="height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; width: 100%; box-sizing: border-box;" oninput="calcularTudo()">
         </div>
 
       </div>
