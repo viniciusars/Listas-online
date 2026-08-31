@@ -26,6 +26,7 @@ from src.motor_estais import calcular_quantitativo_estais
 from src.motor_alcas_lacos import calcular_alcas_lacos, gerar_tabela_validacao
 from src.motor_ferragens import calcular_ferragens, gerar_tabela_validacao_ferragens
 from src.motor_parafusos import calcular_parafusos, identificar_estruturas_ambiguas
+from src import calculadora_parafusos
 from src.exportador import exportar_para_excel, exportar_multiplas_abas
 from src.consolidador import processar_consolidacao
 
@@ -154,6 +155,11 @@ def materiais():
 @app.route('/parafusos')
 def parafusos():
     return render_template('parafusos.html')
+
+
+@app.route('/dimensionar-parafusos')
+def dimensionar_parafusos():
+    return render_template('dimensionar_parafusos.html')
 
 
 @app.route('/alcas')
@@ -452,6 +458,98 @@ def api_paraf_excluir():
         return jsonify({'erro': 'Campos "esforco"/"altura" inválidos.'}), 400
     count = excluir_estrutura_parafusos(tipo, esforco, altura, _parque_ativo_id())
     return jsonify({'ok': True, 'count': count})
+
+
+# ── API: Dimensionar Parafusos ───────────────────────────────────────────────
+
+@app.route('/dimensionar-parafusos/api/dados')
+def api_dimensionar_dados():
+    return jsonify({
+        'estruturas': calculadora_parafusos.listar_estruturas_disponiveis(),
+        'padroes': calculadora_parafusos.listar_padroes_montagem(),
+        'esforcos_padrao': [600, 1000, 1500, 2000, 2500, 3000],
+        'dimensoes_ferragens': calculadora_parafusos.DIMENSOES_FERRAGENS,
+        'comprimentos_comerciais': calculadora_parafusos.COMPRIMENTOS_COMERCIAIS,
+    })
+
+
+@app.route('/dimensionar-parafusos/api/calcular', methods=['POST'])
+def api_dimensionar_calcular():
+    data = request.get_json(force=True)
+    tipo = str(data.get('tipo', '')).strip().upper()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    try:
+        esforco = float(data.get('esforco', 1000))
+    except (TypeError, ValueError):
+        return jsonify({'erro': 'Campo "esforco" inválido.'}), 400
+
+    altura_raw = data.get('altura')
+    altura = float(altura_raw) if altura_raw not in (None, '', 'null', '-') else None
+    
+    cruzeta_raw = data.get('cruzeta_adicional')
+    cruzeta = float(cruzeta_raw) if cruzeta_raw not in (None, '', 'null') else None
+
+    niveis = data.get('niveis')
+
+    try:
+        resultado = calculadora_parafusos.calcular_estrutura_completa(
+            tipo_estrutura=tipo,
+            esforco_dan=esforco,
+            altura_m=altura,
+            niveis_custom=niveis,
+            cruzeta_adicional=cruzeta
+        )
+        return jsonify(resultado)
+    except ValueError as e:
+        return jsonify({'erro': str(e)}), 400
+    except Exception as e:
+        return jsonify({'erro': f'Erro no cálculo: {str(e)}'}), 500
+
+
+@app.route('/dimensionar-parafusos/api/salvar', methods=['POST'])
+def api_dimensionar_salvar():
+    data = request.get_json(force=True)
+    tipo = str(data.get('tipo', '')).strip().upper()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    try:
+        esforco = float(data.get('esforco'))
+        altura = _parse_altura(data.get('altura'))
+    except (TypeError, ValueError):
+        return jsonify({'erro': 'Campos "esforco"/"altura" inválidos.'}), 400
+
+    cruzeta = data.get('cruzeta_adicional')
+    cruzeta = float(cruzeta) if cruzeta not in (None, '', 'null') else None
+
+    linhas_in = data.get('linhas', [])
+    linhas = []
+    for l in linhas_in:
+        posicao = str(l.get('posicao', '')).strip().upper()
+        parafuso = str(l.get('parafuso', '')).strip().upper()
+        if not posicao or not parafuso:
+            continue
+        try:
+            esf_parafuso = float(l.get('esf_parafuso', 50.0))
+            comprimento = int(float(l.get('comprimento', 0)))
+            quantidade = float(l.get('quantidade', 0))
+        except (TypeError, ValueError, KeyError):
+            continue
+        if quantidade <= 0 or comprimento <= 0:
+            continue
+        linhas.append({
+            'posicao': posicao,
+            'parafuso': parafuso,
+            'esf_parafuso': esf_parafuso,
+            'comprimento': comprimento,
+            'quantidade': quantidade,
+        })
+
+    if not linhas:
+        return jsonify({'erro': 'Nenhum parafuso válido gerado para salvar.'}), 400
+
+    count = salvar_grade_parafusos(tipo, esforco, altura, cruzeta, linhas, _parque_ativo_id())
+    return jsonify({'ok': True, 'count': count, 'tipo': tipo, 'esforco': esforco, 'altura': altura})
 
 
 # ── Baixar / Importar receitas (.xlsx) ─────────────────────────────────────

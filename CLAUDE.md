@@ -100,6 +100,8 @@ As receitas são separadas por **parque** (obra/cliente), escolhido num seletor 
 
 * **Fase 15: Preparação para Nuvem (Render + Turso):** O usuário solicitou que o sistema rodasse 100% na web. A arquitetura escolhida foi a hospedagem contínua no **Render** com banco de dados **Turso** (LibSQL gerenciado na nuvem). Adaptações implementadas: (1) `src/banco.py` ganhou detecção automática de `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN` conectando via `libsql` com wrappers `LibSqlConnection`, `LibSqlCursor` e `LibSqlRow` que mantêm compatibilidade com a interface `sqlite3.Row` e evitam avisos do Pandas; se as variáveis não forem informadas, recai no SQLite local `data/sistema.db`; (2) `requirements.txt` atualizado com `gunicorn>=21.0` e `libsql>=0.1.0`; (3) criado `render.yaml` (manifesto de infraestrutura como código para deploy automático); (4) criado `scripts/testar_turso.py` para validação rápida da conexão com a nuvem antes do deploy.
 
+* **Fase 16: Calculadora e Dimensionamento Automático de Parafusos:** Implementação de uma nova aba interativa no menu (`/dimensionar-parafusos`) baseada na modelagem modular do Google Sheets do usuário (abas `PADRAO` e `ESTRUTURAS`). A engine geométrica (`src/calculadora_parafusos.py`) calcula a seção do poste duplo T (Faces A e B) a partir do esforço (600 a 3000 daN) e da cota de cada nível (distância ou `CH+...`), soma as espessuras de ferragens (cruzetas, porcas, arruelas, olhais e sobra) e arredonda para o comprimento comercial padrão. O usuário pode selecionar estruturas do catálogo (19 estruturas embutidas) ou criar novas, editar cotas e montagens em tempo real, visualizar o cálculo nível a nível e, ao validar, clicar em "Validar e Adicionar à Receita" para gravar a estrutura dimensionada diretamente em `parafusos_receita` do parque ativo sem alterar as demais estruturas.
+
 ---
 
 ## 3. Alternativas Consideradas e Descartadas
@@ -108,7 +110,7 @@ As receitas são separadas por **parque** (obra/cliente), escolhido num seletor 
 ---
 
 ## 6. Estado Atual do Projeto
-O sistema está preparado tanto para execução local quanto para deploy 100% na nuvem no Render com banco Turso. Todos os motores (Postes, Estais, Alças/Laços, Ferragens, Parafusos) e rotas web estão operantes e testados.
+O sistema está preparado tanto para execução local quanto para deploy 100% na nuvem no Render com banco Turso. Todos os motores (Postes, Estais, Alças/Laços, Ferragens, Parafusos) e a nova Calculadora de Dimensionamento Automático estão operantes e testados.
 
 **Árvore de Diretórios:**
 > sistema_quantitativos/
@@ -120,6 +122,7 @@ O sistema está preparado tanto para execução local quanto para deploy 100% na
 > │   └── testar_turso.py        # Validação da conexão Turso na nuvem
 > ├── src/
 > │   ├── banco.py              # (OK) Suporte híbrido SQLite local + Turso Cloud (LibSQL)
+> │   ├── calculadora_parafusos.py # (OK) Motor geométrico de dimensionamento por montagens e níveis
 > │   ├── planilhas.py          # (OK) Exporta/importa as 4 receitas em .xlsx
 > │   ├── leitor_excel.py       # (OK) Empilha abas, limpa cabeçalhos
 > │   ├── motor_postes.py       # (OK) Separa Altura/Carga e formata string
@@ -129,7 +132,7 @@ O sistema está preparado tanto para execução local quanto para deploy 100% na
 > │   ├── motor_parafusos.py    # (OK) Parafusos por comprimento
 > │   ├── exportador.py         # (OK) Salva relatórios em .xlsx
 > │   └── consolidador.py       # (OK) Consolidação de materiais
-> ├── templates/               # (OK) Templates Jinja2
+> ├── templates/               # (OK) Templates Jinja2 (dimensionar_parafusos.html, etc.)
 > ├── requirements.txt         # flask, pandas, openpyxl, gunicorn, libsql
 > ├── render.yaml              # Manifesto de deploy no Render
 > └── main.py                  # Servidor Flask / WSGI app para Gunicorn

@@ -1,0 +1,640 @@
+{% extends "base.html" %}
+
+{% block title %}Dimensionar Parafusos — Sistema RMT{% endblock %}
+
+{% block styles %}
+main { max-width: 1180px; }
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.badge-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 99px;
+}
+.badge-info { background: var(--primary-light); color: var(--primary-color); }
+.badge-warning { background: #fef3c7; color: #b45309; }
+.badge-success { background: #dcfce7; color: #15803d; }
+
+.grid-params {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-group label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.tbl-niveis-wrap {
+    overflow-x: auto;
+    margin-top: 12px;
+}
+table.tbl-niveis {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+table.tbl-niveis th {
+    background: var(--bg-color);
+    padding: 10px 12px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
+}
+table.tbl-niveis td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+table.tbl-niveis tr:hover td {
+    background: var(--bg-color);
+}
+table.tbl-niveis select,
+table.tbl-niveis input {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.88rem;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.card-summary {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 16px;
+}
+
+.step-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    margin-top: 10px;
+}
+.step-table th {
+    background: var(--surface-color);
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+.step-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+.step-table tr:hover td {
+    background: var(--surface-color);
+}
+
+.highlight-val {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.comercial-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 18px 24px;
+    background: var(--bg-color);
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.info-alert {
+    padding: 12px 16px;
+    border-radius: var(--border-radius-sm);
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.success-box {
+    padding: 14px 18px;
+    border-radius: var(--border-radius-sm);
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+[data-theme="dark"] .success-box {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btn-icon {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">← Voltar ao Menu</a>
+
+<div class="section-header">
+    <div>
+        <h1 style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+            <span>📐</span> Dimensionamento Automático de Parafusos
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+            Calcule o comprimento e tipos de parafusos por nível a partir da geometria do poste e adicione novas estruturas à receita.
+        </p>
+    </div>
+</div>
+
+<!-- Card 1: Parâmetros de Entrada -->
+<div class="card">
+    <div class="card-header">
+        <span class="step">1</span>
+        <h2>Definir Parâmetros da Estrutura</h2>
+    </div>
+    <div class="card-body">
+        <div class="grid-params">
+            <div class="form-group">
+                <label for="sel-estrutura">Tipo de Estrutura</label>
+                <input type="text" id="sel-estrutura" list="lista-estruturas" placeholder="Ex: N1, N4, N3-CHP..."
+                       autocomplete="off" oninput="aoSelecionarEstrutura(this.value)">
+                <datalist id="lista-estruturas">
+                    <!-- Preenchido via API -->
+                </datalist>
+            </div>
+
+            <div class="form-group">
+                <label for="sel-esforco">Esforço do Poste (daN)</label>
+                <select id="sel-esforco" onchange="recalcular()">
+                    <option value="600">600 daN</option>
+                    <option value="1000" selected>1000 daN</option>
+                    <option value="1500">1500 daN</option>
+                    <option value="2000">2000 daN</option>
+                    <option value="2500">2500 daN</option>
+                    <option value="3000">3000 daN</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="grp-altura">
+                <label for="inp-altura">
+                    Altura do Poste (m)
+                    <span id="tag-dep-altura" class="badge-tag badge-warning" style="display: none;">Cota CH</span>
+                </label>
+                <input type="number" id="inp-altura" placeholder="Ex: 12, 13, 14..." step="0.5" min="6" max="30"
+                       oninput="recalcular()">
+            </div>
+
+            <div class="form-group">
+                <label for="inp-cruzeta-adic">Cruzeta Adicional (Item 36)</label>
+                <input type="number" id="inp-cruzeta-adic" placeholder="0, 1 ou 2" step="1" min="0" max="10"
+                       oninput="recalcular()">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Card 2: Níveis e Montagens -->
+<div class="card">
+    <div class="card-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="step">2</span>
+            <h2>Composição dos Níveis e Montagens</h2>
+        </div>
+        <button type="button" class="btn btn-outline btn-icon" onclick="adicionarNivel()">
+            ➕ Adicionar Nível
+        </button>
+    </div>
+    <div class="card-body" style="padding-top: 10px;">
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">
+            Ajuste as distâncias progressivas e os blocos de montagem de cada nível conforme o projeto.
+        </p>
+
+        <div class="tbl-niveis-wrap">
+            <table class="tbl-niveis" id="tabela-niveis">
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">Nível</th>
+                        <th style="width: 180px;">Distância / Cota (m)</th>
+                        <th>Montagem Padrão</th>
+                        <th style="width: 140px; text-align: center;">Inverter Face</th>
+                        <th style="width: 50px; text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-niveis">
+                    <!-- Inserido dinamicamente via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Card 3: Resultados e Validação -->
+<div class="card" id="card-resultados" style="display: none;">
+    <div class="card-header">
+        <span class="step">3</span>
+        <h2>Dimensionamento Calculado & Parafusos Gerados</h2>
+    </div>
+    <div class="card-body">
+        
+        <!-- Alerta de Sucesso após Salvar -->
+        <div id="alerta-salvo" class="success-box" style="display: none; margin-bottom: 18px;">
+            <div>
+                <strong>✓ Estrutura salva com sucesso!</strong>
+                <p id="msg-salvo-detalhes" style="font-size: 0.85rem; margin-top: 2px;"></p>
+            </div>
+            <a href="/parafusos" class="btn btn-outline btn-icon" style="background: white; color: #065f46 !important;">
+                Ver na Tela de Parafusos ↗
+            </a>
+        </div>
+
+        <div class="results-grid">
+            <!-- Tabela Consolidada de Parafusos -->
+            <div class="card-summary">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span>🔩</span> Resumo dos Parafusos da Estrutura
+                </h3>
+                
+                <table class="step-table">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Tipo de Parafuso</th>
+                            <th>Classe (kN)</th>
+                            <th style="text-align: center;">Comprimento Comercial</th>
+                            <th style="text-align: center;">Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpo-resumo-parafusos">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Detalhamento Passo a Passo -->
+            <div class="card-summary">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span>🔍</span> Memória de Cálculo Geométrico por Nível
+                </h3>
+                
+                <div style="overflow-x: auto;">
+                    <table class="step-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">Nível</th>
+                                <th>Montagem</th>
+                                <th>Face / Posição</th>
+                                <th>Cota (m)</th>
+                                <th>Seção Poste (mm)</th>
+                                <th>Ferragens (mm)</th>
+                                <th>Comp. Calc. (mm)</th>
+                                <th style="text-align: center;">Comercial (mm)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpo-passo-a-passo">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Ação Inferior -->
+    <div class="action-bar">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Ao validar, essa nova estrutura será adicionada diretamente ao cadastro do parque <strong>{{ parque_ativo.nome if parque_ativo else 'ativo' }}</strong>.
+        </div>
+        <button type="button" id="btn-salvar-receita" class="btn btn-success" onclick="salvarNaReceita()">
+            <span>💾</span> Validar e Adicionar à Receita
+        </button>
+    </div>
+</div>
+
+<script>
+let DADOS_SISTEMA = null;
+let NIVEIS_ATUAIS = [];
+let ULTIMO_RESULTADO = null;
+
+// Inicializa dados do servidor
+async function carregarDadosIniciais() {
+    try {
+        const resp = await fetch('/dimensionar-parafusos/api/dados');
+        if (!resp.ok) throw new Error('Falha ao carregar catálogo de dados.');
+        DADOS_SISTEMA = await resp.json();
+        
+        // Popula datalist de estruturas
+        const datalist = document.getElementById('lista-estruturas');
+        datalist.innerHTML = '';
+        DADOS_SISTEMA.estruturas.forEach(est => {
+            const opt = document.createElement('option');
+            opt.value = est.nome;
+            opt.label = `${est.total_niveis} níveis ${est.depende_altura ? '(Depende de Altura)' : ''}`;
+            datalist.appendChild(opt);
+        });
+
+        // Carrega estrutura padrão inicial (ex: N1 ou primeira da lista)
+        if (DADOS_SISTEMA.estruturas.length > 0) {
+            document.getElementById('sel-estrutura').value = 'N1';
+            aoSelecionarEstrutura('N1');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao inicializar calculadora: ' + e.message);
+    }
+}
+
+function obterOpcoesMontagensHtml(selecionada) {
+    if (!DADOS_SISTEMA || !DADOS_SISTEMA.padroes) return '';
+    let html = '';
+    for (const [chave, pad] of Object.entries(DADOS_SISTEMA.padroes)) {
+        const sel = (chave === selecionada) ? 'selected' : '';
+        html += `<option value="${chave}" ${sel}>${pad.nome} (${pad.descricao})</option>`;
+    }
+    return html;
+}
+
+function renderizarTabelaNiveis() {
+    const tbody = document.getElementById('corpo-niveis');
+    tbody.innerHTML = '';
+
+    NIVEIS_ATUAIS.forEach((n, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align: center;">
+                <input type="number" min="1" max="20" value="${n.nivel}" style="width: 55px; text-align: center;"
+                       oninput="atualizarNivelCampo(${idx}, 'nivel', parseInt(this.value) || 1)">
+            </td>
+            <td>
+                <input type="text" value="${n.distancia_prog}" placeholder="Ex: 0.2, 1.4, CH+1.2"
+                       oninput="atualizarNivelCampo(${idx}, 'distancia_prog', this.value)">
+            </td>
+            <td>
+                <select onchange="atualizarNivelCampo(${idx}, 'montagem', this.value)">
+                    ${obterOpcoesMontagensHtml(n.montagem)}
+                </select>
+            </td>
+            <td style="text-align: center;">
+                <input type="checkbox" ${n.inverte ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;"
+                       onchange="atualizarNivelCampo(${idx}, 'inverte', this.checked ? 1 : 0)">
+            </td>
+            <td style="text-align: center;">
+                <button type="button" class="btn btn-outline" style="padding: 4px 8px; color: var(--danger-color) !important;"
+                        title="Remover este nível" onclick="removerNivel(${idx})">
+                    🗑️
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    verificarDependenciaAltura();
+    recalcular();
+}
+
+function verificarDependenciaAltura() {
+    const depende = NIVEIS_ATUAIS.some(n => String(n.distancia_prog || '').toUpperCase().includes('CH'));
+    const tag = document.getElementById('tag-dep-altura');
+    const inpAlt = document.getElementById('inp-altura');
+    
+    if (depende) {
+        tag.style.display = 'inline-block';
+        if (!inpAlt.value) {
+            inpAlt.value = '12'; // Padrão sugerido
+        }
+        inpAlt.style.borderColor = 'var(--warning-color)';
+    } else {
+        tag.style.display = 'none';
+        inpAlt.style.borderColor = '';
+    }
+}
+
+function aoSelecionarEstrutura(nome) {
+    const nomeLimpo = nome.trim();
+    if (!DADOS_SISTEMA) return;
+    
+    const est = DADOS_SISTEMA.estruturas.find(e => e.nome.toUpperCase() === nomeLimpo.toUpperCase());
+    if (est) {
+        // Clona os níveis da estrutura do catálogo
+        NIVEIS_ATUAIS = JSON.parse(JSON.stringify(est.niveis));
+    } else if (NIVEIS_ATUAIS.length === 0) {
+        // Nova estrutura em branco
+        NIVEIS_ATUAIS = [
+            { nivel: 1, distancia_prog: '0.2', montagem: 'N1', inverte: 0 }
+        ];
+    }
+    renderizarTabelaNiveis();
+}
+
+function atualizarNivelCampo(idx, campo, valor) {
+    if (NIVEIS_ATUAIS[idx]) {
+        NIVEIS_ATUAIS[idx][campo] = valor;
+        verificarDependenciaAltura();
+        recalcular();
+    }
+}
+
+function adicionarNivel() {
+    const proximoNivel = NIVEIS_ATUAIS.length > 0 ? (Math.max(...NIVEIS_ATUAIS.map(n => n.nivel || 1)) + 1) : 1;
+    NIVEIS_ATUAIS.push({
+        nivel: proximoNivel,
+        distancia_prog: '1.2',
+        montagem: 'N1',
+        inverte: 0
+    });
+    renderizarTabelaNiveis();
+}
+
+function removerNivel(idx) {
+    if (NIVEIS_ATUAIS.length <= 1) {
+        alert('A estrutura deve ter pelo menos 1 nível.');
+        return;
+    }
+    NIVEIS_ATUAIS.splice(idx, 1);
+    renderizarTabelaNiveis();
+}
+
+// Executa o cálculo em tempo real
+async function recalcular() {
+    const tipo = document.getElementById('sel-estrutura').value.trim();
+    const esforco = parseFloat(document.getElementById('sel-esforco').value) || 1000;
+    const alturaVal = document.getElementById('inp-altura').value.trim();
+    const altura = alturaVal ? parseFloat(alturaVal) : null;
+    const cruzAdicVal = document.getElementById('inp-cruzeta-adic').value.trim();
+    const cruzetaAdic = cruzAdicVal ? parseFloat(cruzAdicVal) : null;
+
+    if (!tipo || NIVEIS_ATUAIS.length === 0) {
+        document.getElementById('card-resultados').style.display = 'none';
+        return;
+    }
+
+    try {
+        const resp = await fetch('/dimensionar-parafusos/api/calcular', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: tipo,
+                esforco: esforco,
+                altura: altura,
+                cruzeta_adicional: cruzetaAdic,
+                niveis: NIVEIS_ATUAIS
+            })
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) {
+            console.warn('Cálculo pendente:', data.erro);
+            return;
+        }
+
+        ULTIMO_RESULTADO = data;
+        exibirResultados(data);
+    } catch (e) {
+        console.error('Erro na requisição de cálculo:', e);
+    }
+}
+
+function exibirResultados(data) {
+    const cardRes = document.getElementById('card-resultados');
+    cardRes.style.display = 'block';
+
+    // 1. Resumo dos Parafusos
+    const corpoResumo = document.getElementById('corpo-resumo-parafusos');
+    corpoResumo.innerHTML = '';
+    
+    if (data.parafusos_consolidados && data.parafusos_consolidados.length > 0) {
+        data.parafusos_consolidados.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${p.posicao}</strong></td>
+                <td>${p.parafuso}</td>
+                <td>${p.esf_parafuso} kN</td>
+                <td style="text-align: center;">
+                    <span class="comercial-badge">${p.comprimento} mm</span>
+                </td>
+                <td style="text-align: center; font-weight: 700; font-size: 1rem; color: var(--primary-color);">
+                    ${p.quantidade}
+                </td>
+            `;
+            corpoResumo.appendChild(tr);
+        });
+    } else {
+        corpoResumo.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum parafuso gerado para esta configuração.</td></tr>';
+    }
+
+    // 2. Passo a Passo Detalhado
+    const corpoPasso = document.getElementById('corpo-passo-a-passo');
+    corpoPasso.innerHTML = '';
+
+    data.detalhes_niveis.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align: center; font-weight: 600;">N${d.nivel}</td>
+            <td><code>${d.montagem}</code></td>
+            <td><span class="badge-tag ${d.face === 'A' ? 'badge-info' : 'badge-warning'}">${d.posicao} (Face ${d.face})</span></td>
+            <td>${d.distancia_m.toFixed(2)} m <small style="color: var(--text-muted);">(${d.distancia_prog_raw})</small></td>
+            <td>${d.secao_poste_mm.toFixed(1)} mm</td>
+            <td>+${d.ferragens_mm.toFixed(1)} mm</td>
+            <td><strong>${d.comp_calculado_mm.toFixed(1)} mm</strong></td>
+            <td style="text-align: center;">
+                <span class="comercial-badge">${d.comp_comercial_mm} mm</span>
+            </td>
+        `;
+        corpoPasso.appendChild(tr);
+    });
+}
+
+// Salvar na receita do parque ativo
+async function salvarNaReceita() {
+    if (!ULTIMO_RESULTADO || !ULTIMO_RESULTADO.parafusos_consolidados || ULTIMO_RESULTADO.parafusos_consolidados.length === 0) {
+        alert('Nenhum resultado válido para salvar.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-salvar-receita');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Salvando...';
+
+    try {
+        const payload = {
+            tipo: ULTIMO_RESULTADO.tipo,
+            esforco: ULTIMO_RESULTADO.esforco,
+            altura: ULTIMO_RESULTADO.altura,
+            cruzeta_adicional: ULTIMO_RESULTADO.cruzeta_adicional,
+            linhas: ULTIMO_RESULTADO.parafusos_consolidados
+        };
+
+        const resp = await fetch('/dimensionar-parafusos/api/salvar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const resJson = await resp.json();
+        if (!resp.ok) throw new Error(resJson.erro || 'Falha ao salvar na receita.');
+
+        // Exibe mensagem de sucesso
+        const alerta = document.getElementById('alerta-salvo');
+        const msgDet = document.getElementById('msg-salvo-detalhes');
+        const altTxt = payload.altura ? ` • Altura: ${payload.altura}m` : '';
+        msgDet.textContent = `Estrutura "${payload.tipo}" (Esforço: ${payload.esforco} daN${altTxt}) com ${resJson.count} parafuso(s) adicionada com sucesso.`;
+        alerta.style.display = 'flex';
+        alerta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    } catch (e) {
+        alert('Erro ao salvar na receita: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// Inicia ao carregar a página
+document.addEventListener('DOMContentLoaded', carregarDadosIniciais);
+</script>
+{% endblock %}
