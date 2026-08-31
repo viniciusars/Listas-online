@@ -308,8 +308,8 @@ main {
 </div>
 
 <!-- MODAL: Gerenciar Padrões de Montagem do Parque -->
-<div id="modal-padroes" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
-  <div style="background: var(--surface-color); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
+<div id="modal-padroes" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+  <div style="background: var(--surface-color); color: var(--text-main); width: 100%; max-width: 1000px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
     
     <!-- Modal Header -->
     <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03);">
@@ -327,16 +327,16 @@ main {
         <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center;">
           <thead>
             <tr style="background: #1e293b; color: #f8fafc;">
-              <th style="padding: 8px 6px; text-align: left;">Nome</th>
+              <th style="padding: 8px 6px; text-align: center;">Nome</th>
               <th style="padding: 8px 6px; text-align: left;">Descrição</th>
-              <th style="padding: 8px 6px;">Cruzeta</th>
-              <th style="padding: 8px 6px;">P. Simples</th>
-              <th style="padding: 8px 6px;">P. Dupla</th>
-              <th style="padding: 8px 6px;">Porca</th>
-              <th style="padding: 8px 6px;">Arruela</th>
-              <th style="padding: 8px 6px;">Olhal</th>
-              <th style="padding: 8px 6px;">Sobra</th>
-              <th style="padding: 8px 6px;">Face</th>
+              <th style="padding: 8px 6px; text-align: center;">Cruzeta</th>
+              <th style="padding: 8px 6px; text-align: center;">P. Simples</th>
+              <th style="padding: 8px 6px; text-align: center;">P. Dupla</th>
+              <th style="padding: 8px 6px; text-align: center;">Porca</th>
+              <th style="padding: 8px 6px; text-align: center;">Arruela</th>
+              <th style="padding: 8px 6px; text-align: center;">Olhal</th>
+              <th style="padding: 8px 6px; text-align: center;">Sobra</th>
+              <th style="padding: 8px 6px; text-align: center;">Face</th>
               <th style="padding: 8px 6px; width: 45px;"></th>
             </tr>
           </thead>
@@ -347,65 +347,67 @@ main {
       </div>
 
       <!-- Formulário Estruturado para Criar/Editar Padrão -->
-      <div style="padding: 1.25rem; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
-        <h4 style="margin: 0 0 1rem; font-size: 0.9rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.3rem;">
+      <div style="padding: 1.25rem; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box;">
+        <h4 style="margin: 0 0 1rem; font-size: 0.92rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
           <span>✏️</span> Adicionar ou Atualizar Padrão de Montagem
         </h4>
 
         <!-- Grupo 1: Identificação -->
-        <div style="display: grid; grid-template-columns: 1.2fr 2.5fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div style="display: grid; grid-template-columns: minmax(140px, 1.2fr) minmax(200px, 2.8fr) minmax(120px, 1.2fr); gap: 0.75rem; margin-bottom: 1rem;">
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Nome do Padrão:</label>
-            <input type="text" id="modal-p-nome" class="form-control" placeholder="Ex: N1.ESP" style="text-transform: uppercase; font-size: 0.82rem; height: 34px;">
+            <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Nome do Padrão:</label>
+            <input type="text" id="modal-p-nome" class="modal-field-text" placeholder="Ex: N1.ESP" style="text-transform: uppercase;">
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Descrição:</label>
-            <input type="text" id="modal-p-desc" class="form-control" placeholder="Descrição clara da montagem" style="font-size: 0.82rem; height: 34px;">
+            <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Descrição:</label>
+            <input type="text" id="modal-p-desc" class="modal-field-text" placeholder="Descrição clara da montagem">
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Face Padrão:</label>
-            <select id="modal-p-face" class="form-control" style="font-size: 0.82rem; height: 34px;">
+            <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Face Padrão:</label>
+            <select id="modal-p-face" class="modal-field-text">
               <option value="B">B (Gaveta)</option>
               <option value="A">A (Topo)</option>
             </select>
           </div>
         </div>
 
-        <!-- Grupo 2: Ferragens e Parafusos -->
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr) 1.2fr; gap: 0.5rem; align-items: end;">
+        <!-- Grupo 2: Quantidades (7 colunas perfeitamente distribuídas) -->
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Cruzeta:</label>
-            <input type="number" id="modal-p-cruz" class="form-control text-center" value="1" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Cruzeta:</label>
+            <input type="number" id="modal-p-cruz" class="modal-field-input" value="1" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">P. Simples:</label>
-            <input type="number" id="modal-p-psimples" class="form-control text-center" value="0" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Simples:</label>
+            <input type="number" id="modal-p-psimples" class="modal-field-input" value="0" min="0" step="1" style="color: #0284c7; font-weight: 700;">
           </div>
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">P. Dupla:</label>
-            <input type="number" id="modal-p-pdupla" class="form-control text-center" value="0" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Dupla:</label>
+            <input type="number" id="modal-p-pdupla" class="modal-field-input" value="0" min="0" step="1" style="color: #16a34a; font-weight: 700;">
           </div>
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Porca:</label>
-            <input type="number" id="modal-p-porca" class="form-control text-center" value="2" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Porca:</label>
+            <input type="number" id="modal-p-porca" class="modal-field-input" value="2" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Arruela:</label>
-            <input type="number" id="modal-p-arr" class="form-control text-center" value="2" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Arruela:</label>
+            <input type="number" id="modal-p-arr" class="modal-field-input" value="2" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Olhal:</label>
-            <input type="number" id="modal-p-olhal" class="form-control text-center" value="0" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Olhal:</label>
+            <input type="number" id="modal-p-olhal" class="modal-field-input" value="0" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Sobra:</label>
-            <input type="number" id="modal-p-sobra" class="form-control text-center" value="1" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Sobra:</label>
+            <input type="number" id="modal-p-sobra" class="modal-field-input" value="1" min="0" step="1">
           </div>
-          <div>
-            <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()" style="width: 100%; height: 34px; font-size: 0.8rem; font-weight: 600; padding: 0;">
-              Salvar Padrão
-            </button>
-          </div>
+        </div>
+
+        <!-- Grupo 3: Ação de Salvar -->
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()" style="padding: 0.5rem 1.5rem; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+            <span>💾</span> Salvar Padrão de Montagem
+          </button>
         </div>
 
       </div>
@@ -419,6 +421,39 @@ main {
 </div>
 
 <style>
+  /* Inputs do Modal de Padrões */
+  .modal-field-text {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 6px 10px !important;
+    font-size: 0.88rem !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    background: var(--surface-color) !important;
+    color: var(--text-main) !important;
+  }
+  .modal-field-input {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 4px 6px !important;
+    font-size: 0.88rem !important;
+    text-align: center !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    background: var(--surface-color) !important;
+    color: var(--text-main) !important;
+  }
+  .modal-field-text:focus, .modal-field-input:focus {
+    border-color: var(--primary-color) !important;
+    outline: 2px solid var(--primary-light) !important;
+  }
+
   /* Células de input compactas da tabela de níveis */
   .cell-grid-input {
     width: 100%;
