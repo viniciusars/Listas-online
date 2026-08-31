@@ -185,69 +185,83 @@
     </div>
   </div>
 
-  <!-- CARD 3: Resultados do Dimensionamento (Design Moderno em Dashboard) -->
+  <!-- CARD 3: Resultados do Dimensionamento (Grade Matricial Idêntica ao Cadastro de Parafusos) -->
   <div class="card" style="margin-bottom: 1.5rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
       <div style="display: flex; align-items: center; gap: 0.5rem;">
         <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">3</span>
         <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
-          Resultados do Dimensionamento
+          Resultados do Dimensionamento (Grade de Parafusos Gerada)
         </h2>
       </div>
-      <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()" style="font-weight: 600; font-size: 0.85rem; padding: 0.45rem 1rem; display: flex; align-items: center; gap: 0.4rem;">
+      <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()" style="font-weight: 600; font-size: 0.85rem; padding: 0.45rem 1.1rem; display: flex; align-items: center; gap: 0.4rem;">
         <span>💾</span> Validar e Adicionar à Receita do Parque
       </button>
     </div>
 
-    <div style="padding: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
-      
-      <!-- Lado Esquerdo: Memória de Cálculo Geométrica -->
-      <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem;">
-        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 0.6rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem;">
-          <span>📏</span> Memória de Cálculo Geométrica
-        </h3>
-        <div style="overflow-x: auto;">
+    <div style="padding: 1.25rem;">
+
+      <!-- Grade Matricial por Comprimento (Fiel à Página Cadastrar Parafusos) -->
+      <div style="overflow-x: auto; margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px;">
+        <table id="tabela-matriz-parafusos" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: center;">
+          <thead>
+            <tr style="background: #1e293b; color: #f8fafc;">
+              <th style="padding: 8px 10px; text-align: left; min-width: 90px; border-right: 1px solid #334155;">POSIÇÃO</th>
+              <th style="padding: 8px 10px; text-align: left; min-width: 150px; border-right: 1px solid #334155;">PARAFUSO</th>
+              <th style="padding: 8px 10px; min-width: 85px; border-right: 1px solid #334155;">CLASSE (KN)</th>
+              <!-- Comprimentos fixos de 200 a 900 mm -->
+              <th style="padding: 8px 4px; min-width: 42px;">200</th>
+              <th style="padding: 8px 4px; min-width: 42px;">250</th>
+              <th style="padding: 8px 4px; min-width: 42px;">300</th>
+              <th style="padding: 8px 4px; min-width: 42px;">350</th>
+              <th style="padding: 8px 4px; min-width: 42px;">400</th>
+              <th style="padding: 8px 4px; min-width: 42px;">450</th>
+              <th style="padding: 8px 4px; min-width: 42px;">500</th>
+              <th style="padding: 8px 4px; min-width: 42px;">550</th>
+              <th style="padding: 8px 4px; min-width: 42px;">600</th>
+              <th style="padding: 8px 4px; min-width: 42px;">650</th>
+              <th style="padding: 8px 4px; min-width: 42px;">700</th>
+              <th style="padding: 8px 4px; min-width: 42px;">750</th>
+              <th style="padding: 8px 4px; min-width: 42px;">800</th>
+              <th style="padding: 8px 4px; min-width: 42px;">850</th>
+              <th style="padding: 8px 4px; min-width: 42px;">900</th>
+              <th style="padding: 8px 4px; width: 35px;"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-matriz-parafusos">
+            <tr>
+              <td colspan="19" style="padding: 24px; text-align: center; color: var(--text-muted);">
+                Preencha os parâmetros para calcular os parafusos.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Detalhes Expansíveis da Memória de Cálculo Geométrica -->
+      <details style="background: rgba(0,0,0,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.6rem 0.9rem;">
+        <summary style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none;">
+          🔍 Ver Memória de Cálculo Geométrica Passo a Passo por Nível
+        </summary>
+        <div style="margin-top: 0.75rem; overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: left;">
             <thead>
               <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
-                <th style="padding: 4px 6px;">Nível</th>
-                <th style="padding: 4px 6px;">Cota</th>
-                <th style="padding: 4px 6px;">Posição</th>
-                <th style="padding: 4px 6px;">Seção Poste</th>
-                <th style="padding: 4px 6px;">Ferragens</th>
-                <th style="padding: 4px 6px;">Calculado</th>
-                <th style="padding: 4px 6px; color: var(--primary-color);">Comercial</th>
+                <th style="padding: 5px 6px;">Nível</th>
+                <th style="padding: 5px 6px;">Cota</th>
+                <th style="padding: 5px 6px;">Posição</th>
+                <th style="padding: 5px 6px;">Seção Poste</th>
+                <th style="padding: 5px 6px;">Ferragens Somadas</th>
+                <th style="padding: 5px 6px;">Comp. Calculado</th>
+                <th style="padding: 5px 6px; color: var(--primary-color);">Comp. Comercial</th>
               </tr>
             </thead>
             <tbody id="tbody-memoria-calculo">
-              <tr><td colspan="7" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>
+              <tr><td colspan="7" style="padding: 8px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>
             </tbody>
           </table>
         </div>
-      </div>
-
-      <!-- Lado Direito: Parafusos Finais Consolidados -->
-      <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; display: flex; flex-direction: column;">
-        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 0.6rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem;">
-          <span>🔩</span> Parafusos Consolidados (Receita Final)
-        </h3>
-        <div style="flex: 1;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
-            <thead>
-              <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
-                <th style="padding: 6px 8px;">Posição</th>
-                <th style="padding: 6px 8px;">Tipo Parafuso</th>
-                <th style="padding: 6px 8px;">Classe</th>
-                <th style="padding: 6px 8px;">Comprimento</th>
-                <th style="padding: 6px 8px; text-align: right;">Quantidade</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-parafusos-consolidados">
-              <tr><td colspan="5" style="padding: 12px; text-align: center; color: var(--text-muted);">Preencha os parâmetros para gerar os parafusos.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </details>
 
     </div>
   </div>
@@ -366,7 +380,7 @@
 </div>
 
 <style>
-  /* Células de input compactas da tabela */
+  /* Células de input compactas da tabela de níveis */
   .cell-grid-input {
     width: 100%;
     box-sizing: border-box;
@@ -395,15 +409,40 @@
     font-size: 0.75rem;
     font-weight: 600;
   }
+  
+  /* Células da Grade Matricial */
+  .cell-matriz-qtd {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 2px;
+    text-align: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .cell-matriz-qtd:focus {
+    outline: 2px solid var(--primary-color);
+    background: var(--surface-color);
+    border-color: var(--primary-color);
+  }
   .text-center {
     text-align: center;
   }
   tr.grid-row:hover td {
     background: rgba(59, 130, 246, 0.04);
   }
+  tr.matriz-row:hover td {
+    background: rgba(59, 130, 246, 0.04);
+  }
 </style>
 
 <script>
+// Lista Fixa de Comprimentos Comerciais (Idêntica à tela Cadastrar Parafusos)
+const COMPRIMENTOS_GRADE = [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900];
+
 // Estado Global
 let dadosGlobais = {
   estruturas: [],
@@ -415,6 +454,7 @@ let dadosGlobais = {
 
 let linhasGridAtuais = [];
 let resultadoCalculoAtual = null;
+let specsMatrizAtuais = []; // [{posicao, parafuso, esf_parafuso, comprimentos: {350: 3, ...}}, ...]
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
@@ -682,12 +722,31 @@ async function calcularTudo() {
 }
 
 function renderizarResultados(data) {
-  // 1. Memória de cálculo
+  // 1. Converte lista plana de parafusos consolidados em specs matriciais (Idêntico ao Cadastrar Parafusos)
+  const specsMap = {};
+  specsMatrizAtuais = [];
+
+  (data.parafusos_consolidados || []).forEach(p => {
+    const chave = p.posicao + '|' + p.parafuso + '|' + p.esf_parafuso;
+    if (!(chave in specsMap)) {
+      specsMap[chave] = specsMatrizAtuais.length;
+      specsMatrizAtuais.push({
+        posicao: p.posicao,
+        parafuso: p.parafuso,
+        esf_parafuso: p.esf_parafuso,
+        comprimentos: {}
+      });
+    }
+    specsMatrizAtuais[specsMap[chave]].comprimentos[p.comprimento] = p.quantidade;
+  });
+
+  renderizarMatrizParafusos();
+
+  // 2. Memória de cálculo passo a passo
   const tbodyMemoria = document.getElementById('tbody-memoria-calculo');
   tbodyMemoria.innerHTML = '';
 
   data.detalhes_niveis.forEach(n => {
-    // Máquina
     if (n.detalhes_maquina) {
       const trM = document.createElement('tr');
       trM.style.borderBottom = '1px solid var(--border-color)';
@@ -698,12 +757,11 @@ function renderizarResultados(data) {
         <td style="padding: 4px 6px;">${n.secao_poste_mm} mm</td>
         <td style="padding: 4px 6px;">+ ${n.detalhes_maquina.esp_ferragens} mm</td>
         <td style="padding: 4px 6px;">= ${n.detalhes_maquina.comp_calc} mm</td>
-        <td style="padding: 4px 6px;"><strong style="color: #2563eb; font-size: 0.9rem;">${n.detalhes_maquina.comp_comercial} mm</strong> (${n.detalhes_maquina.quantidade} un)</td>
+        <td style="padding: 4px 6px;"><strong style="color: #2563eb; font-size: 0.85rem;">${n.detalhes_maquina.comp_comercial} mm</strong> (${n.detalhes_maquina.quantidade} un)</td>
       `;
       tbodyMemoria.appendChild(trM);
     }
 
-    // Rosca Dupla
     if (n.detalhes_dupla) {
       const trD = document.createElement('tr');
       trD.style.borderBottom = '1px solid var(--border-color)';
@@ -714,38 +772,87 @@ function renderizarResultados(data) {
         <td style="padding: 4px 6px;">${n.secao_poste_mm} mm</td>
         <td style="padding: 4px 6px;">+ ${n.detalhes_dupla.esp_ferragens} mm</td>
         <td style="padding: 4px 6px;">= ${n.detalhes_dupla.comp_calc} mm</td>
-        <td style="padding: 4px 6px;"><strong style="color: #16a34a; font-size: 0.9rem;">${n.detalhes_dupla.comp_comercial} mm</strong> (${n.detalhes_dupla.quantidade} un)</td>
+        <td style="padding: 4px 6px;"><strong style="color: #16a34a; font-size: 0.85rem;">${n.detalhes_dupla.comp_comercial} mm</strong> (${n.detalhes_dupla.quantidade} un)</td>
       `;
       tbodyMemoria.appendChild(trD);
     }
   });
+}
 
-  // 2. Grade Consolidada
-  const tbodyConsolidado = document.getElementById('tbody-parafusos-consolidados');
-  tbodyConsolidado.innerHTML = '';
+function renderizarMatrizParafusos() {
+  const tbody = document.getElementById('tbody-matriz-parafusos');
+  tbody.innerHTML = '';
 
-  if (!data.parafusos_consolidados || data.parafusos_consolidados.length === 0) {
-    tbodyConsolidado.innerHTML = '<tr><td colspan="5" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum parafuso necessário para esta configuração.</td></tr>';
+  if (!specsMatrizAtuais.length) {
+    tbody.innerHTML = '<tr><td colspan="19" style="padding: 24px; text-align: center; color: var(--text-muted);">Nenhum parafuso necessário para esta configuração.</td></tr>';
     return;
   }
 
-  data.parafusos_consolidados.forEach(p => {
+  specsMatrizAtuais.forEach((spec, sIdx) => {
     const tr = document.createElement('tr');
+    tr.className = 'matriz-row';
     tr.style.borderBottom = '1px solid var(--border-color)';
-    tr.innerHTML = `
-      <td style="padding: 6px 8px;"><strong>${p.posicao}</strong></td>
-      <td style="padding: 6px 8px;">${p.parafuso}</td>
-      <td style="padding: 6px 8px;"><span style="font-size: 0.75rem; color: var(--text-muted);">${p.esf_parafuso} kN</span></td>
-      <td style="padding: 6px 8px;"><span class="badge" style="background: var(--primary-color); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 2px 8px; border-radius: 4px;">${p.comprimento} mm</span></td>
-      <td style="padding: 6px 8px; text-align: right;"><strong style="font-size: 1rem; color: var(--text-main);">${p.quantidade}</strong></td>
+
+    let html = `
+      <td style="padding: 6px 8px; text-align: left; font-weight: 700; border-right: 1px solid var(--border-color); color: var(--text-main);">
+        ${spec.posicao}
+      </td>
+      <td style="padding: 6px 8px; text-align: left; font-weight: 600; border-right: 1px solid var(--border-color); color: var(--text-main);">
+        ${spec.parafuso}
+      </td>
+      <td style="padding: 6px 8px; text-align: center; border-right: 1px solid var(--border-color); color: var(--text-muted);">
+        ${spec.esf_parafuso}
+      </td>
     `;
-    tbodyConsolidado.appendChild(tr);
+
+    COMPRIMENTOS_GRADE.forEach(c => {
+      const v = spec.comprimentos[c];
+      if (v != null && v > 0) {
+        html += `
+          <td style="padding: 3px 2px; background: rgba(37, 99, 235, 0.08);">
+            <input type="number" class="cell-matriz-qtd" value="${v}" min="0" step="1" onchange="atualizarQtdMatriz(${sIdx}, ${c}, this.value)">
+          </td>
+        `;
+      } else {
+        html += `
+          <td style="padding: 3px 2px; color: var(--text-muted); opacity: 0.35;">
+            —
+          </td>
+        `;
+      }
+    });
+
+    html += `
+      <td style="padding: 4px; text-align: center;">
+        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.85rem; color: var(--text-muted); border-color: transparent;" onclick="removerSpecMatriz(${sIdx})" title="Remover linha">
+          ×
+        </button>
+      </td>
+    `;
+
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
   });
 }
 
+function atualizarQtdMatriz(sIdx, comp, valor) {
+  const v = parseFloat(valor);
+  if (isNaN(v) || v <= 0) {
+    delete specsMatrizAtuais[sIdx].comprimentos[comp];
+  } else {
+    specsMatrizAtuais[sIdx].comprimentos[comp] = v;
+  }
+}
+
+function removerSpecMatriz(sIdx) {
+  specsMatrizAtuais.splice(sIdx, 1);
+  renderizarMatrizParafusos();
+}
+
 function limparResultados() {
-  document.getElementById('tbody-memoria-calculo').innerHTML = '<tr><td colspan="7" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>';
-  document.getElementById('tbody-parafusos-consolidados').innerHTML = '<tr><td colspan="5" style="padding: 12px; text-align: center; color: var(--text-muted);">Preencha os parâmetros para gerar os parafusos.</td></tr>';
+  specsMatrizAtuais = [];
+  document.getElementById('tbody-matriz-parafusos').innerHTML = '<tr><td colspan="19" style="padding: 24px; text-align: center; color: var(--text-muted);">Preencha os parâmetros para calcular os parafusos.</td></tr>';
+  document.getElementById('tbody-memoria-calculo').innerHTML = '<tr><td colspan="7" style="padding: 8px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>';
 }
 
 // Ações de Persistência no Parque
@@ -807,8 +914,25 @@ async function excluirEstruturaParque() {
 }
 
 async function salvarParafusosNaReceita() {
-  if (!resultadoCalculoAtual || !resultadoCalculoAtual.parafusos_consolidados || resultadoCalculoAtual.parafusos_consolidados.length === 0) {
-    exibirAlerta('Não há parafusos gerados para salvar na receita.', 'warning');
+  // Converte specsMatrizAtuais de volta para lista plana de parafusos
+  const linhasParaSalvar = [];
+  specsMatrizAtuais.forEach(spec => {
+    for (const compr in spec.comprimentos) {
+      const qtd = spec.comprimentos[compr];
+      if (qtd > 0) {
+        linhasParaSalvar.push({
+          posicao: spec.posicao,
+          parafuso: spec.parafuso,
+          esf_parafuso: spec.esf_parafuso,
+          comprimento: parseInt(compr),
+          quantidade: qtd
+        });
+      }
+    }
+  });
+
+  if (!linhasParaSalvar.length) {
+    exibirAlerta('Não há parafusos gerados na tabela para salvar.', 'warning');
     return;
   }
 
@@ -828,7 +952,7 @@ async function salvarParafusosNaReceita() {
         esforco: esforco,
         altura: altura,
         cruzeta_adicional: cruzeta,
-        linhas: resultadoCalculoAtual.parafusos_consolidados
+        linhas: linhasParaSalvar
       })
     });
 
