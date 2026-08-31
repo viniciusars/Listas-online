@@ -3,262 +3,288 @@
 {% block title %}Dimensionar Parafusos — Sistema de Quantitativos RMT{% endblock %}
 
 {% block content %}
-<div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-  <div>
-    <h1 style="margin: 0; font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-      <span>📐</span> Dimensionamento Automático de Parafusos
-    </h1>
-    <p class="text-muted" style="margin: 0.25rem 0 0; font-size: 0.9rem;">
-      Calculadora paramétrica baseada no padrão de montagens por nível e conicidade do poste duplo T.
-    </p>
-  </div>
-  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-    <button class="btn btn-secondary" onclick="abrirModalPadroes()" style="display: flex; align-items: center; gap: 0.4rem;">
-      <span>⚙️</span> Padrões de Montagem
-    </button>
-    <a href="/parafusos" class="btn btn-outline" style="text-decoration: none;">
-      <span>📋</span> Ver Cadastro de Parafusos
-    </a>
-  </div>
-</div>
+<div class="page-container" style="max-width: 1300px; margin: 0 auto; padding-bottom: 2rem;">
 
-<!-- Alerta de Feedback -->
-<div id="alerta-feedback" style="display: none; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.25rem; font-weight: 500; transition: all 0.3s ease;"></div>
-
-<!-- CARD 1: Parâmetros da Estrutura -->
-<div class="card" style="margin-bottom: 1.5rem;">
-  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 0.75rem; margin-bottom: 1rem;">
-    <h2 style="font-size: 1.15rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
-      <span>1️⃣</span> Parâmetros da Estrutura
-    </h2>
-    <span class="badge" id="badge-parque-ativo" style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-weight: 600; font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 999px;">
-      Parque Ativo
-    </span>
-  </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-    <!-- Seletor de Estrutura -->
+  <!-- Header da Página -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
     <div>
-      <label for="sel-estrutura" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-        Tipo da Estrutura:
-      </label>
+      <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
+        <span>📐</span> Dimensionamento Automático de Parafusos
+      </h1>
+      <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted);">
+        Calculadora geométrica por níveis e conicidade do poste duplo T com padrões personalizáveis por parque.
+      </p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="btn btn-secondary" onclick="abrirModalPadroes()" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.5rem 0.9rem;">
+        <span>⚙️</span> Padrões de Montagem
+      </button>
+      <a href="/parafusos" class="btn btn-outline" style="text-decoration: none; font-size: 0.85rem; padding: 0.5rem 0.9rem;">
+        <span>📋</span> Cadastro de Parafusos
+      </a>
+    </div>
+  </div>
+
+  <!-- Alerta de Notificação / Feedback -->
+  <div id="alerta-feedback" style="display: none; padding: 0.85rem 1.25rem; border-radius: var(--border-radius-sm, 8px); margin-bottom: 1rem; font-weight: 500; font-size: 0.9rem;"></div>
+
+  <!-- CARD 1: Parâmetros da Estrutura -->
+  <div class="card" style="margin-bottom: 1.25rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">1</span>
+        <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
+          Parâmetros da Estrutura
+        </h2>
+      </div>
+      <span id="badge-parque-ativo" style="background: var(--primary-light); color: var(--primary-color); font-weight: 600; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px;">
+        Parque Ativo
+      </span>
+    </div>
+
+    <div style="padding: 1.25rem;">
+      <div style="display: grid; grid-template-columns: minmax(240px, 1.8fr) minmax(180px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr); gap: 1rem; align-items: start;">
+        
+        <!-- Campo: Tipo da Estrutura -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+            Tipo da Estrutura:
+          </label>
+          <div style="display: flex; gap: 0.4rem; width: 100%;">
+            <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600; height: 38px; min-width: 0;" onchange="aoMudarEstrutura()">
+              <option value="">-- Selecione uma Estrutura --</option>
+            </select>
+            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 38px; padding: 0 0.6rem; flex-shrink: 0;">
+              ➕
+            </button>
+          </div>
+          <!-- Input de Nome quando for Nova -->
+          <div id="div-nome-custom" style="display: none; margin-top: 0.4rem;">
+            <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Digite o nome da nova estrutura" style="text-transform: uppercase; font-size: 0.85rem; height: 34px;" oninput="aoDigitarNomeCustom()">
+          </div>
+        </div>
+
+        <!-- Campo: Esforço do Poste (daN) -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+            Esforço do Poste (daN):
+          </label>
+          <select id="sel-esforco" class="form-control" style="font-weight: 600; height: 38px; width: 100%;" onchange="calcularTudo()">
+            <option value="600">600 daN (Fator 0.0)</option>
+            <option value="1000" selected>1000 daN (Fator 1.5)</option>
+            <option value="1500">1500 daN (Fator 3.0)</option>
+            <option value="2000">2000 daN (Fator 4.5)</option>
+            <option value="2500">2500 daN (Fator 6.0)</option>
+            <option value="3000">3000 daN (Fator 7.5)</option>
+          </select>
+        </div>
+
+        <!-- Campo: Altura do Poste (m) -->
+        <div>
+          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+            <span>Altura (m):</span>
+            <span id="badge-ch-req" style="display: none; color: var(--warning-color, #f59e0b); font-size: 0.7rem; font-weight: 700;">(Requerida)</span>
+          </label>
+          <input type="number" id="input-altura" class="form-control" placeholder="Opcional (ex: 12)" step="0.5" min="6" max="30" style="height: 38px; width: 100%;" oninput="calcularTudo()">
+        </div>
+
+        <!-- Campo: Cruzeta Adicional (Item 36) -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
+            Cruzeta Adic. (Item 36):
+          </label>
+          <input type="number" id="input-cruzeta-adic" class="form-control" placeholder="0" min="0" step="1" style="height: 38px; width: 100%;" oninput="calcularTudo()">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: Elementos Construtivos por Nível (Visual 100% Sem Rolagem) -->
+  <div class="card" style="margin-bottom: 1.25rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">2</span>
+        <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
+          Elementos Construtivos por Nível
+        </h2>
+        <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">(Visualização compacta em tela única)</span>
+      </div>
       <div style="display: flex; gap: 0.4rem;">
-        <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600;" onchange="aoMudarEstrutura()">
-          <option value="">-- Selecione ou digite --</option>
-        </select>
-        <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="padding: 0 0.75rem;">
-          ➕
+        <button class="btn btn-secondary" onclick="adicionarLinhaGrid()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+          ➕ Adicionar Nível
+        </button>
+        <button class="btn btn-primary" onclick="salvarPadraoEstruturaParque()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+          💾 Salvar Padrão no Parque
+        </button>
+        <button class="btn btn-outline" id="btn-excluir-est" onclick="excluirEstruturaParque()" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; color: var(--danger-color); border-color: var(--danger-color);" title="Excluir estrutura do parque">
+          🗑️
         </button>
       </div>
     </div>
 
-    <!-- Nome Customizado (quando editável) -->
-    <div id="div-nome-custom" style="display: none;">
-      <label for="input-nome-estrutura" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-        Nome da Estrutura:
-      </label>
-      <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Ex: N4-ESPECIAL" style="text-transform: uppercase;" oninput="aoDigitarNomeCustom()">
-    </div>
-
-    <!-- Esforço do Poste (daN) -->
-    <div>
-      <label for="sel-esforco" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-        Esforço do Poste (daN):
-      </label>
-      <select id="sel-esforco" class="form-control" style="font-weight: 600;" onchange="calcularTudo()">
-        <option value="600">600 daN (Fator 0.0)</option>
-        <option value="1000" selected>1000 daN (Fator 1.5)</option>
-        <option value="1500">1500 daN (Fator 3.0)</option>
-        <option value="2000">2000 daN (Fator 4.5)</option>
-        <option value="2500">2500 daN (Fator 6.0)</option>
-        <option value="3000">3000 daN (Fator 7.5)</option>
-      </select>
-    </div>
-
-    <!-- Altura do Poste (m) -->
-    <div>
-      <label for="input-altura" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; display: flex; justify-content: space-between;">
-        <span>Altura do Poste (m):</span>
-        <span id="badge-ch-req" style="display: none; color: #d97706; font-size: 0.75rem; font-weight: bold;">(Requerida p/ CH)</span>
-      </label>
-      <input type="number" id="input-altura" class="form-control" placeholder="Opcional (ex: 12)" step="0.5" min="6" max="30" oninput="calcularTudo()">
-    </div>
-
-    <!-- Cruzeta Adicional -->
-    <div>
-      <label for="input-cruzeta-adic" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-        Cruzeta Adicional (Item 36):
-      </label>
-      <input type="number" id="input-cruzeta-adic" class="form-control" placeholder="0" min="0" step="1" oninput="calcularTudo()">
-    </div>
-  </div>
-</div>
-
-<!-- CARD 2: Composição Construtiva por Níveis (Formato Planilha / Imagem) -->
-<div class="card" style="margin-bottom: 1.5rem;">
-  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 0.75rem; margin-bottom: 1rem;">
-    <div>
-      <h2 style="font-size: 1.15rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
-        <span>2️⃣</span> Elementos Construtivos por Nível
-      </h2>
-      <span class="text-muted" style="font-size: 0.8rem;">
-        Estruturação física de cruzetas, porcas, arruelas, olhais e parafusos para cada cota do poste.
-      </span>
-    </div>
-    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-      <button class="btn btn-secondary" onclick="adicionarLinhaGrid()" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
-        ➕ Adicionar Nível
-      </button>
-      <button class="btn btn-outline" onclick="salvarPadraoEstruturaParque()" style="font-size: 0.85rem; padding: 0.4rem 0.8rem; border-color: #2563eb; color: #2563eb;">
-        💾 Salvar no Parque
-      </button>
-      <button class="btn btn-outline" id="btn-excluir-est" onclick="excluirEstruturaParque()" style="font-size: 0.85rem; padding: 0.4rem 0.8rem; border-color: #ef4444; color: #ef4444;" title="Excluir estrutura do parque">
-        🗑️
-      </button>
-    </div>
-  </div>
-
-  <!-- Tabela Estilo Planilha (Imagem do Usuário) -->
-  <div class="table-responsive" style="overflow-x: auto; max-width: 100%; border: 1px solid #334155; border-radius: 6px;">
-    <table id="tabela-grid-niveis" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.85rem;">
-      <thead>
-        <!-- Linha 1 de Cabeçalho -->
-        <tr style="background: #1e293b; color: #f8fafc;">
-          <th rowspan="2" style="border: 1px solid #475569; padding: 8px 6px; min-width: 80px; vertical-align: middle;">NÍVEIS</th>
-          <th rowspan="2" style="border: 1px solid #475569; padding: 8px 6px; min-width: 90px; vertical-align: middle;">COTA (m)</th>
-          <th rowspan="2" style="border: 1px solid #475569; padding: 8px 6px; min-width: 100px; vertical-align: middle;">POSIÇÃO</th>
-          <th rowspan="2" style="border: 1px solid #475569; padding: 8px 6px; min-width: 80px; vertical-align: middle; background: #0f172a;">
-            QUANT.<br><span style="font-size: 0.75rem; color: #93c5fd;">CRUZETA</span>
-          </th>
-          <th colspan="5" style="border: 1px solid #475569; padding: 6px; background: #0f172a; color: #38bdf8; font-weight: 700; letter-spacing: 0.5px;">
-            QUANTIDADE P/ MÁQUINA (CAB. QUADRADA)
-          </th>
-          <th colspan="5" style="border: 1px solid #475569; padding: 6px; background: #022c22; color: #4ade80; font-weight: 700; letter-spacing: 0.5px;">
-            QUANTIDADE P/ ROSCA DUPLA
-          </th>
-          <th rowspan="2" style="border: 1px solid #475569; padding: 8px 6px; min-width: 120px; vertical-align: middle;">PADRÃO RÁPIDO</th>
-          <th rowspan="2" style="border: 1px solid #475569; padding: 8px 6px; width: 45px; vertical-align: middle;"></th>
-        </tr>
-        <!-- Linha 2 de Cabeçalho -->
-        <tr style="background: #1e293b; color: #f8fafc; font-size: 0.75rem;">
-          <!-- Máquina -->
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 55px; background: #1e293b;">PARAFUSO</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #1e293b;">PORCA</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #1e293b;">ARRUELA</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #1e293b;">OLHAL</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #1e293b;">SOBRA</th>
-          <!-- Rosca Dupla -->
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 55px; background: #064e3b;">PARAFUSO</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #064e3b;">PORCA</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #064e3b;">ARRUELA</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #064e3b;">OLHAL</th>
-          <th style="border: 1px solid #475569; padding: 6px 4px; min-width: 50px; background: #064e3b;">SOBRA</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-grid-niveis">
-        <!-- Linhas geradas dinamicamente via JS -->
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- CARD 3: Resultados do Dimensionamento e Memória de Cálculo -->
-<div class="card" style="margin-bottom: 1.5rem;">
-  <div class="card-header" style="border-bottom: 1px solid var(--border-color, #e2e8f0); padding-bottom: 0.75rem; margin-bottom: 1rem;">
-    <h2 style="font-size: 1.15rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
-      <span>3️⃣</span> Resultados do Dimensionamento
-    </h2>
-  </div>
-
-  <!-- Memória de Cálculo por Nível -->
-  <div style="margin-bottom: 1.5rem;">
-    <h3 style="font-size: 0.95rem; font-weight: 600; margin: 0 0 0.5rem; color: var(--text-color, #1e293b);">
-      Memória Geométrica por Nível:
-    </h3>
-    <div class="table-responsive">
-      <table class="table" style="width: 100%; font-size: 0.85rem;">
+    <!-- Tabela Compacta sem Rolagem Horizontal -->
+    <div style="padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
+      <table id="tabela-grid-niveis" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.8rem; table-layout: fixed;">
+        <colgroup>
+          <col style="width: 6%;">   <!-- Nível -->
+          <col style="width: 8.5%;"> <!-- Cota (m) -->
+          <col style="width: 8.5%;"> <!-- Posição/Face -->
+          <col style="width: 6%;">   <!-- Cruzeta -->
+          <!-- Máquina (5 colunas = 31%) -->
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <!-- Rosca Dupla (5 colunas = 31%) -->
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6.2%;">
+          <col style="width: 6%;">   <!-- Ações -->
+        </colgroup>
         <thead>
-          <tr style="background: rgba(0,0,0,0.03);">
-            <th>Nível</th>
-            <th>Cota (m)</th>
-            <th>Posição</th>
-            <th>Seção Poste (mm)</th>
-            <th>Tipo Parafuso</th>
-            <th>Ferragens (mm)</th>
-            <th>Comp. Calculado (mm)</th>
-            <th>Comp. Comercial</th>
-            <th>Qtd</th>
+          <!-- Linha 1 de Cabeçalho -->
+          <tr style="background: #1e293b; color: #f8fafc;">
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;">NÍVEL</th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;">COTA (m)</th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;">FACE</th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle; background: #0f172a; color: #93c5fd;">
+              CRUZ.
+            </th>
+            <th colspan="5" style="border: 1px solid #334155; padding: 4px; background: #082f49; color: #38bdf8; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
+              QUANTIDADE P/ MÁQUINA (50 kN)
+            </th>
+            <th colspan="5" style="border: 1px solid #334155; padding: 4px; background: #064e3b; color: #4ade80; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
+              QUANTIDADE P/ ROSCA DUPLA (70 kN)
+            </th>
+            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; vertical-align: middle;"></th>
+          </tr>
+          <!-- Linha 2 de Cabeçalho -->
+          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.7rem;">
+            <!-- Máquina -->
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">PARAF</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">PORCA</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">ARR</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">OLHAL</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #0c4a6e; color: #e0f2fe;">SOBRA</th>
+            <!-- Rosca Dupla -->
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">PARAF</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">PORCA</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">ARR</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">OLHAL</th>
+            <th style="border: 1px solid #334155; padding: 4px 1px; background: #065f46; color: #d1fae5;">SOBRA</th>
           </tr>
         </thead>
-        <tbody id="tbody-memoria-calculo">
-          <tr><td colspan="9" style="text-align: center; color: #64748b;">Nenhum nível calculado.</td></tr>
+        <tbody id="tbody-grid-niveis">
+          <!-- Linhas geradas dinamicamente via JS -->
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Grade Consolidada de Parafusos -->
-  <div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-      <h3 style="font-size: 0.95rem; font-weight: 600; margin: 0; color: var(--text-color, #1e293b);">
-        Parafusos Consolidados (Receita Final):
-      </h3>
-      <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()" style="font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+  <!-- CARD 3: Resultados do Dimensionamento (Design Moderno em Dashboard) -->
+  <div class="card" style="margin-bottom: 1.5rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">3</span>
+        <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
+          Resultados do Dimensionamento
+        </h2>
+      </div>
+      <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()" style="font-weight: 600; font-size: 0.85rem; padding: 0.45rem 1rem; display: flex; align-items: center; gap: 0.4rem;">
         <span>💾</span> Validar e Adicionar à Receita do Parque
       </button>
     </div>
 
-    <div class="table-responsive">
-      <table class="table" style="width: 100%; font-size: 0.9rem;">
-        <thead>
-          <tr style="background: rgba(0,0,0,0.03);">
-            <th>Posição</th>
-            <th>Tipo de Parafuso</th>
-            <th>Classe (kN)</th>
-            <th>Comprimento Comercial (mm)</th>
-            <th>Quantidade</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-parafusos-consolidados">
-          <tr><td colspan="5" style="text-align: center; color: #64748b;">Preencha a estrutura para gerar os parafusos.</td></tr>
-        </tbody>
-      </table>
+    <div style="padding: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      
+      <!-- Lado Esquerdo: Memória de Cálculo Geométrica -->
+      <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem;">
+        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 0.6rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem;">
+          <span>📏</span> Memória de Cálculo Geométrica
+        </h3>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+                <th style="padding: 4px 6px;">Nível</th>
+                <th style="padding: 4px 6px;">Cota</th>
+                <th style="padding: 4px 6px;">Posição</th>
+                <th style="padding: 4px 6px;">Seção Poste</th>
+                <th style="padding: 4px 6px;">Ferragens</th>
+                <th style="padding: 4px 6px;">Calculado</th>
+                <th style="padding: 4px 6px; color: var(--primary-color);">Comercial</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-memoria-calculo">
+              <tr><td colspan="7" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Lado Direito: Parafusos Finais Consolidados -->
+      <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; display: flex; flex-direction: column;">
+        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 0.6rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem;">
+          <span>🔩</span> Parafusos Consolidados (Receita Final)
+        </h3>
+        <div style="flex: 1;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+                <th style="padding: 6px 8px;">Posição</th>
+                <th style="padding: 6px 8px;">Tipo Parafuso</th>
+                <th style="padding: 6px 8px;">Classe</th>
+                <th style="padding: 6px 8px;">Comprimento</th>
+                <th style="padding: 6px 8px; text-align: right;">Quantidade</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-parafusos-consolidados">
+              <tr><td colspan="5" style="padding: 12px; text-align: center; color: var(--text-muted);">Preencha os parâmetros para gerar os parafusos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
+
 </div>
 
-<!-- MODAL: Gerenciar Padrões de Montagem (PADRAO) do Parque -->
-<div id="modal-padroes" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
-  <div style="background: var(--bg-card, #ffffff); color: var(--text-color, #1e293b); width: 100%; max-width: 850px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); overflow: hidden;">
+<!-- MODAL: Gerenciar Padrões de Montagem do Parque -->
+<div id="modal-padroes" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+  <div style="background: var(--surface-color); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
+    
     <!-- Modal Header -->
-    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: space-between; align-items: center;">
-      <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03);">
+      <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
         <span>⚙️</span> Padrões de Montagem do Parque Ativo
       </h3>
-      <button onclick="fecharModalPadroes()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit;">&times;</button>
+      <button onclick="fecharModalPadroes()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
     </div>
 
     <!-- Modal Body -->
     <div style="padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1;">
-      <p class="text-muted" style="font-size: 0.85rem; margin-top: 0;">
-        Estes blocos definem a quantidade de cruzetas, parafusos, porcas, arruelas, olhais e sobras para cada tipo de montagem padrão.
-      </p>
-
-      <div class="table-responsive">
-        <table class="table" style="width: 100%; font-size: 0.85rem;">
+      
+      <!-- Tabela de Padrões Existentes -->
+      <div style="margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center;">
           <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Descrição</th>
-              <th>Cruzeta</th>
-              <th>P. Simples</th>
-              <th>P. Dupla</th>
-              <th>Arruela</th>
-              <th>Porca</th>
-              <th>Olhal</th>
-              <th>Sobra</th>
-              <th>Face</th>
-              <th></th>
+            <tr style="background: #1e293b; color: #f8fafc;">
+              <th style="padding: 8px 6px; text-align: left;">Nome</th>
+              <th style="padding: 8px 6px; text-align: left;">Descrição</th>
+              <th style="padding: 8px 6px;">Cruzeta</th>
+              <th style="padding: 8px 6px;">P. Simples</th>
+              <th style="padding: 8px 6px;">P. Dupla</th>
+              <th style="padding: 8px 6px;">Porca</th>
+              <th style="padding: 8px 6px;">Arruela</th>
+              <th style="padding: 8px 6px;">Olhal</th>
+              <th style="padding: 8px 6px;">Sobra</th>
+              <th style="padding: 8px 6px;">Face</th>
+              <th style="padding: 8px 6px; width: 45px;"></th>
             </tr>
           </thead>
           <tbody id="tbody-modal-padroes">
@@ -267,112 +293,113 @@
         </table>
       </div>
 
-      <!-- Formulário para Criar/Editar Padrão -->
-      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px;">
-        <h4 style="margin: 0 0 0.75rem; font-size: 0.95rem; font-weight: 600;">➕ Adicionar ou Atualizar Padrão de Montagem</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; align-items: end;">
+      <!-- Formulário Estruturado para Criar/Editar Padrão -->
+      <div style="padding: 1.25rem; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
+        <h4 style="margin: 0 0 1rem; font-size: 0.9rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.3rem;">
+          <span>✏️</span> Adicionar ou Atualizar Padrão de Montagem
+        </h4>
+
+        <!-- Grupo 1: Identificação -->
+        <div style="display: grid; grid-template-columns: 1.2fr 2.5fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Nome:</label>
-            <input type="text" id="modal-p-nome" class="form-control" placeholder="Ex: N1.ESP" style="text-transform: uppercase;">
-          </div>
-          <div style="grid-column: span 2;">
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Descrição:</label>
-            <input type="text" id="modal-p-desc" class="form-control" placeholder="Descrição da montagem">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Cruzeta:</label>
-            <input type="number" id="modal-p-cruz" class="form-control" value="1" min="0" step="1">
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Nome do Padrão:</label>
+            <input type="text" id="modal-p-nome" class="form-control" placeholder="Ex: N1.ESP" style="text-transform: uppercase; font-size: 0.82rem; height: 34px;">
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">P. Simples:</label>
-            <input type="number" id="modal-p-psimples" class="form-control" value="0" min="0" step="1">
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Descrição:</label>
+            <input type="text" id="modal-p-desc" class="form-control" placeholder="Descrição clara da montagem" style="font-size: 0.82rem; height: 34px;">
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">P. Dupla:</label>
-            <input type="number" id="modal-p-pdupla" class="form-control" value="0" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Porca:</label>
-            <input type="number" id="modal-p-porca" class="form-control" value="2" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Arruela:</label>
-            <input type="number" id="modal-p-arr" class="form-control" value="2" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Olhal:</label>
-            <input type="number" id="modal-p-olhal" class="form-control" value="0" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Sobra:</label>
-            <input type="number" id="modal-p-sobra" class="form-control" value="1" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block;">Face Padrão:</label>
-            <select id="modal-p-face" class="form-control">
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Face Padrão:</label>
+            <select id="modal-p-face" class="form-control" style="font-size: 0.82rem; height: 34px;">
               <option value="B">B (Gaveta)</option>
               <option value="A">A (Topo)</option>
             </select>
           </div>
+        </div>
+
+        <!-- Grupo 2: Ferragens e Parafusos -->
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr) 1.2fr; gap: 0.5rem; align-items: end;">
           <div>
-            <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()" style="width: 100%;">
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Cruzeta:</label>
+            <input type="number" id="modal-p-cruz" class="form-control text-center" value="1" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">P. Simples:</label>
+            <input type="number" id="modal-p-psimples" class="form-control text-center" value="0" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">P. Dupla:</label>
+            <input type="number" id="modal-p-pdupla" class="form-control text-center" value="0" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Porca:</label>
+            <input type="number" id="modal-p-porca" class="form-control text-center" value="2" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Arruela:</label>
+            <input type="number" id="modal-p-arr" class="form-control text-center" value="2" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Olhal:</label>
+            <input type="number" id="modal-p-olhal" class="form-control text-center" value="0" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 0.2rem; color: var(--text-main);">Sobra:</label>
+            <input type="number" id="modal-p-sobra" class="form-control text-center" value="1" min="0" step="1" style="font-size: 0.82rem; height: 34px; padding: 2px;">
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()" style="width: 100%; height: 34px; font-size: 0.8rem; font-weight: 600; padding: 0;">
               Salvar Padrão
             </button>
           </div>
         </div>
+
       </div>
     </div>
 
     <!-- Modal Footer -->
-    <div style="padding: 0.75rem 1.5rem; border-top: 1px solid var(--border-color, #e2e8f0); text-align: right;">
-      <button class="btn btn-secondary" onclick="fecharModalPadroes()">Fechar</button>
+    <div style="padding: 0.75rem 1.5rem; border-top: 1px solid var(--border-color); text-align: right; background: rgba(0,0,0,0.02);">
+      <button class="btn btn-secondary" onclick="fecharModalPadroes()" style="font-size: 0.85rem;">Fechar</button>
     </div>
   </div>
 </div>
 
 <style>
   /* Células de input compactas da tabela */
-  .cell-input {
+  .cell-grid-input {
     width: 100%;
-    min-width: 44px;
-    padding: 4px 2px;
+    box-sizing: border-box;
+    padding: 3px 1px;
     text-align: center;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-  .cell-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    background: rgba(59, 130, 246, 0.08);
-  }
-  .cell-input-cota {
-    min-width: 75px;
-    text-align: center;
+    background: var(--surface-color);
+    color: var(--text-main);
+    font-size: 0.78rem;
     font-weight: 600;
   }
-  .cell-select {
-    padding: 4px;
-    border: 1px solid rgba(0,0,0,0.15);
+  .cell-grid-input:focus {
+    outline: 2px solid var(--primary-color);
+    border-color: transparent;
+  }
+  .cell-grid-select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 3px 1px;
+    text-align: center;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    font-size: 0.8rem;
+    background: var(--surface-color);
+    color: var(--text-main);
+    font-size: 0.75rem;
+    font-weight: 600;
   }
-  /* Estilização para modo escuro */
-  body.dark-mode .cell-input,
-  body.dark-mode .cell-select {
-    border-color: #475569;
-    color: #f8fafc;
+  .text-center {
+    text-align: center;
   }
-  body.dark-mode tr.grid-row:hover {
-    background: rgba(255, 255, 255, 0.03);
-  }
-  tr.grid-row:hover {
-    background: rgba(0, 0, 0, 0.02);
+  tr.grid-row:hover td {
+    background: rgba(59, 130, 246, 0.04);
   }
 </style>
 
@@ -508,73 +535,62 @@ function renderizarGridNiveis() {
   linhasGridAtuais.forEach((linha, idx) => {
     const tr = document.createElement('tr');
     tr.className = 'grid-row';
+    tr.style.borderBottom = '1px solid var(--border-color)';
 
     const distRaw = String(linha.distancia_prog || '').toUpperCase();
     if (distRaw.includes('CH')) temCH = true;
 
-    // Opções de Padrão Rápido
-    let optPadroes = '<option value="">Aplicar Padrão...</option>';
-    for (const pNome in dadosGlobais.padroes) {
-      optPadroes += `<option value="${pNome}" ${linha.montagem === pNome ? 'selected' : ''}>${pNome}</option>`;
-    }
-
     tr.innerHTML = `
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="text" class="cell-input cell-input-cota" value="${linha.distancia_prog}" placeholder="0.2 ou CH+1.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="text" class="cell-grid-input" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <select class="cell-select" onchange="atualizarCampoLinha(${idx}, 'face', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <select class="cell-grid-select" onchange="atualizarCampoLinha(${idx}, 'face', this.value)">
           <option value="B" ${linha.face === 'B' ? 'selected' : ''}>B (Gaveta)</option>
           <option value="A" ${linha.face === 'A' ? 'selected' : ''}>A (Topo)</option>
         </select>
       </td>
-      <td style="border: 1px solid #475569; padding: 4px; background: rgba(59, 130, 246, 0.05);">
-        <input type="number" class="cell-input" value="${linha.cruzeta}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(59, 130, 246, 0.04);">
+        <input type="number" class="cell-grid-input" value="${linha.cruzeta}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
       </td>
       <!-- Máquina -->
-      <td style="border: 1px solid #475569; padding: 4px; background: rgba(56, 189, 248, 0.05);">
-        <input type="number" class="cell-input" value="${linha.p_maquina}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(56, 189, 248, 0.04);">
+        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #0284c7;" value="${linha.p_maquina}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.porca_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.porca_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.arruela_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.arruela_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.olhal_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.olhal_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.sobra_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.sobra_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
       </td>
       <!-- Rosca Dupla -->
-      <td style="border: 1px solid #475569; padding: 4px; background: rgba(74, 222, 128, 0.05);">
-        <input type="number" class="cell-input" value="${linha.p_dupla}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(74, 222, 128, 0.04);">
+        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #16a34a;" value="${linha.p_dupla}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.porca_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.porca_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.arruela_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.arruela_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.olhal_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.olhal_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
       </td>
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <input type="number" class="cell-input" value="${linha.sobra_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
-      </td>
-      <!-- Seletor Padrão Rápido -->
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <select class="cell-select" style="font-size: 0.75rem; width: 100%;" onchange="aplicarPadraoRapido(${idx}, this.value)">
-          ${optPadroes}
-        </select>
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <input type="number" class="cell-grid-input" value="${linha.sobra_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
       </td>
       <!-- Ações -->
-      <td style="border: 1px solid #475569; padding: 4px;">
-        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.8rem; color: #ef4444; border-color: transparent;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
+      <td style="border: 1px solid var(--border-color); padding: 3px;">
+        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.75rem; color: var(--danger-color); border-color: transparent;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
           🗑️
         </button>
       </td>
@@ -597,33 +613,6 @@ function atualizarCampoLinha(idx, campo, valor) {
   } else {
     linhasGridAtuais[idx][campo] = valor;
   }
-  calcularTudo();
-}
-
-function aplicarPadraoRapido(idx, padraoNome) {
-  if (!padraoNome || !dadosGlobais.padroes[padraoNome]) return;
-  const p = dadosGlobais.padroes[padraoNome];
-  
-  linhasGridAtuais[idx].montagem = padraoNome;
-  linhasGridAtuais[idx].face = p.face_padrao || 'B';
-  linhasGridAtuais[idx].cruzeta = p.cruzeta || 0;
-  
-  const pSimples = p.parafuso_simples || 0;
-  const pDupla = p.parafuso_dupla || 0;
-
-  linhasGridAtuais[idx].p_maquina = pSimples;
-  linhasGridAtuais[idx].porca_m = pSimples > 0 ? (p.porca || 0) : 0;
-  linhasGridAtuais[idx].arruela_m = pSimples > 0 ? (p.arruela || 0) : 0;
-  linhasGridAtuais[idx].olhal_m = pSimples > 0 ? (p.porca_olhal || 0) : 0;
-  linhasGridAtuais[idx].sobra_m = pSimples > 0 ? (p.sobra || 1) : 0;
-
-  linhasGridAtuais[idx].p_dupla = pDupla;
-  linhasGridAtuais[idx].porca_d = pDupla > 0 ? (p.porca || 0) : 0;
-  linhasGridAtuais[idx].arruela_d = pDupla > 0 ? (p.arruela || 0) : 0;
-  linhasGridAtuais[idx].olhal_d = pDupla > 0 ? (p.porca_olhal || 0) : 0;
-  linhasGridAtuais[idx].sobra_d = pDupla > 0 ? (p.sobra || 1) : 0;
-
-  renderizarGridNiveis();
   calcularTudo();
 }
 
@@ -698,36 +687,34 @@ function renderizarResultados(data) {
   tbodyMemoria.innerHTML = '';
 
   data.detalhes_niveis.forEach(n => {
-    // Linha de Máquina se houver
+    // Máquina
     if (n.detalhes_maquina) {
       const trM = document.createElement('tr');
+      trM.style.borderBottom = '1px solid var(--border-color)';
       trM.innerHTML = `
-        <td><strong>Nível ${n.nivel}</strong></td>
-        <td>${n.distancia_prog_raw} (${n.distancia_m}m)</td>
-        <td><span class="badge" style="background: rgba(56, 189, 248, 0.1); color: #0284c7;">${n.posicao}</span></td>
-        <td>${n.secao_poste_mm} mm</td>
-        <td>Cabeça Quadrada (50kN)</td>
-        <td>${n.detalhes_maquina.esp_ferragens} mm</td>
-        <td>${n.detalhes_maquina.comp_calc} mm</td>
-        <td><strong style="color: #2563eb; font-size: 1rem;">${n.detalhes_maquina.comp_comercial} mm</strong></td>
-        <td><strong>${n.detalhes_maquina.quantidade}</strong></td>
+        <td style="padding: 4px 6px;"><strong>Nível ${n.nivel}</strong></td>
+        <td style="padding: 4px 6px;">${n.distancia_prog_raw} (${n.distancia_m}m)</td>
+        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #0284c7; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">${n.posicao}</span></td>
+        <td style="padding: 4px 6px;">${n.secao_poste_mm} mm</td>
+        <td style="padding: 4px 6px;">+ ${n.detalhes_maquina.esp_ferragens} mm</td>
+        <td style="padding: 4px 6px;">= ${n.detalhes_maquina.comp_calc} mm</td>
+        <td style="padding: 4px 6px;"><strong style="color: #2563eb; font-size: 0.9rem;">${n.detalhes_maquina.comp_comercial} mm</strong> (${n.detalhes_maquina.quantidade} un)</td>
       `;
       tbodyMemoria.appendChild(trM);
     }
 
-    // Linha de Rosca Dupla se houver
+    // Rosca Dupla
     if (n.detalhes_dupla) {
       const trD = document.createElement('tr');
+      trD.style.borderBottom = '1px solid var(--border-color)';
       trD.innerHTML = `
-        <td><strong>Nível ${n.nivel}</strong></td>
-        <td>${n.distancia_prog_raw} (${n.distancia_m}m)</td>
-        <td><span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;">${n.posicao}</span></td>
-        <td>${n.secao_poste_mm} mm</td>
-        <td>Rosca Dupla (70kN)</td>
-        <td>${n.detalhes_dupla.esp_ferragens} mm</td>
-        <td>${n.detalhes_dupla.comp_calc} mm</td>
-        <td><strong style="color: #16a34a; font-size: 1rem;">${n.detalhes_dupla.comp_comercial} mm</strong></td>
-        <td><strong>${n.detalhes_dupla.quantidade}</strong></td>
+        <td style="padding: 4px 6px;"><strong>Nível ${n.nivel}</strong></td>
+        <td style="padding: 4px 6px;">${n.distancia_prog_raw} (${n.distancia_m}m)</td>
+        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #16a34a; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">${n.posicao}</span></td>
+        <td style="padding: 4px 6px;">${n.secao_poste_mm} mm</td>
+        <td style="padding: 4px 6px;">+ ${n.detalhes_dupla.esp_ferragens} mm</td>
+        <td style="padding: 4px 6px;">= ${n.detalhes_dupla.comp_calc} mm</td>
+        <td style="padding: 4px 6px;"><strong style="color: #16a34a; font-size: 0.9rem;">${n.detalhes_dupla.comp_comercial} mm</strong> (${n.detalhes_dupla.quantidade} un)</td>
       `;
       tbodyMemoria.appendChild(trD);
     }
@@ -738,26 +725,27 @@ function renderizarResultados(data) {
   tbodyConsolidado.innerHTML = '';
 
   if (!data.parafusos_consolidados || data.parafusos_consolidados.length === 0) {
-    tbodyConsolidado.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Nenhum parafuso necessário para esta configuração.</td></tr>';
+    tbodyConsolidado.innerHTML = '<tr><td colspan="5" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum parafuso necessário para esta configuração.</td></tr>';
     return;
   }
 
   data.parafusos_consolidados.forEach(p => {
     const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border-color)';
     tr.innerHTML = `
-      <td><strong>${p.posicao}</strong></td>
-      <td>${p.parafuso}</td>
-      <td>${p.esf_parafuso} kN</td>
-      <td><span class="badge" style="background: #2563eb; color: white; font-size: 0.95rem; font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 6px;">${p.comprimento} mm</span></td>
-      <td><strong style="font-size: 1.05rem;">${p.quantidade}</strong></td>
+      <td style="padding: 6px 8px;"><strong>${p.posicao}</strong></td>
+      <td style="padding: 6px 8px;">${p.parafuso}</td>
+      <td style="padding: 6px 8px;"><span style="font-size: 0.75rem; color: var(--text-muted);">${p.esf_parafuso} kN</span></td>
+      <td style="padding: 6px 8px;"><span class="badge" style="background: var(--primary-color); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 2px 8px; border-radius: 4px;">${p.comprimento} mm</span></td>
+      <td style="padding: 6px 8px; text-align: right;"><strong style="font-size: 1rem; color: var(--text-main);">${p.quantidade}</strong></td>
     `;
     tbodyConsolidado.appendChild(tr);
   });
 }
 
 function limparResultados() {
-  document.getElementById('tbody-memoria-calculo').innerHTML = '<tr><td colspan="9" style="text-align: center; color: #64748b;">Nenhum nível calculado.</td></tr>';
-  document.getElementById('tbody-parafusos-consolidados').innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Preencha a estrutura para gerar os parafusos.</td></tr>';
+  document.getElementById('tbody-memoria-calculo').innerHTML = '<tr><td colspan="7" style="padding: 12px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>';
+  document.getElementById('tbody-parafusos-consolidados').innerHTML = '<tr><td colspan="5" style="padding: 12px; text-align: center; color: var(--text-muted);">Preencha os parâmetros para gerar os parafusos.</td></tr>';
 }
 
 // Ações de Persistência no Parque
@@ -847,7 +835,7 @@ async function salvarParafusosNaReceita() {
     const data = await res.json();
     if (res.ok && data.ok) {
       exibirAlerta(
-        `✅ Estrutura ${data.tipo} (${data.esforco} daN${data.altura ? ', ' + data.altura + 'm' : ''}) com ${data.count} linhas de parafusos foi ADICIONADA À RECEITA com sucesso! <a href="/parafusos" style="text-decoration: underline; margin-left: 8px; font-weight: bold;">Ver em Cadastrar Parafusos ➔</a>`,
+        `✅ Estrutura <strong>${data.tipo}</strong> (${data.esforco} daN${data.altura ? ', ' + data.altura + 'm' : ''}) com ${data.count} linhas de parafusos foi ADICIONADA À RECEITA com sucesso! <a href="/parafusos" style="text-decoration: underline; margin-left: 8px; font-weight: bold; color: inherit;">Ver em Cadastrar Parafusos ➔</a>`,
         'success'
       );
     } else {
@@ -875,19 +863,20 @@ function renderizarModalPadroes() {
   for (const nome in dadosGlobais.padroes) {
     const p = dadosGlobais.padroes[nome];
     const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border-color)';
     tr.innerHTML = `
-      <td><strong>${p.nome}</strong></td>
-      <td style="font-size: 0.75rem; max-width: 180px;">${p.descricao || ''}</td>
-      <td>${p.cruzeta}</td>
-      <td>${p.parafuso_simples}</td>
-      <td>${p.parafuso_dupla}</td>
-      <td>${p.arruela}</td>
-      <td>${p.porca}</td>
-      <td>${p.porca_olhal}</td>
-      <td>${p.sobra}</td>
-      <td><span class="badge">${p.face_padrao || 'B'}</span></td>
-      <td>
-        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="carregarPadraoParaEditar('${p.nome}')">
+      <td style="padding: 6px 8px; text-align: left;"><strong>${p.nome}</strong></td>
+      <td style="padding: 6px 8px; text-align: left; font-size: 0.75rem; color: var(--text-muted);">${p.descricao || ''}</td>
+      <td style="padding: 6px 8px;">${p.cruzeta}</td>
+      <td style="padding: 6px 8px; color: #0284c7; font-weight: 600;">${p.parafuso_simples}</td>
+      <td style="padding: 6px 8px; color: #16a34a; font-weight: 600;">${p.parafuso_dupla}</td>
+      <td style="padding: 6px 8px;">${p.porca}</td>
+      <td style="padding: 6px 8px;">${p.arruela}</td>
+      <td style="padding: 6px 8px;">${p.porca_olhal}</td>
+      <td style="padding: 6px 8px;">${p.sobra}</td>
+      <td style="padding: 6px 8px;"><span class="badge" style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${p.face_padrao || 'B'}</span></td>
+      <td style="padding: 6px 8px;">
+        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="carregarPadraoParaEditar('${p.nome}')" title="Editar este padrão">
           ✏️
         </button>
       </td>
@@ -909,6 +898,7 @@ function carregarPadraoParaEditar(nome) {
   document.getElementById('modal-p-olhal').value = p.porca_olhal || 0;
   document.getElementById('modal-p-sobra').value = p.sobra || 1;
   document.getElementById('modal-p-face').value = p.face_padrao || 'B';
+  document.getElementById('modal-p-nome').focus();
 }
 
 async function salvarPadraoMontagemModal() {
@@ -942,7 +932,6 @@ async function salvarPadraoMontagemModal() {
     if (res.ok && data.ok) {
       await carregarDadosIniciais();
       renderizarModalPadroes();
-      renderizarGridNiveis();
       exibirAlerta(`Padrão "${nome}" salvo no parque ativo com sucesso!`, 'success');
     } else {
       alert(data.erro || 'Erro ao salvar padrão');
