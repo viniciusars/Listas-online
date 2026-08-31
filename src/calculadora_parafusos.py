@@ -21,8 +21,8 @@ DIMENSOES_FERRAGENS = {
 }
 
 POSTE_DT = {
-    'face_a': {'topo': 140.0, 'conicidade': 28.0},  # mm e mm/m (Face A - Topo)
-    'face_b': {'topo': 110.0, 'conicidade': 20.0},  # mm e mm/m (Face B - Gaveta)
+    'A': {'topo': 140.0, 'conicidade': 28.0},  # mm e mm/m (Face A - Topo)
+    'B': {'topo': 110.0, 'conicidade': 20.0},  # mm e mm/m (Face B - Gaveta)
 }
 
 COEFICIENTES_ESFORCO = {
@@ -45,109 +45,109 @@ PADROES_MONTAGEM: Dict[str, Dict[str, Any]] = {
     'N1': {
         'nome': 'N1',
         'descricao': 'N1 simples (1 cruzeta, 3 paraf. simples)',
-        'cruzeta': 1,
-        'parafuso_simples': 3,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 1.0,
+        'parafuso_simples': 3.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'B',  # Gaveta por padrão
     },
     'N4.C': {
         'nome': 'N4.C',
         'descricao': 'N4 Topo (2 cruzetas, 3 roscas duplas c/ olhais)',
-        'cruzeta': 2,
-        'parafuso_simples': 0,
-        'parafuso_dupla': 3,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 2,
-        'sobra': 1,
+        'cruzeta': 2.0,
+        'parafuso_simples': 0.0,
+        'parafuso_dupla': 3.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 2.0,
+        'sobra': 1.0,
         'face_padrao': 'A',  # Face A (Topo)
     },
     'N4.B': {
         'nome': 'N4.B',
         'descricao': 'N4 Gaveta (2 cruzetas, 2 paraf. simples)',
-        'cruzeta': 2,
-        'parafuso_simples': 2,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 2.0,
+        'parafuso_simples': 2.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'B',  # Face B (Gaveta)
     },
     'N3.C': {
         'nome': 'N3.C',
         'descricao': 'N3 Topo (2 cruzetas, 3 paraf. simples, 1 olhal)',
-        'cruzeta': 2,
-        'parafuso_simples': 3,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 1,
-        'porca_olhal': 1,
-        'sobra': 1,
+        'cruzeta': 2.0,
+        'parafuso_simples': 3.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 1.0,
+        'porca_olhal': 1.0,
+        'sobra': 1.0,
         'face_padrao': 'A',  # Face A (Topo)
     },
     'N3.B': {
         'nome': 'N3.B',
         'descricao': 'N3 Gaveta (2 cruzetas, 2 paraf. simples)',
-        'cruzeta': 2,
-        'parafuso_simples': 2,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 2.0,
+        'parafuso_simples': 2.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'B',  # Face B (Gaveta)
     },
     'N3.C_1C': {
         'nome': 'N3.C_1C',
         'descricao': 'N3 Topo 1 Cruzeta (1 cruzeta, 3 paraf. simples)',
-        'cruzeta': 1,
-        'parafuso_simples': 3,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 1.0,
+        'parafuso_simples': 3.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'A',
     },
     'CHAVE': {
         'nome': 'CHAVE',
         'descricao': 'Montagem Chave (2 cruzetas, 4 paraf. simples)',
-        'cruzeta': 2,
-        'parafuso_simples': 4,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 2.0,
+        'parafuso_simples': 4.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'B',
     },
     'SUSP': {
         'nome': 'SUSP',
         'descricao': 'Suspensão com cruzeta (1 cruzeta, 3 paraf. simples)',
-        'cruzeta': 1,
-        'parafuso_simples': 3,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 1.0,
+        'parafuso_simples': 3.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'B',
     },
     'SUSP_NU': {
         'nome': 'SUSP_NU',
         'descricao': 'Suspensão direta no poste (0 cruzeta, 2 paraf. simples)',
-        'cruzeta': 0,
-        'parafuso_simples': 2,
-        'parafuso_dupla': 0,
-        'arruela': 2,
-        'porca': 2,
-        'porca_olhal': 0,
-        'sobra': 1,
+        'cruzeta': 0.0,
+        'parafuso_simples': 2.0,
+        'parafuso_dupla': 0.0,
+        'arruela': 2.0,
+        'porca': 2.0,
+        'porca_olhal': 0.0,
+        'sobra': 1.0,
         'face_padrao': 'B',
     },
 }
@@ -300,6 +300,49 @@ ESTRUTURAS_PADRAO: Dict[str, List[Dict[str, Any]]] = {
 }
 
 
+def gerar_linhas_iniciais_estruturas() -> Dict[str, List[Dict[str, Any]]]:
+    """Converte o catálogo de ESTRUTURAS_PADRAO e PADROES_MONTAGEM para a grade completa
+    de elementos por nível (Cruzeta, Máquina e Rosca Dupla com todos os seus componentes)."""
+    res = {}
+    for est_nome, niveis in ESTRUTURAS_PADRAO.items():
+        linhas = []
+        for idx, n in enumerate(niveis, 1):
+            mont_nome = n.get('montagem', 'N1')
+            mont = PADROES_MONTAGEM.get(mont_nome, PADROES_MONTAGEM['N1'])
+            inv = int(n.get('inverte', 0))
+            face_base = mont.get('face_padrao', 'B').upper()
+            if face_base == 'B' and inv:
+                face = 'A'
+            elif face_base == 'A' and inv:
+                face = 'B'
+            else:
+                face = face_base
+                
+            p_simples = float(mont.get('parafuso_simples', 0))
+            p_dupla = float(mont.get('parafuso_dupla', 0))
+            
+            linhas.append({
+                'ordem': idx,
+                'nivel': int(n.get('nivel', idx)),
+                'distancia_prog': str(n.get('distancia_prog', '0.2')),
+                'face': face,
+                'cruzeta': float(mont.get('cruzeta', 0)),
+                'p_maquina': p_simples,
+                'porca_m': float(mont.get('porca', 0)) if p_simples > 0 else 0.0,
+                'arruela_m': float(mont.get('arruela', 0)) if p_simples > 0 else 0.0,
+                'olhal_m': float(mont.get('porca_olhal', 0)) if p_simples > 0 else 0.0,
+                'sobra_m': float(mont.get('sobra', 1)) if p_simples > 0 else 0.0,
+                'p_dupla': p_dupla,
+                'porca_d': float(mont.get('porca', 0)) if p_dupla > 0 else 0.0,
+                'arruela_d': float(mont.get('arruela', 0)) if p_dupla > 0 else 0.0,
+                'olhal_d': float(mont.get('porca_olhal', 0)) if p_dupla > 0 else 0.0,
+                'sobra_d': float(mont.get('sobra', 1)) if p_dupla > 0 else 0.0,
+                'montagem': mont_nome
+            })
+        res[est_nome] = linhas
+    return res
+
+
 # ── Funções de Cálculo Geométrico ──────────────────────────────────────────
 
 def calcular_engaste(altura_m: float) -> float:
@@ -333,7 +376,6 @@ def resolver_distancia_metros(dist_prog: Any, altura_m: Optional[float] = None) 
         if altura_m is None or altura_m <= 0:
             raise ValueError(f"A cota '{dist_prog}' depende da altura do poste, mas a altura não foi informada.")
         ch_val = calcular_ch(altura_m)
-        # Processa CH+X ou CH-X
         if txt == 'CH':
             return ch_val
         match = re.search(r'CH([\+\-])([0-9\.]+)', txt)
@@ -372,103 +414,117 @@ def calcular_secao_poste(distancia_m: float, esforco_dan: float, face: str) -> f
     Face A (Topo):   Largura = 140 + 28 * Coef_Esforco + 28 * distancia_m
     Face B (Gaveta): Largura = 110 + 20 * Coef_Esforco + 20 * distancia_m
     """
-    face_key = 'face_a' if face.upper() in ('A', 'TOPO') else 'face_b'
+    face_key = 'A' if str(face).upper() in ('A', 'TOPO') else 'B'
     params = POSTE_DT[face_key]
     coef_esf = obter_coeficiente_esforco(esforco_dan)
     largura = params['topo'] + (params['conicidade'] * coef_esf) + (params['conicidade'] * distancia_m)
     return round(largura, 2)
 
 
-def calcular_espessura_ferragens(montagem_info: Dict[str, Any], custom_dim: Optional[Dict[str, float]] = None) -> float:
-    """Calcula o somatório das espessuras de ferragens e acessórios para a montagem."""
-    dim = DIMENSOES_FERRAGENS.copy()
-    if custom_dim:
-        dim.update(custom_dim)
-        
-    cruz = float(montagem_info.get('cruzeta', 0))
-    porca = float(montagem_info.get('porca', 0))
-    arr = float(montagem_info.get('arruela', 0))
-    olhal = float(montagem_info.get('porca_olhal', 0))
-    sobra = float(montagem_info.get('sobra', 1))
-
-    total = (
-        (cruz * dim['cruzeta']) +
-        (porca * dim['porca']) +
-        (arr * dim['arruela']) +
-        (olhal * dim['porca_olhal']) +
-        (sobra * dim['sobra'])
-    )
-    return round(total, 2)
-
-
-def processar_calculo_nivel(
-    nivel_idx: int,
-    dist_prog_raw: str,
-    montagem_nome: str,
-    inverte_flag: int,
-    esforco_dan: float,
-    altura_m: Optional[float] = None,
-    custom_padroes: Optional[Dict[str, Dict[str, Any]]] = None
-) -> Dict[str, Any]:
-    """Calcula um nível individual e gera os dados detalhados."""
-    padroes = custom_padroes or PADROES_MONTAGEM
-    mont = padroes.get(montagem_nome)
-    if not mont:
-        raise ValueError(f"Montagem '{montagem_nome}' não encontrada no cadastro de padrões.")
-
-    dist_m = resolver_distancia_metros(dist_prog_raw, altura_m)
+def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Optional[float] = None) -> Dict[str, Any]:
+    """Calcula o dimensionamento de uma linha da grade de níveis e elementos."""
+    dist_raw = str(linha.get('distancia_prog', '0.2')).strip()
+    dist_m = resolver_distancia_metros(dist_raw, altura_m)
     
-    # Determina Face (A ou B)
-    face_base = mont.get('face_padrao', 'B').upper()
-    if inverte_flag:
-        face = 'B' if face_base == 'A' else 'A'
-    else:
-        face = face_base
+    face = str(linha.get('face', 'B')).strip().upper()
+    if face not in ('A', 'B'):
+        face = 'A' if face in ('TOPO', 'A') else 'B'
         
     posicao_nome = 'TOPO' if face == 'A' else 'GAVETA'
-    
     w_poste = calcular_secao_poste(dist_m, esforco_dan, face)
-    esp_ferragens = calcular_espessura_ferragens(mont)
-    comp_calc = round(w_poste + esp_ferragens, 2)
-    comp_comercial = arredondar_comprimento_comercial(comp_calc)
     
-    qtd_simples = int(mont.get('parafuso_simples', 0))
-    qtd_dupla = int(mont.get('parafuso_dupla', 0))
+    cruzeta = float(linha.get('cruzeta', 0))
     
-    parafusos_gerados = []
-    if qtd_simples > 0:
-        parafusos_gerados.append({
+    # Máquina
+    p_maq = float(linha.get('p_maquina', 0))
+    porca_m = float(linha.get('porca_m', 0))
+    arr_m = float(linha.get('arruela_m', 0))
+    olh_m = float(linha.get('olhal_m', 0))
+    sob_m = float(linha.get('sobra_m', 1 if p_maq > 0 else 0))
+
+    # Rosca Dupla
+    p_dup = float(linha.get('p_dupla', 0))
+    porca_d = float(linha.get('porca_d', 0))
+    arr_d = float(linha.get('arruela_d', 0))
+    olh_d = float(linha.get('olhal_d', 0))
+    sob_d = float(linha.get('sobra_d', 1 if p_dup > 0 else 0))
+
+    parafusos = []
+    detalhes_m = None
+    detalhes_d = None
+
+    if p_maq > 0:
+        esp_m = (
+            (cruzeta * DIMENSOES_FERRAGENS['cruzeta']) +
+            (porca_m * DIMENSOES_FERRAGENS['porca']) +
+            (arr_m * DIMENSOES_FERRAGENS['arruela']) +
+            (olh_m * DIMENSOES_FERRAGENS['porca_olhal']) +
+            (sob_m * DIMENSOES_FERRAGENS['sobra'])
+        )
+        comp_m = w_poste + esp_m
+        comercial_m = arredondar_comprimento_comercial(comp_m)
+        detalhes_m = {
+            'esp_ferragens': round(esp_m, 2),
+            'comp_calc': round(comp_m, 2),
+            'comp_comercial': comercial_m,
+            'quantidade': p_maq,
+        }
+        parafusos.append({
             'posicao': posicao_nome,
             'parafuso': 'CABEÇA QUADRADA',
             'esf_parafuso': 50.0,
-            'comprimento': comp_comercial,
-            'quantidade': float(qtd_simples),
-            'comp_calculado': comp_calc,
+            'comprimento': comercial_m,
+            'quantidade': p_maq,
+            'comp_calculado': round(comp_m, 2),
         })
-    if qtd_dupla > 0:
-        parafusos_gerados.append({
+
+    if p_dup > 0:
+        esp_d = (
+            (cruzeta * DIMENSOES_FERRAGENS['cruzeta']) +
+            (porca_d * DIMENSOES_FERRAGENS['porca']) +
+            (arr_d * DIMENSOES_FERRAGENS['arruela']) +
+            (olh_d * DIMENSOES_FERRAGENS['porca_olhal']) +
+            (sob_d * DIMENSOES_FERRAGENS['sobra'])
+        )
+        comp_d = w_poste + esp_d
+        comercial_d = arredondar_comprimento_comercial(comp_d)
+        detalhes_d = {
+            'esp_ferragens': round(esp_d, 2),
+            'comp_calc': round(comp_d, 2),
+            'comp_comercial': comercial_d,
+            'quantidade': p_dup,
+        }
+        parafusos.append({
             'posicao': posicao_nome,
             'parafuso': 'ROSCA DUPLA',
             'esf_parafuso': 70.0,
-            'comprimento': comp_comercial,
-            'quantidade': float(qtd_dupla),
-            'comp_calculado': comp_calc,
+            'comprimento': comercial_d,
+            'quantidade': p_dup,
+            'comp_calculado': round(comp_d, 2),
         })
 
     return {
-        'nivel': nivel_idx,
-        'distancia_prog_raw': str(dist_prog_raw),
-        'distancia_m': dist_m,
-        'montagem': montagem_nome,
-        'inverte': int(inverte_flag),
+        'nivel': linha.get('nivel', 1),
+        'distancia_prog_raw': dist_raw,
+        'distancia_m': round(dist_m, 3),
         'face': face,
         'posicao': posicao_nome,
-        'secao_poste_mm': w_poste,
-        'ferragens_mm': esp_ferragens,
-        'comp_calculado_mm': comp_calc,
-        'comp_comercial_mm': comp_comercial,
-        'montagem_detalhe': mont,
-        'parafusos': parafusos_gerados,
+        'secao_poste_mm': round(w_poste, 2),
+        'cruzeta': cruzeta,
+        'p_maquina': p_maq,
+        'porca_m': porca_m,
+        'arruela_m': arr_m,
+        'olhal_m': olh_m,
+        'sobra_m': sob_m,
+        'p_dupla': p_dup,
+        'porca_d': porca_d,
+        'arruela_d': arr_d,
+        'olhal_d': olh_d,
+        'sobra_d': sob_d,
+        'montagem': linha.get('montagem', ''),
+        'detalhes_maquina': detalhes_m,
+        'detalhes_dupla': detalhes_d,
+        'parafusos': parafusos,
     }
 
 
@@ -476,24 +532,22 @@ def calcular_estrutura_completa(
     tipo_estrutura: str,
     esforco_dan: float,
     altura_m: Optional[float] = None,
-    niveis_custom: Optional[List[Dict[str, Any]]] = None,
+    niveis_grid: Optional[List[Dict[str, Any]]] = None,
     cruzeta_adicional: Optional[float] = None,
-    custom_padroes: Optional[Dict[str, Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
-    """Calcula todos os níveis de uma estrutura e consolida os parafusos gerados."""
+    """Calcula todos os níveis de uma estrutura a partir da grade de elementos."""
     avisos = []
     
-    # Se não foram fornecidos níveis customizados, busca no catálogo padrão
-    if niveis_custom is not None:
-        niveis_def = niveis_custom
+    if niveis_grid is not None and len(niveis_grid) > 0:
+        linhas_grid = niveis_grid
     else:
-        niveis_def = ESTRUTURAS_PADRAO.get(tipo_estrutura)
-        if not niveis_def:
+        grid_all = gerar_linhas_iniciais_estruturas()
+        linhas_grid = grid_all.get(tipo_estrutura, [])
+        if not linhas_grid:
             raise ValueError(f"Estrutura '{tipo_estrutura}' não encontrada no catálogo. "
                              "Forneça a definição de níveis para calcular.")
 
-    # Valida necessidade de altura
-    dep_alt = estrutura_depende_altura(niveis_def)
+    dep_alt = estrutura_depende_altura(linhas_grid)
     if dep_alt and (altura_m is None or altura_m <= 0):
         raise ValueError(f"A estrutura '{tipo_estrutura}' depende da altura do poste (possui cotas 'CH'). "
                          "Por favor, informe a altura do poste em metros.")
@@ -501,21 +555,8 @@ def calcular_estrutura_completa(
     detalhes_niveis = []
     todos_parafusos = []
     
-    for idx, item in enumerate(niveis_def, 1):
-        nivel_num = item.get('nivel', idx)
-        dist_raw = item.get('distancia_prog', '0.2')
-        mont_nome = item.get('montagem', 'N1')
-        inv = item.get('inverte', 0)
-        
-        calc_res = processar_calculo_nivel(
-            nivel_idx=nivel_num,
-            dist_prog_raw=dist_raw,
-            montagem_nome=mont_nome,
-            inverte_flag=inv,
-            esforco_dan=esforco_dan,
-            altura_m=altura_m,
-            custom_padroes=custom_padroes
-        )
+    for idx, item in enumerate(linhas_grid, 1):
+        calc_res = calcular_linha_grid(item, esforco_dan=esforco_dan, altura_m=altura_m)
         detalhes_niveis.append(calc_res)
         todos_parafusos.extend(calc_res['parafusos'])
 
@@ -546,22 +587,3 @@ def calcular_estrutura_completa(
         'parafusos_consolidados': linhas_grade,
         'avisos': avisos
     }
-
-
-def listar_estruturas_disponiveis() -> List[Dict[str, Any]]:
-    """Retorna a lista de estruturas do catálogo com resumo de níveis."""
-    lista = []
-    for nome, niveis in ESTRUTURAS_PADRAO.items():
-        dep_alt = estrutura_depende_altura(niveis)
-        lista.append({
-            'nome': nome,
-            'total_niveis': len(niveis),
-            'depende_altura': dep_alt,
-            'niveis': niveis
-        })
-    return lista
-
-
-def listar_padroes_montagem() -> Dict[str, Dict[str, Any]]:
-    """Retorna os blocos de montagem padrão disponíveis."""
-    return PADROES_MONTAGEM

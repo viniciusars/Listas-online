@@ -464,13 +464,60 @@ def api_paraf_excluir():
 
 @app.route('/dimensionar-parafusos/api/dados')
 def api_dimensionar_dados():
+    pid = _parque_ativo_id()
+    estruturas = banco.listar_estruturas_calculadora(pid)
+    padroes = banco.listar_padroes_calculadora(pid)
     return jsonify({
-        'estruturas': calculadora_parafusos.listar_estruturas_disponiveis(),
-        'padroes': calculadora_parafusos.listar_padroes_montagem(),
+        'estruturas': estruturas,
+        'padroes': padroes,
         'esforcos_padrao': [600, 1000, 1500, 2000, 2500, 3000],
         'dimensoes_ferragens': calculadora_parafusos.DIMENSOES_FERRAGENS,
         'comprimentos_comerciais': calculadora_parafusos.COMPRIMENTOS_COMERCIAIS,
     })
+
+
+@app.route('/dimensionar-parafusos/api/estrutura')
+def api_dimensionar_estrutura():
+    tipo = request.args.get('tipo', '').strip()
+    if not tipo:
+        return jsonify({'erro': 'Parâmetro "tipo" é obrigatório.'}), 400
+    pid = _parque_ativo_id()
+    linhas = banco.obter_estrutura_calculadora(tipo, pid)
+    return jsonify({'tipo': tipo, 'linhas': linhas})
+
+
+@app.route('/dimensionar-parafusos/api/salvar-padrao-estrutura', methods=['POST'])
+def api_dimensionar_salvar_padrao():
+    data = request.get_json(force=True)
+    tipo = str(data.get('tipo', '')).strip().upper()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    linhas = data.get('linhas', [])
+    pid = _parque_ativo_id()
+    count = banco.salvar_estrutura_calculadora(tipo, linhas, pid)
+    return jsonify({'ok': True, 'count': count, 'tipo': tipo})
+
+
+@app.route('/dimensionar-parafusos/api/excluir-padrao-estrutura', methods=['POST'])
+def api_dimensionar_excluir_padrao():
+    data = request.get_json(force=True)
+    tipo = str(data.get('tipo', '')).strip()
+    if not tipo:
+        return jsonify({'erro': 'Campo "tipo" é obrigatório.'}), 400
+    pid = _parque_ativo_id()
+    count = banco.excluir_estrutura_calculadora(tipo, pid)
+    return jsonify({'ok': True, 'count': count, 'tipo': tipo})
+
+
+@app.route('/dimensionar-parafusos/api/padroes/salvar', methods=['POST'])
+def api_dimensionar_salvar_padrao_montagem():
+    data = request.get_json(force=True)
+    nome = str(data.get('nome', '')).strip().upper()
+    if not nome:
+        return jsonify({'erro': 'Nome do padrão de montagem é obrigatório.'}), 400
+    pid = _parque_ativo_id()
+    banco.salvar_padrao_calculadora(data, pid)
+    return jsonify({'ok': True, 'nome': nome})
 
 
 @app.route('/dimensionar-parafusos/api/calcular', methods=['POST'])
@@ -490,14 +537,14 @@ def api_dimensionar_calcular():
     cruzeta_raw = data.get('cruzeta_adicional')
     cruzeta = float(cruzeta_raw) if cruzeta_raw not in (None, '', 'null') else None
 
-    niveis = data.get('niveis')
+    linhas = data.get('linhas') or data.get('niveis')
 
     try:
         resultado = calculadora_parafusos.calcular_estrutura_completa(
             tipo_estrutura=tipo,
             esforco_dan=esforco,
             altura_m=altura,
-            niveis_custom=niveis,
+            niveis_grid=linhas,
             cruzeta_adicional=cruzeta
         )
         return jsonify(resultado)
