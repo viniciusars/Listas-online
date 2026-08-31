@@ -220,29 +220,51 @@ main {
 
       <!-- Grade Matricial por Comprimento (Fiel à Página Cadastrar Parafusos) -->
       <div style="overflow-x: auto; margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px;">
-        <table id="tabela-matriz-parafusos" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: center;">
+        <table id="tabela-matriz-parafusos" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: center; table-layout: fixed;">
+          <colgroup>
+            <col style="width: 11%;">  <!-- POSIÇÃO -->
+            <col style="width: 17%;">  <!-- PARAFUSO -->
+            <col style="width: 8%;">   <!-- CLASSE -->
+            <!-- 15 colunas de comprimento = 4% cada (total 60%) -->
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">
+            <col style="width: 4%;">   <!-- Ações -->
+          </colgroup>
           <thead>
             <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
-              <th style="padding: 8px 10px; text-align: center; min-width: 100px; border-right: 1px solid #334155;">POSIÇÃO</th>
-              <th style="padding: 8px 10px; text-align: center; min-width: 160px; border-right: 1px solid #334155;">PARAFUSO</th>
-              <th style="padding: 8px 10px; text-align: center; min-width: 90px; border-right: 1px solid #334155;">CLASSE (KN)</th>
+              <th style="padding: 8px 6px; text-align: center; border-right: 1px solid #334155;">POSIÇÃO</th>
+              <th style="padding: 8px 6px; text-align: center; border-right: 1px solid #334155;">PARAFUSO</th>
+              <th style="padding: 8px 4px; text-align: center; border-right: 1px solid #334155;">CLASSE (KN)</th>
               <!-- Comprimentos fixos de 200 a 900 mm -->
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">200</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">250</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">300</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">350</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">400</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">450</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">500</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">550</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">600</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">650</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">700</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">750</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">800</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">850</th>
-              <th style="padding: 8px 4px; text-align: center; min-width: 42px;">900</th>
-              <th style="padding: 8px 4px; text-align: center; width: 35px;"></th>
+              <th style="padding: 8px 2px; text-align: center;">200</th>
+              <th style="padding: 8px 2px; text-align: center;">250</th>
+              <th style="padding: 8px 2px; text-align: center;">300</th>
+              <th style="padding: 8px 2px; text-align: center;">350</th>
+              <th style="padding: 8px 2px; text-align: center;">400</th>
+              <th style="padding: 8px 2px; text-align: center;">450</th>
+              <th style="padding: 8px 2px; text-align: center;">500</th>
+              <th style="padding: 8px 2px; text-align: center;">550</th>
+              <th style="padding: 8px 2px; text-align: center;">600</th>
+              <th style="padding: 8px 2px; text-align: center;">650</th>
+              <th style="padding: 8px 2px; text-align: center;">700</th>
+              <th style="padding: 8px 2px; text-align: center;">750</th>
+              <th style="padding: 8px 2px; text-align: center;">800</th>
+              <th style="padding: 8px 2px; text-align: center;">850</th>
+              <th style="padding: 8px 2px; text-align: center;">900</th>
+              <th style="padding: 8px 2px; text-align: center;"></th>
             </tr>
           </thead>
           <tbody id="tbody-matriz-parafusos">
