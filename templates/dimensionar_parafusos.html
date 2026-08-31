@@ -77,6 +77,9 @@ main {
             <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
               ➕
             </button>
+            <button class="btn btn-outline" id="btn-excluir-est-card1" title="Excluir Estrutura do Parque" onclick="excluirEstruturaParque()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-size: 1rem; color: var(--danger-color); border-color: var(--border-color); display: flex; align-items: center; justify-content: center;">
+              🗑️
+            </button>
           </div>
           <!-- Input de Nome quando for Nova -->
           <div id="div-nome-custom" style="display: none; margin-top: 0.5rem;">
@@ -574,11 +577,15 @@ async function aoMudarEstrutura() {
   const divCustom = document.getElementById('div-nome-custom');
   const inputCustom = document.getElementById('input-nome-estrutura');
   const btnExcluir = document.getElementById('btn-excluir-est');
+  const btnExcluir1 = document.getElementById('btn-excluir-est-card1');
+  const btnRenomear1 = document.getElementById('btn-renomear-est');
 
   if (valor === '__NOVA__') {
     divCustom.style.display = 'block';
     inputCustom.value = '';
     btnExcluir.style.display = 'none';
+    if (btnExcluir1) btnExcluir1.style.display = 'none';
+    if (btnRenomear1) btnRenomear1.style.display = 'none';
     linhasGridAtuais = [
       criarLinhaVazia(1, '0.2', 'B')
     ];
@@ -589,13 +596,18 @@ async function aoMudarEstrutura() {
 
   divCustom.style.display = 'none';
   if (!valor) {
+    if (btnExcluir) btnExcluir.style.display = 'none';
+    if (btnExcluir1) btnExcluir1.style.display = 'none';
+    if (btnRenomear1) btnRenomear1.style.display = 'none';
     linhasGridAtuais = [];
     renderizarGridNiveis();
     limparResultados();
     return;
   }
 
-  btnExcluir.style.display = 'inline-block';
+  if (btnExcluir) btnExcluir.style.display = 'inline-block';
+  if (btnExcluir1) btnExcluir1.style.display = 'inline-flex';
+  if (btnRenomear1) btnRenomear1.style.display = 'inline-flex';
 
   try {
     const res = await fetch(`/dimensionar-parafusos/api/estrutura?tipo=${encodeURIComponent(valor)}`);
