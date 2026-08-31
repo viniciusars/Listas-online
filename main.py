@@ -520,6 +520,17 @@ def api_dimensionar_salvar_padrao_montagem():
     return jsonify({'ok': True, 'nome': nome})
 
 
+@app.route('/dimensionar-parafusos/api/padroes/excluir', methods=['POST'])
+def api_dimensionar_excluir_padrao_montagem():
+    data = request.get_json(force=True)
+    nome = str(data.get('nome', '')).strip().upper()
+    if not nome:
+        return jsonify({'erro': 'Nome do padrão de montagem é obrigatório.'}), 400
+    pid = _parque_ativo_id()
+    count = banco.excluir_padrao_calculadora(nome, pid)
+    return jsonify({'ok': True, 'count': count, 'nome': nome})
+
+
 @app.route('/dimensionar-parafusos/api/calcular', methods=['POST'])
 def api_dimensionar_calcular():
     data = request.get_json(force=True)

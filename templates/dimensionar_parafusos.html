@@ -1073,13 +1073,41 @@ function renderizarModalPadroes() {
       <td style="padding: 6px 8px;">${p.porca_olhal}</td>
       <td style="padding: 6px 8px;">${p.sobra}</td>
       <td style="padding: 6px 8px;"><span class="badge" style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${p.face_padrao || 'B'}</span></td>
-      <td style="padding: 6px 8px;">
+      <td style="padding: 6px 8px; text-align: center; white-space: nowrap;">
         <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="carregarPadraoParaEditar('${p.nome}')" title="Editar este padrão">
           ✏️
+        </button>
+        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem; color: var(--danger-color); border-color: transparent;" onclick="excluirPadraoMontagemModal('${p.nome}')" title="Excluir este padrão do parque">
+          🗑️
         </button>
       </td>
     `;
     tbody.appendChild(tr);
+  }
+}
+
+async function excluirPadraoMontagemModal(nome) {
+  if (!confirm(`Deseja realmente excluir o padrão de montagem "${nome}" deste parque?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/dimensionar-parafusos/api/padroes/excluir', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({nome: nome})
+    });
+
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      exibirAlerta(`Padrão "${nome}" excluído do parque ativo.`, 'info');
+      await carregarDadosIniciais();
+      renderizarModalPadroes();
+    } else {
+      alert(data.erro || 'Erro ao excluir padrão');
+    }
+  } catch (e) {
+    alert('Erro de comunicação: ' + e.message);
   }
 }
 

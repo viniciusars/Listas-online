@@ -1676,6 +1676,22 @@ def salvar_padrao_calculadora(padrao_dict, parque_id=None):
         conn.close()
 
 
+def excluir_padrao_calculadora(nome, parque_id=None):
+    """Exclui um padrão de montagem do parque."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        conn.execute(
+            "DELETE FROM calculadora_padroes WHERE parque_id = ? AND nome = ?",
+            (parque_id, nome)
+        )
+        affected = conn.execute("SELECT changes()").fetchone()[0]
+        conn.commit()
+        return affected
+    finally:
+        conn.close()
+
+
 if __name__ == '__main__':
     # Permite rodar a migração manualmente: python -m src.banco
     inicializar()
