@@ -426,63 +426,82 @@ main {
     outline: 2px solid var(--primary-light) !important;
   }
 
-  /* Estilização da Tabela de Níveis (Fundo Branco nas Informações) */
-  .grid-table {
+  /* Estilização da Tabela de Níveis (Fundo Branco em TODAS as Informações) */
+  #tabela-grid-niveis {
+    background-color: #ffffff !important;
     background: #ffffff !important;
-    border-collapse: collapse !important;
   }
-  .grid-table td {
+  #tbody-grid-niveis,
+  #tbody-grid-niveis tr,
+  #tbody-grid-niveis td {
+    background-color: #ffffff !important;
     background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
   }
-  .grid-table tr:hover td {
+  #tbody-grid-niveis tr:hover td {
     background-color: #f8fafc !important;
+    background: #f8fafc !important;
   }
 
-  /* Inputs com Fundo Branco */
+  /* Inputs com Fundo Branco Absoluto */
+  #tbody-grid-niveis input,
   .cell-grid-white {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 5px 2px;
-    text-align: center;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    background: #ffffff;
-    color: #0f172a;
-    font-size: 0.84rem;
-    font-weight: 600;
-    transition: all 0.15s ease;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 5px 2px !important;
+    text-align: center !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    transition: all 0.15s ease !important;
   }
+  #tbody-grid-niveis input:focus,
   .cell-grid-white:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-    background: #ffffff;
-    color: #0f172a;
+    outline: none !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
   }
 
   /* Elementos zerados exibidos como '-' */
+  #tbody-grid-niveis input.is-dash,
   .cell-grid-white.is-dash {
     color: #94a3b8 !important;
     font-weight: 500 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
   }
+  #tbody-grid-niveis input.is-active,
   .cell-grid-white.is-active {
     color: #0f172a !important;
     font-weight: 700 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
   }
 
-  /* Destaque dos campos de parafuso */
+  /* Destaque nos textos dos campos de parafuso (com fundo 100% branco) */
+  #tbody-grid-niveis input.maq-main.is-active,
   .cell-grid-white.maq-main.is-active {
     color: #0284c7 !important;
     font-weight: 800 !important;
-    border-color: #7dd3fc !important;
-    background: #f0f9ff !important;
+    border-color: #38bdf8 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
   }
+  #tbody-grid-niveis input.dup-main.is-active,
   .cell-grid-white.dup-main.is-active {
     color: #16a34a !important;
     font-weight: 800 !important;
-    border-color: #86efac !important;
-    background: #f0fdf4 !important;
+    border-color: #4ade80 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
   }
 
   /* Células da Grade Matricial */
@@ -662,7 +681,7 @@ function renderizarGridNiveis() {
   linhasGridAtuais.forEach((linha, idx) => {
     const tr = document.createElement('tr');
     tr.className = 'grid-row';
-    tr.style.background = '#ffffff';
+    tr.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important;';
 
     const distRaw = String(linha.distancia_prog || '').toUpperCase();
     if (distRaw.includes('CH')) temCH = true;
@@ -680,54 +699,57 @@ function renderizarGridNiveis() {
     const olhald = linha.olhal_d != null ? Number(linha.olhal_d) : 0;
     const sobrad = linha.sobra_d != null ? Number(linha.sobra_d) : 1;
 
+    const baseInputStyle = 'background: #ffffff !important; background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; text-align: center !important; font-size: 0.85rem !important; padding: 5px 2px !important; width: 100% !important; box-sizing: border-box !important; height: 32px !important;';
+    const tdStyle = 'border: 1px solid #cbd5e1 !important; padding: 4px 2px !important; background: #ffffff !important; background-color: #ffffff !important;';
+
     tr.innerHTML = `
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="number" class="cell-grid-white is-active" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
+      <td style="${tdStyle}">
+        <input type="number" class="cell-grid-white" style="${baseInputStyle} color: #0f172a !important; font-weight: 700 !important;" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white is-active" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: #0f172a !important; font-weight: 700 !important;" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${cruz === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(cruz)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${cruz === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${cruz === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(cruz)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
       </td>
       
       <!-- Cabeça Quadrada -->
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white maq-main ${pm === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(pm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${pm === 0 ? '#94a3b8' : '#0284c7'} !important; font-weight: ${pm === 0 ? '500' : '800'} !important; border: 1px solid ${pm === 0 ? '#cbd5e1' : '#38bdf8'} !important;" value="${formatarDisplayZero(pm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${porcam === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(porcam)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${porcam === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${porcam === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(porcam)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${arrm === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(arrm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${arrm === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${arrm === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(arrm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${olhalm === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(olhalm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${olhalm === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${olhalm === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(olhalm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${sobram === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(sobram)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${sobram === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${sobram === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(sobram)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
       </td>
       
       <!-- Rosca Dupla -->
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white dup-main ${pd === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(pd)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${pd === 0 ? '#94a3b8' : '#16a34a'} !important; font-weight: ${pd === 0 ? '500' : '800'} !important; border: 1px solid ${pd === 0 ? '#cbd5e1' : '#4ade80'} !important;" value="${formatarDisplayZero(pd)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${porcad === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(porcad)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${porcad === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${porcad === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(porcad)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${arrd === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(arrd)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${arrd === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${arrd === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(arrd)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${olhald === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(olhald)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${olhald === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${olhald === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(olhald)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
       </td>
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <input type="text" class="cell-grid-white ${sobrad === 0 ? 'is-dash' : 'is-active'}" value="${formatarDisplayZero(sobrad)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
+      <td style="${tdStyle}">
+        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${sobrad === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${sobrad === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(sobrad)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
       </td>
       
       <!-- Ações -->
-      <td style="border: 1px solid #e2e8f0; padding: 4px 2px; background: #ffffff;">
-        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.8rem; color: var(--danger-color); border-color: transparent; border-radius: 4px;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
+      <td style="${tdStyle}">
+        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.85rem; color: var(--danger-color); border-color: transparent; border-radius: 4px; background: transparent !important;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
           🗑️
         </button>
       </td>
