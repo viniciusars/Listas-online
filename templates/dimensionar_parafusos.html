@@ -353,134 +353,6 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
 .tag.gaveta { background: var(--c-dup-soft); color: var(--c-dup); border: 1px solid var(--c-dup-line); }
 .res-maq { color: var(--c-maq); font-weight: 700; }
 .res-dup { color: var(--c-dup); font-weight: 700; }
-
-/* ── Modal de padrões de montagem ──────────────────────────────────── */
-.modal-fundo {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(3px);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-.modal-fundo.open { display: flex; }
-.modal-caixa {
-    background: var(--surface-color);
-    color: var(--text-main);
-    width: 100%;
-    max-width: 880px;
-    max-height: 88vh;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-float);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.modal-caixa > header {
-    all: unset;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 22px;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--bg-color);
-}
-.modal-caixa > header h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.modal-fechar {
-    background: none;
-    border: none;
-    font-size: 1.6rem;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--text-muted);
-    padding: 0 4px;
-    border-radius: 6px;
-}
-.modal-fechar:hover { color: var(--danger-color); }
-.modal-corpo { padding: 20px 22px; overflow-y: auto; flex: 1; }
-.modal-rodape {
-    padding: 12px 22px;
-    border-top: 1px solid var(--border-color);
-    background: var(--bg-color);
-    text-align: right;
-}
-
-.form-padrao {
-    padding: 18px;
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    margin-top: 18px;
-}
-.form-padrao h4 {
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.form-padrao .grid-ident {
-    display: grid;
-    grid-template-columns: minmax(130px, 1fr) minmax(200px, 2.6fr);
-    gap: 12px;
-    margin-bottom: 14px;
-}
-.form-padrao .grid-qtd {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-}
-@media (max-width: 560px) {
-    .form-padrao .grid-ident,
-    .form-padrao .grid-qtd { grid-template-columns: minmax(0, 1fr); }
-}
-.form-padrao label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-}
-.form-padrao input {
-    width: 100%;
-    height: 38px;
-    padding: 0 10px;
-    font-size: 0.88rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: var(--surface-color);
-    color: var(--text-main);
-    font-family: inherit;
-}
-.form-padrao input.centro { text-align: center; font-weight: 700; }
-.form-padrao input.tinta-maq { color: var(--c-maq); }
-.form-padrao input.tinta-dup { color: var(--c-dup); }
-.form-padrao input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px var(--primary-light);
-}
-.form-padrao .acao { display: flex; justify-content: flex-end; }
-
-table.padroes { min-width: 620px; }
-table.padroes td { padding: 7px 8px; }
-table.padroes td.esq { text-align: left; }
-table.padroes td.desc { text-align: left; font-size: 0.76rem; color: var(--text-muted); }
 {% endblock %}
 
 {% block content %}
@@ -498,7 +370,6 @@ table.padroes td.desc { text-align: left; font-size: 0.76rem; color: var(--text-
       </p>
     </div>
     <div class="acoes">
-      <button class="btn btn-outline" onclick="abrirModalPadroes()">⚙️ Padrões de Montagem</button>
       <a href="/parafusos" class="btn btn-outline">📋 Cadastro de Parafusos</a>
     </div>
   </div>
@@ -696,73 +567,6 @@ table.padroes td.desc { text-align: left; font-size: 0.76rem; color: var(--text-
 
 </div>
 
-<!-- ── MODAL: padrões de montagem do parque ──────────────────────────── -->
-<div id="modal-padroes" class="modal-fundo dim" onclick="if(event.target===this)fecharModalPadroes()">
-  <div class="modal-caixa">
-
-    <header>
-      <h3><span>⚙️</span> Padrões de Montagem do Parque Ativo</h3>
-      <button class="modal-fechar" onclick="fecharModalPadroes()" title="Fechar">&times;</button>
-    </header>
-
-    <div class="modal-corpo">
-      <div class="tbl-wrap">
-        <table class="grade padroes">
-          <thead>
-            <tr>
-              <th class="esq">Nome</th>
-              <th class="esq">Descrição</th>
-              <th>Cruzeta</th>
-              <th>P. máquina</th>
-              <th>P. dupla</th>
-              <th style="width: 78px;"></th>
-            </tr>
-          </thead>
-          <tbody id="tbody-modal-padroes"></tbody>
-        </table>
-      </div>
-
-      <div class="form-padrao">
-        <h4><span>✏️</span> Adicionar ou atualizar padrão de montagem</h4>
-
-        <div class="grid-ident">
-          <div>
-            <label for="modal-p-nome">Nome do padrão</label>
-            <input type="text" id="modal-p-nome" placeholder="Ex: N1.ESP" style="text-transform: uppercase;">
-          </div>
-          <div>
-            <label for="modal-p-desc">Descrição</label>
-            <input type="text" id="modal-p-desc" placeholder="Descrição clara da montagem">
-          </div>
-        </div>
-
-        <div class="grid-qtd">
-          <div>
-            <label for="modal-p-cruz">Cruzeta</label>
-            <input type="number" id="modal-p-cruz" class="centro" value="1" min="0" step="1">
-          </div>
-          <div>
-            <label for="modal-p-psimples">P. máquina</label>
-            <input type="number" id="modal-p-psimples" class="centro tinta-maq" value="0" min="0" step="1">
-          </div>
-          <div>
-            <label for="modal-p-pdupla">P. dupla</label>
-            <input type="number" id="modal-p-pdupla" class="centro tinta-dup" value="0" min="0" step="1">
-          </div>
-        </div>
-
-        <div class="acao">
-          <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()">💾 Salvar padrão de montagem</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-rodape">
-      <button class="btn btn-outline" onclick="fecharModalPadroes()">Fechar</button>
-    </div>
-  </div>
-</div>
-
 <script>
 // Lista Fixa de Comprimentos Comerciais (Idêntica à tela Cadastrar Parafusos)
 const COMPRIMENTOS_GRADE = [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900];
@@ -770,7 +574,6 @@ const COMPRIMENTOS_GRADE = [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 70
 // Estado Global
 let dadosGlobais = {
   estruturas: [],
-  padroes: {},
   esforcos: [600, 1000, 1500, 2000, 2500, 3000],
   dimensoes: {},
   comprimentos: []
@@ -1343,124 +1146,6 @@ async function salvarParafusosNaReceita() {
     }
   } catch (e) {
     exibirAlerta('Erro de comunicação: ' + esc(e.message), 'danger');
-  }
-}
-
-// Modal de Padrões
-function abrirModalPadroes() {
-  renderizarModalPadroes();
-  document.getElementById('modal-padroes').classList.add('open');
-}
-
-function fecharModalPadroes() {
-  document.getElementById('modal-padroes').classList.remove('open');
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') fecharModalPadroes();
-});
-
-function renderizarModalPadroes() {
-  const tbody = document.getElementById('tbody-modal-padroes');
-  tbody.innerHTML = '';
-
-  const nomes = Object.keys(dadosGlobais.padroes || {});
-  if (!nomes.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="tbl-vazia">Nenhum padrão de montagem cadastrado neste parque.</td></tr>';
-    return;
-  }
-
-  nomes.forEach(nome => {
-    const p = dadosGlobais.padroes[nome];
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="esq"><strong>${esc(p.nome)}</strong></td>
-      <td class="desc">${esc(p.descricao || '')}</td>
-      <td>${esc(p.cruzeta)}</td>
-      <td><span class="res-maq">${esc(p.parafuso_simples)}</span></td>
-      <td><span class="res-dup">${esc(p.parafuso_dupla)}</span></td>
-      <td style="white-space: nowrap;">
-        <button class="btn-del" onclick="carregarPadraoParaEditar('${esc(p.nome)}')" title="Editar este padrão">✏️</button>
-        <button class="btn-del" onclick="excluirPadraoMontagemModal('${esc(p.nome)}')" title="Excluir este padrão do parque">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-async function excluirPadraoMontagemModal(nome) {
-  if (!confirm(`Deseja realmente excluir o padrão de montagem "${nome}" deste parque?`)) {
-    return;
-  }
-
-  try {
-    const res = await fetch('/dimensionar-parafusos/api/padroes/excluir', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({nome: nome})
-    });
-
-    const data = await res.json();
-    if (res.ok && data.ok) {
-      exibirAlerta(`Padrão <strong>${esc(nome)}</strong> excluído do parque ativo.`, 'info');
-      await carregarDadosIniciais();
-      renderizarModalPadroes();
-    } else {
-      alert(data.erro || 'Erro ao excluir padrão');
-    }
-  } catch (e) {
-    alert('Erro de comunicação: ' + e.message);
-  }
-}
-
-function carregarPadraoParaEditar(nome) {
-  const p = dadosGlobais.padroes[nome];
-  if (!p) return;
-  document.getElementById('modal-p-nome').value = p.nome;
-  document.getElementById('modal-p-desc').value = p.descricao || '';
-  document.getElementById('modal-p-cruz').value = p.cruzeta || 0;
-  document.getElementById('modal-p-psimples').value = p.parafuso_simples || 0;
-  document.getElementById('modal-p-pdupla').value = p.parafuso_dupla || 0;
-  document.getElementById('modal-p-nome').focus();
-}
-
-async function salvarPadraoMontagemModal() {
-  const nome = document.getElementById('modal-p-nome').value.trim().toUpperCase();
-  if (!nome) {
-    alert('O nome do padrão é obrigatório.');
-    return;
-  }
-
-  const payload = {
-    nome: nome,
-    descricao: document.getElementById('modal-p-desc').value.trim(),
-    cruzeta: parseFloat(document.getElementById('modal-p-cruz').value) || 0,
-    parafuso_simples: parseFloat(document.getElementById('modal-p-psimples').value) || 0,
-    parafuso_dupla: parseFloat(document.getElementById('modal-p-pdupla').value) || 0,
-    porca: 2,
-    arruela: 2,
-    porca_olhal: 0,
-    sobra: 1,
-    face_padrao: 'B'
-  };
-
-  try {
-    const res = await fetch('/dimensionar-parafusos/api/padroes/salvar', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-    if (res.ok && data.ok) {
-      await carregarDadosIniciais();
-      renderizarModalPadroes();
-      exibirAlerta(`Padrão <strong>${esc(nome)}</strong> salvo no parque ativo.`, 'success');
-    } else {
-      alert(data.erro || 'Erro ao salvar padrão');
-    }
-  } catch (e) {
-    alert('Erro de comunicação: ' + e.message);
   }
 }
 

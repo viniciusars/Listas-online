@@ -41,7 +41,6 @@ TABELAS_RECEITA = (
     'parafusos_receita',
     'alcas_lacos_receita',
     'estais_receita',
-    'calculadora_padroes',
     'calculadora_estruturas',
 )
 
@@ -236,23 +235,6 @@ _DDL = {
             qtd_por_estai REAL    NOT NULL
         )
     """,
-    'calculadora_padroes': """
-        CREATE TABLE IF NOT EXISTS calculadora_padroes (
-            id               INTEGER PRIMARY KEY AUTOINCREMENT,
-            parque_id        INTEGER NOT NULL REFERENCES parques(id) ON DELETE CASCADE,
-            nome             TEXT    NOT NULL,
-            descricao        TEXT,
-            cruzeta          REAL    NOT NULL DEFAULT 0,
-            parafuso_simples REAL    NOT NULL DEFAULT 0,
-            parafuso_dupla   REAL    NOT NULL DEFAULT 0,
-            arruela          REAL    NOT NULL DEFAULT 0,
-            porca            REAL    NOT NULL DEFAULT 0,
-            porca_olhal      REAL    NOT NULL DEFAULT 0,
-            sobra            REAL    NOT NULL DEFAULT 1,
-            face_padrao      TEXT    NOT NULL DEFAULT 'B',
-            UNIQUE (parque_id, nome)
-        )
-    """,
     'calculadora_estruturas': """
         CREATE TABLE IF NOT EXISTS calculadora_estruturas (
             id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -283,7 +265,6 @@ _DDL_INDICES = (
     "CREATE INDEX IF NOT EXISTS idx_parafusos_parque_tipo   ON parafusos_receita(parque_id, tipo)",
     "CREATE INDEX IF NOT EXISTS idx_alcas_parque_tipo       ON alcas_lacos_receita(parque_id, tipo)",
     "CREATE INDEX IF NOT EXISTS idx_estais_parque           ON estais_receita(parque_id)",
-    "CREATE INDEX IF NOT EXISTS idx_calc_padroes_parque     ON calculadora_padroes(parque_id)",
     "CREATE INDEX IF NOT EXISTS idx_calc_estruturas_parque  ON calculadora_estruturas(parque_id, estrutura)",
 )
 
@@ -516,20 +497,6 @@ def _seed_estais(conn, parque_id):
 
 def _seed_calculadora(conn, parque_id):
     from src import calculadora_parafusos
-    # 1. Padrões
-    padroes = calculadora_parafusos.PADROES_MONTAGEM
-    for nome, p in padroes.items():
-        conn.execute(
-            "INSERT OR IGNORE INTO calculadora_padroes "
-            "(parque_id, nome, descricao, cruzeta, parafuso_simples, parafuso_dupla, "
-            "arruela, porca, porca_olhal, sobra, face_padrao) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (parque_id, nome, p.get('descricao', ''), float(p.get('cruzeta', 0)),
-             float(p.get('parafuso_simples', 0)), float(p.get('parafuso_dupla', 0)),
-             float(p.get('arruela', 2)), float(p.get('porca', 2)), float(p.get('porca_olhal', 0)),
-             float(p.get('sobra', 1)), 'B')
-        )
-    # 2. Estruturas
     grid_all = calculadora_parafusos.gerar_linhas_iniciais_estruturas()
     for est_nome, linhas in grid_all.items():
         for l in linhas:
@@ -676,8 +643,6 @@ def _copiar_receitas(conn, origem_id, destino_id):
                               'comprimento, quantidade, cruzeta_adicional'),
         'alcas_lacos_receita': 'tipo, nivel, direcao, qtd_alcas, qtd_lacos',
         'estais_receita': 'ordem, material, unidade, qtd_por_estai',
-        'calculadora_padroes': ('nome, descricao, cruzeta, parafuso_simples, parafuso_dupla, '
-                                'arruela, porca, porca_olhal, sobra, face_padrao'),
         'calculadora_estruturas': ('estrutura, ordem, nivel, distancia_prog, montagem, face, '
                                    'cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, '
                                    'p_dupla, porca_d, arruela_d, olhal_d, sobra_d'),
@@ -1639,67 +1604,6 @@ def renomear_estrutura_calculadora(tipo_antigo, tipo_novo, parque_id=None):
         conn.execute(
             "UPDATE calculadora_estruturas SET estrutura = ? WHERE parque_id = ? AND estrutura = ?",
             (tipo_novo, parque_id, tipo_antigo)
-        )
-        affected = conn.execute("SELECT changes()").fetchone()[0]
-        conn.commit()
-        return affected
-    finally:
-        conn.close()
-
-
-def listar_padroes_calculadora(parque_id=None):
-    """Retorna os padrões de montagem cadastrados no parque como dicionário."""
-    parque_id = _pid(parque_id)
-    conn = conectar()
-    try:
-        rows = conn.execute(
-            "SELECT nome, descricao, cruzeta, parafuso_simples, parafuso_dupla, "
-            "arruela, porca, porca_olhal, sobra, face_padrao FROM calculadora_padroes "
-            "WHERE parque_id = ? ORDER BY nome",
-            (parque_id,)
-        ).fetchall()
-        res = {}
-        for r in rows:
-            res[r['nome']] = dict(r)
-        return res
-    finally:
-        conn.close()
-
-
-def salvar_padrao_calculadora(padrao_dict, parque_id=None):
-    """Salva/atualiza um padrão de montagem no parque."""
-    parque_id = _pid(parque_id)
-    conn = conectar()
-    try:
-        conn.execute(
-            "INSERT INTO calculadora_padroes "
-            "(parque_id, nome, descricao, cruzeta, parafuso_simples, parafuso_dupla, "
-            "arruela, porca, porca_olhal, sobra, face_padrao) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(parque_id, nome) DO UPDATE SET "
-            "descricao = excluded.descricao, cruzeta = excluded.cruzeta, "
-            "parafuso_simples = excluded.parafuso_simples, parafuso_dupla = excluded.parafuso_dupla, "
-            "arruela = excluded.arruela, porca = excluded.porca, porca_olhal = excluded.porca_olhal, "
-            "sobra = excluded.sobra, face_padrao = excluded.face_padrao",
-            (parque_id, padrao_dict['nome'], padrao_dict.get('descricao', ''),
-             float(padrao_dict.get('cruzeta', 0)), float(padrao_dict.get('parafuso_simples', 0)),
-             float(padrao_dict.get('parafuso_dupla', 0)), float(padrao_dict.get('arruela', 0)),
-             float(padrao_dict.get('porca', 0)), float(padrao_dict.get('porca_olhal', 0)),
-             float(padrao_dict.get('sobra', 1)), padrao_dict.get('face_padrao', 'B'))
-        )
-        conn.commit()
-    finally:
-        conn.close()
-
-
-def excluir_padrao_calculadora(nome, parque_id=None):
-    """Exclui um padrão de montagem do parque."""
-    parque_id = _pid(parque_id)
-    conn = conectar()
-    try:
-        conn.execute(
-            "DELETE FROM calculadora_padroes WHERE parque_id = ? AND nome = ?",
-            (parque_id, nome)
         )
         affected = conn.execute("SELECT changes()").fetchone()[0]
         conn.commit()

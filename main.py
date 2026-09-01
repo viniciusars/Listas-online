@@ -466,10 +466,8 @@ def api_paraf_excluir():
 def api_dimensionar_dados():
     pid = _parque_ativo_id()
     estruturas = banco.listar_estruturas_calculadora(pid)
-    padroes = banco.listar_padroes_calculadora(pid)
     return jsonify({
         'estruturas': estruturas,
-        'padroes': padroes,
         'esforcos_padrao': [600, 1000, 1500, 2000, 2500, 3000],
         'dimensoes_ferragens': calculadora_parafusos.DIMENSOES_FERRAGENS,
         'comprimentos_comerciais': calculadora_parafusos.COMPRIMENTOS_COMERCIAIS,
@@ -519,28 +517,6 @@ def api_dimensionar_renomear_padrao():
     pid = _parque_ativo_id()
     count = banco.renomear_estrutura_calculadora(tipo_antigo, tipo_novo, pid)
     return jsonify({'ok': True, 'count': count, 'tipo_novo': tipo_novo})
-
-
-@app.route('/dimensionar-parafusos/api/padroes/salvar', methods=['POST'])
-def api_dimensionar_salvar_padrao_montagem():
-    data = request.get_json(force=True)
-    nome = str(data.get('nome', '')).strip().upper()
-    if not nome:
-        return jsonify({'erro': 'Nome do padrão de montagem é obrigatório.'}), 400
-    pid = _parque_ativo_id()
-    banco.salvar_padrao_calculadora(data, pid)
-    return jsonify({'ok': True, 'nome': nome})
-
-
-@app.route('/dimensionar-parafusos/api/padroes/excluir', methods=['POST'])
-def api_dimensionar_excluir_padrao_montagem():
-    data = request.get_json(force=True)
-    nome = str(data.get('nome', '')).strip().upper()
-    if not nome:
-        return jsonify({'erro': 'Nome do padrão de montagem é obrigatório.'}), 400
-    pid = _parque_ativo_id()
-    count = banco.excluir_padrao_calculadora(nome, pid)
-    return jsonify({'ok': True, 'count': count, 'nome': nome})
 
 
 @app.route('/dimensionar-parafusos/api/calcular', methods=['POST'])
