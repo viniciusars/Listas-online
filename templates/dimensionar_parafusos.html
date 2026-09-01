@@ -146,53 +146,53 @@ main {
       </div>
     </div>
 
-    <!-- Tabela Compacta sem Rolagem Horizontal -->
+    <!-- Tabela Compacta com Forte Diferenciação Visual entre Zonas -->
     <div style="padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
-      <table id="tabela-grid-niveis" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.8rem; table-layout: fixed;">
+      <table id="tabela-grid-niveis" class="grid-table" style="width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 0.8rem; table-layout: fixed; border: 1.5px solid #334155; border-radius: 8px; overflow: hidden;">
         <colgroup>
-          <col style="width: 5%;">    <!-- Nível -->
-          <col style="width: 8%;">    <!-- Cota (m) -->
-          <col style="width: 6%;">    <!-- Cruzeta -->
-          <!-- Cabeça Quadrada (5 colunas = 38.5%) -->
-          <col style="width: 8.5%;">  <!-- Parafuso -->
-          <col style="width: 7.5%;">  <!-- Porca -->
-          <col style="width: 7.5%;">  <!-- Arruela -->
-          <col style="width: 7.5%;">  <!-- Olhal -->
-          <col style="width: 7.5%;">  <!-- Sobra -->
-          <!-- Rosca Dupla (5 colunas = 38.5%) -->
-          <col style="width: 8.5%;">  <!-- Parafuso -->
-          <col style="width: 7.5%;">  <!-- Porca -->
-          <col style="width: 7.5%;">  <!-- Arruela -->
-          <col style="width: 7.5%;">  <!-- Olhal -->
-          <col style="width: 7.5%;">  <!-- Sobra -->
-          <col style="width: 4%;">    <!-- Ações -->
+          <col style="width: 5.5%;">   <!-- Nível -->
+          <col style="width: 8%;">     <!-- Cota (m) -->
+          <col style="width: 6.5%;">   <!-- Cruzeta -->
+          <!-- Cabeça Quadrada (5 colunas = 38%) -->
+          <col style="width: 8.5%;">   <!-- Parafuso -->
+          <col style="width: 7.375%;"> <!-- Porca -->
+          <col style="width: 7.375%;"> <!-- Arruela -->
+          <col style="width: 7.375%;"> <!-- Olhal -->
+          <col style="width: 7.375%;"> <!-- Sobra -->
+          <!-- Rosca Dupla (5 colunas = 38%) -->
+          <col style="width: 8.5%;">   <!-- Parafuso -->
+          <col style="width: 7.375%;"> <!-- Porca -->
+          <col style="width: 7.375%;"> <!-- Arruela -->
+          <col style="width: 7.375%;"> <!-- Olhal -->
+          <col style="width: 7.375%;"> <!-- Sobra -->
+          <col style="width: 4%;">     <!-- Ações -->
         </colgroup>
         <thead>
-          <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">NÍVEL</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">COTA (M)</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle; background: #0f172a; color: #93c5fd;">CRUZETA</th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 6px; text-align: center; background: #082f49; color: #38bdf8; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px;">
-              PARAFUSO CABEÇA QUADRADA
+          <tr style="background: #0f172a; color: #f8fafc; text-align: center;">
+            <th rowspan="2" style="border-bottom: 2px solid #334155; border-right: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b; font-weight: 700;">NÍVEL</th>
+            <th rowspan="2" style="border-bottom: 2px solid #334155; border-right: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b; font-weight: 700;">COTA (M)</th>
+            <th rowspan="2" style="border-bottom: 2px solid #334155; border-right: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e1b4b; color: #a5b4fc; font-weight: 700;">CRUZETA</th>
+            <th colspan="5" style="border-left: 2.5px solid #0284c7; border-bottom: 1px solid #0284c7; padding: 7px 6px; text-align: center; background: linear-gradient(90deg, #0369a1, #0284c7); color: #ffffff; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+              🔩 PARAFUSO CABEÇA QUADRADA
             </th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 6px; text-align: center; background: #064e3b; color: #4ade80; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px;">
-              PARAFUSO ROSCA DUPLA
+            <th colspan="5" style="border-left: 2.5px solid #10b981; border-bottom: 1px solid #059669; padding: 7px 6px; text-align: center; background: linear-gradient(90deg, #047857, #059669); color: #ffffff; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+              🔗 PARAFUSO ROSCA DUPLA
             </th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;"></th>
+            <th rowspan="2" style="border-left: 2px solid #334155; border-bottom: 2px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b;"></th>
           </tr>
-          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.7rem; text-align: center;">
+          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.72rem; text-align: center;">
             <!-- Cabeça Quadrada -->
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">PARAFUSO</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">ARRUELA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">SOBRA</th>
+            <th style="border-left: 2.5px solid #0284c7; border-bottom: 2px solid #0284c7; border-right: 1px solid #0c4a6e; padding: 5px 1px; text-align: center; background: #0369a1; color: #f0f9ff; font-weight: 800;">PARAFUSO</th>
+            <th style="border-bottom: 2px solid #0284c7; border-right: 1px solid #0c4a6e; padding: 5px 1px; text-align: center; background: #082f49; color: #bae6fd; font-weight: 700;">PORCA</th>
+            <th style="border-bottom: 2px solid #0284c7; border-right: 1px solid #0c4a6e; padding: 5px 1px; text-align: center; background: #082f49; color: #bae6fd; font-weight: 700;">ARRUELA</th>
+            <th style="border-bottom: 2px solid #0284c7; border-right: 1px solid #0c4a6e; padding: 5px 1px; text-align: center; background: #082f49; color: #bae6fd; font-weight: 700;">OLHAL</th>
+            <th style="border-bottom: 2px solid #0284c7; border-right: 1px solid #334155; padding: 5px 1px; text-align: center; background: #082f49; color: #bae6fd; font-weight: 700;">SOBRA</th>
             <!-- Rosca Dupla -->
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">PARAFUSO</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">ARRUELA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">SOBRA</th>
+            <th style="border-left: 2.5px solid #10b981; border-bottom: 2px solid #059669; border-right: 1px solid #064e3b; padding: 5px 1px; text-align: center; background: #047857; color: #f0fdf4; font-weight: 800;">PARAFUSO</th>
+            <th style="border-bottom: 2px solid #059669; border-right: 1px solid #064e3b; padding: 5px 1px; text-align: center; background: #064e3b; color: #a7f3d0; font-weight: 700;">PORCA</th>
+            <th style="border-bottom: 2px solid #059669; border-right: 1px solid #064e3b; padding: 5px 1px; text-align: center; background: #064e3b; color: #a7f3d0; font-weight: 700;">ARRUELA</th>
+            <th style="border-bottom: 2px solid #059669; border-right: 1px solid #064e3b; padding: 5px 1px; text-align: center; background: #064e3b; color: #a7f3d0; font-weight: 700;">OLHAL</th>
+            <th style="border-bottom: 2px solid #059669; border-right: 1px solid #334155; padding: 5px 1px; text-align: center; background: #064e3b; color: #a7f3d0; font-weight: 700;">SOBRA</th>
           </tr>
         </thead>
         <tbody id="tbody-grid-niveis">
@@ -426,36 +426,144 @@ main {
     outline: 2px solid var(--primary-light) !important;
   }
 
-  /* Células de input compactas da tabela de níveis */
-  .cell-grid-input {
+  /* Estilização Premium da Tabela de Níveis (Zonas Distintas) */
+  .grid-table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+
+  /* Inputs Básicos (Nível, Cota) */
+  .input-grid-basic {
     width: 100%;
     box-sizing: border-box;
-    padding: 3px 1px;
+    padding: 4px 2px;
     text-align: center;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--surface-color);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 5px;
+    background: rgba(15, 23, 42, 0.6);
     color: var(--text-main);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     font-weight: 600;
+    transition: all 0.15s ease;
   }
-  .cell-grid-input:focus {
-    outline: 2px solid var(--primary-color);
-    border-color: transparent;
+  .input-grid-basic:focus {
+    outline: none;
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.25);
   }
-  .cell-grid-select {
+
+  /* Input Cruzeta (Indigo) */
+  .input-grid-cruz {
     width: 100%;
     box-sizing: border-box;
-    padding: 3px 1px;
+    padding: 4px 2px;
     text-align: center;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--surface-color);
-    color: var(--text-main);
-    font-size: 0.75rem;
-    font-weight: 600;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-radius: 5px;
+    background: rgba(99, 102, 241, 0.12);
+    color: #a5b4fc;
+    font-size: 0.85rem;
+    font-weight: 800;
+    transition: all 0.15s ease;
   }
-  
+  .input-grid-cruz:focus {
+    outline: none;
+    border-color: #818cf8;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.35);
+  }
+
+  /* Cabeça Quadrada - Input Principal (Parafuso) */
+  .input-grid-maq-main {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 2px;
+    text-align: center;
+    border: 1.5px solid #0284c7;
+    border-radius: 5px;
+    background: rgba(2, 132, 199, 0.2);
+    color: #38bdf8;
+    font-size: 0.88rem;
+    font-weight: 800;
+    transition: all 0.15s ease;
+  }
+  .input-grid-maq-main:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4);
+    background: rgba(2, 132, 199, 0.3);
+  }
+
+  /* Cabeça Quadrada - Inputs Secundários */
+  .input-grid-maq-sub {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 2px;
+    text-align: center;
+    border: 1px solid rgba(2, 132, 199, 0.25);
+    border-radius: 5px;
+    background: rgba(2, 132, 199, 0.05);
+    color: #e0f2fe;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .input-grid-maq-sub:focus {
+    outline: none;
+    border-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+  }
+
+  /* Rosca Dupla - Input Principal (Parafuso) */
+  .input-grid-dup-main {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 2px;
+    text-align: center;
+    border: 1.5px solid #059669;
+    border-radius: 5px;
+    background: rgba(5, 150, 105, 0.2);
+    color: #4ade80;
+    font-size: 0.88rem;
+    font-weight: 800;
+    transition: all 0.15s ease;
+  }
+  .input-grid-dup-main:focus {
+    outline: none;
+    border-color: #4ade80;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4);
+    background: rgba(5, 150, 105, 0.3);
+  }
+
+  /* Rosca Dupla - Inputs Secundários */
+  .input-grid-dup-sub {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 2px;
+    text-align: center;
+    border: 1px solid rgba(5, 150, 105, 0.25);
+    border-radius: 5px;
+    background: rgba(5, 150, 105, 0.05);
+    color: #d1fae5;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .input-grid-dup-sub:focus {
+    outline: none;
+    border-color: #059669;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
+  }
+
+  /* Suavização de zeros e destaque de ativos */
+  .is-zero {
+    opacity: 0.4 !important;
+    font-weight: 500 !important;
+    color: #94a3b8 !important;
+  }
+  .is-active {
+    opacity: 1 !important;
+  }
+
   /* Células da Grade Matricial */
   .cell-matriz-qtd {
     width: 100%;
@@ -478,7 +586,7 @@ main {
     text-align: center;
   }
   tr.grid-row:hover td {
-    background: rgba(59, 130, 246, 0.04);
+    background-color: rgba(255, 255, 255, 0.04) !important;
   }
   tr.matriz-row:hover td {
     background: rgba(59, 130, 246, 0.04);
@@ -628,56 +736,71 @@ function renderizarGridNiveis() {
   linhasGridAtuais.forEach((linha, idx) => {
     const tr = document.createElement('tr');
     tr.className = 'grid-row';
-    tr.style.borderBottom = '1px solid var(--border-color)';
+    tr.style.borderBottom = '1px solid #334155';
 
     const distRaw = String(linha.distancia_prog || '').toUpperCase();
     if (distRaw.includes('CH')) temCH = true;
 
+    const pm = linha.p_maquina != null ? Number(linha.p_maquina) : 0;
+    const porcam = linha.porca_m != null ? Number(linha.porca_m) : 2;
+    const arrm = linha.arruela_m != null ? Number(linha.arruela_m) : 2;
+    const olhalm = linha.olhal_m != null ? Number(linha.olhal_m) : 0;
+    const sobram = linha.sobra_m != null ? Number(linha.sobra_m) : 1;
+
+    const pd = linha.p_dupla != null ? Number(linha.p_dupla) : 0;
+    const porcad = linha.porca_d != null ? Number(linha.porca_d) : 2;
+    const arrd = linha.arruela_d != null ? Number(linha.arruela_d) : 2;
+    const olhald = linha.olhal_d != null ? Number(linha.olhal_d) : 0;
+    const sobrad = linha.sobra_d != null ? Number(linha.sobra_d) : 1;
+
     tr.innerHTML = `
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid #334155; padding: 4px 2px; background: rgba(30, 41, 59, 0.4);">
+        <input type="number" class="input-grid-basic" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="text" class="cell-grid-input" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid #334155; padding: 4px 2px; background: rgba(30, 41, 59, 0.4);">
+        <input type="text" class="input-grid-basic" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(59, 130, 246, 0.04);">
-        <input type="number" class="cell-grid-input" value="${linha.cruzeta != null ? linha.cruzeta : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid #334155; padding: 4px 2px; background: rgba(99, 102, 241, 0.05);">
+        <input type="number" class="input-grid-cruz" value="${linha.cruzeta != null ? linha.cruzeta : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
       </td>
-      <!-- Cabeça Quadrada -->
-      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(56, 189, 248, 0.04);">
-        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #0284c7;" value="${linha.p_maquina != null ? linha.p_maquina : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
+      
+      <!-- Cabeça Quadrada (Zona Azul com borda de destaque) -->
+      <td style="border-left: 2.5px solid #0284c7; border-bottom: 1px solid #334155; border-right: 1px solid rgba(2, 132, 199, 0.25); padding: 4px 2px; background: rgba(2, 132, 199, 0.1);">
+        <input type="number" class="input-grid-maq-main ${pm === 0 ? 'is-zero' : 'is-active'}" value="${pm}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.porca_m != null ? linha.porca_m : 2}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid rgba(2, 132, 199, 0.25); padding: 4px 2px; background: rgba(2, 132, 199, 0.04);">
+        <input type="number" class="input-grid-maq-sub ${porcam === 0 ? 'is-zero' : 'is-active'}" value="${porcam}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.arruela_m != null ? linha.arruela_m : 2}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid rgba(2, 132, 199, 0.25); padding: 4px 2px; background: rgba(2, 132, 199, 0.04);">
+        <input type="number" class="input-grid-maq-sub ${arrm === 0 ? 'is-zero' : 'is-active'}" value="${arrm}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.olhal_m != null ? linha.olhal_m : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid rgba(2, 132, 199, 0.25); padding: 4px 2px; background: rgba(2, 132, 199, 0.04);">
+        <input type="number" class="input-grid-maq-sub ${olhalm === 0 ? 'is-zero' : 'is-active'}" value="${olhalm}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.sobra_m != null ? linha.sobra_m : 1}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid #334155; padding: 4px 2px; background: rgba(2, 132, 199, 0.04);">
+        <input type="number" class="input-grid-maq-sub ${sobram === 0 ? 'is-zero' : 'is-active'}" value="${sobram}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
       </td>
-      <!-- Rosca Dupla -->
-      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(74, 222, 128, 0.04);">
-        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #16a34a;" value="${linha.p_dupla != null ? linha.p_dupla : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
+      
+      <!-- Rosca Dupla (Zona Verde com borda de destaque) -->
+      <td style="border-left: 2.5px solid #10b981; border-bottom: 1px solid #334155; border-right: 1px solid rgba(5, 150, 105, 0.25); padding: 4px 2px; background: rgba(5, 150, 105, 0.1);">
+        <input type="number" class="input-grid-dup-main ${pd === 0 ? 'is-zero' : 'is-active'}" value="${pd}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.porca_d != null ? linha.porca_d : 2}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid rgba(5, 150, 105, 0.25); padding: 4px 2px; background: rgba(5, 150, 105, 0.04);">
+        <input type="number" class="input-grid-dup-sub ${porcad === 0 ? 'is-zero' : 'is-active'}" value="${porcad}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.arruela_d != null ? linha.arruela_d : 2}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid rgba(5, 150, 105, 0.25); padding: 4px 2px; background: rgba(5, 150, 105, 0.04);">
+        <input type="number" class="input-grid-dup-sub ${arrd === 0 ? 'is-zero' : 'is-active'}" value="${arrd}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.olhal_d != null ? linha.olhal_d : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid rgba(5, 150, 105, 0.25); padding: 4px 2px; background: rgba(5, 150, 105, 0.04);">
+        <input type="number" class="input-grid-dup-sub ${olhald === 0 ? 'is-zero' : 'is-active'}" value="${olhald}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.sobra_d != null ? linha.sobra_d : 1}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
+      <td style="border-bottom: 1px solid #334155; border-right: 1px solid #334155; padding: 4px 2px; background: rgba(5, 150, 105, 0.04);">
+        <input type="number" class="input-grid-dup-sub ${sobrad === 0 ? 'is-zero' : 'is-active'}" value="${sobrad}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
       </td>
+      
       <!-- Ações -->
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.75rem; color: var(--danger-color); border-color: transparent;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
+      <td style="border-left: 2px solid #334155; border-bottom: 1px solid #334155; padding: 4px 2px; background: rgba(30, 41, 59, 0.4);">
+        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.8rem; color: var(--danger-color); border-color: transparent; border-radius: 4px;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
           🗑️
         </button>
       </td>
