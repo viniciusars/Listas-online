@@ -148,57 +148,27 @@ main {
 
     <!-- Tabela Compacta sem Rolagem Horizontal -->
     <div style="padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
-      <table id="tabela-grid-niveis" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.8rem; table-layout: fixed;">
+      <table id="tabela-grid-niveis" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.82rem; table-layout: fixed;">
         <colgroup>
-          <col style="width: 6%;">   <!-- Nível -->
-          <col style="width: 8.5%;"> <!-- Cota (m) -->
-          <col style="width: 8.5%;"> <!-- Posição/Face -->
-          <col style="width: 6%;">   <!-- Cruzeta -->
-          <!-- Máquina (5 colunas = 31%) -->
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <!-- Rosca Dupla (5 colunas = 31%) -->
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6.2%;">
-          <col style="width: 6%;">   <!-- Ações -->
+          <col style="width: 8%;">    <!-- Nível -->
+          <col style="width: 14%;">   <!-- Cota (m) -->
+          <col style="width: 12%;">   <!-- Cruzeta -->
+          <col style="width: 30%;">   <!-- Quantidade p/ Máquina -->
+          <col style="width: 30%;">   <!-- Quantidade p/ Rosca Dupla -->
+          <col style="width: 6%;">    <!-- Ações -->
         </colgroup>
         <thead>
-          <!-- Linha 1 de Cabeçalho (Todos Centralizados) -->
           <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">NÍVEL</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">COTA (m)</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;">FACE</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle; background: #0f172a; color: #93c5fd;">
-              CRUZ.
+            <th style="border: 1px solid #334155; padding: 8px 4px; text-align: center; vertical-align: middle;">NÍVEL</th>
+            <th style="border: 1px solid #334155; padding: 8px 4px; text-align: center; vertical-align: middle;">COTA (M)</th>
+            <th style="border: 1px solid #334155; padding: 8px 4px; text-align: center; vertical-align: middle; background: #0f172a; color: #93c5fd;">CRUZ.</th>
+            <th style="border: 1px solid #334155; padding: 8px 6px; text-align: center; background: #082f49; color: #38bdf8; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px;">
+              QUANTIDADE P/ MÁQUINA
             </th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 4px; text-align: center; background: #082f49; color: #38bdf8; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
-              QUANTIDADE P/ MÁQUINA (50 kN)
+            <th style="border: 1px solid #334155; padding: 8px 6px; text-align: center; background: #064e3b; color: #4ade80; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px;">
+              QUANTIDADE P/ ROSCA DUPLA
             </th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 4px; text-align: center; background: #064e3b; color: #4ade80; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">
-              QUANTIDADE P/ ROSCA DUPLA (70 kN)
-            </th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 6px 2px; text-align: center; vertical-align: middle;"></th>
-          </tr>
-          <!-- Linha 2 de Cabeçalho (Todos Centralizados) -->
-          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.7rem; text-align: center;">
-            <!-- Máquina -->
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">PARAF</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">ARR</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #0c4a6e; color: #e0f2fe;">SOBRA</th>
-            <!-- Rosca Dupla -->
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">PARAF</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">ARR</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 4px 1px; text-align: center; background: #065f46; color: #d1fae5;">SOBRA</th>
+            <th style="border: 1px solid #334155; padding: 8px 2px; text-align: center; vertical-align: middle;"></th>
           </tr>
         </thead>
         <tbody id="tbody-grid-niveis">
@@ -286,7 +256,7 @@ main {
       <!-- Detalhes Expansíveis da Memória de Cálculo Geométrica -->
       <details style="background: rgba(0,0,0,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.6rem 0.9rem;">
         <summary style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none;">
-          🔍 Ver Memória de Cálculo Geométrica Passo a Passo por Nível
+          🔍 Ver Memória de Cálculo Geométrica Passo a Passo (Topo e Gaveta)
         </summary>
         <div style="margin-top: 0.75rem; overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: left;">
@@ -294,7 +264,7 @@ main {
               <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
                 <th style="padding: 5px 6px;">Nível</th>
                 <th style="padding: 5px 6px;">Cota</th>
-                <th style="padding: 5px 6px;">Posição</th>
+                <th style="padding: 5px 6px;">Face / Elemento</th>
                 <th style="padding: 5px 6px;">Seção Poste</th>
                 <th style="padding: 5px 6px;">Ferragens Somadas</th>
                 <th style="padding: 5px 6px;">Comp. Calculado</th>
@@ -315,7 +285,7 @@ main {
 
 <!-- MODAL: Gerenciar Padrões de Montagem do Parque -->
 <div id="modal-padroes" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
-  <div style="background: var(--surface-color); color: var(--text-main); width: 100%; max-width: 1000px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
+  <div style="background: var(--surface-color); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
     
     <!-- Modal Header -->
     <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03);">
@@ -336,13 +306,8 @@ main {
               <th style="padding: 8px 6px; text-align: center;">Nome</th>
               <th style="padding: 8px 6px; text-align: left;">Descrição</th>
               <th style="padding: 8px 6px; text-align: center;">Cruzeta</th>
-              <th style="padding: 8px 6px; text-align: center;">P. Simples</th>
+              <th style="padding: 8px 6px; text-align: center;">P. Máquina</th>
               <th style="padding: 8px 6px; text-align: center;">P. Dupla</th>
-              <th style="padding: 8px 6px; text-align: center;">Porca</th>
-              <th style="padding: 8px 6px; text-align: center;">Arruela</th>
-              <th style="padding: 8px 6px; text-align: center;">Olhal</th>
-              <th style="padding: 8px 6px; text-align: center;">Sobra</th>
-              <th style="padding: 8px 6px; text-align: center;">Face</th>
               <th style="padding: 8px 6px; width: 45px;"></th>
             </tr>
           </thead>
@@ -359,7 +324,7 @@ main {
         </h4>
 
         <!-- Grupo 1: Identificação -->
-        <div style="display: grid; grid-template-columns: minmax(140px, 1.2fr) minmax(200px, 2.8fr) minmax(120px, 1.2fr); gap: 0.75rem; margin-bottom: 1rem;">
+        <div style="display: grid; grid-template-columns: minmax(140px, 1.2fr) minmax(200px, 2.8fr); gap: 0.75rem; margin-bottom: 1rem;">
           <div>
             <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Nome do Padrão:</label>
             <input type="text" id="modal-p-nome" class="modal-field-text" placeholder="Ex: N1.ESP" style="text-transform: uppercase;">
@@ -368,44 +333,21 @@ main {
             <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Descrição:</label>
             <input type="text" id="modal-p-desc" class="modal-field-text" placeholder="Descrição clara da montagem">
           </div>
-          <div>
-            <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Face Padrão:</label>
-            <select id="modal-p-face" class="modal-field-text">
-              <option value="B">B (Gaveta)</option>
-              <option value="A">A (Topo)</option>
-            </select>
-          </div>
         </div>
 
-        <!-- Grupo 2: Quantidades (7 colunas perfeitamente distribuídas) -->
-        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+        <!-- Grupo 2: Quantidades (3 colunas) -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
           <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Cruzeta:</label>
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Cruzeta:</label>
             <input type="number" id="modal-p-cruz" class="modal-field-input" value="1" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Simples:</label>
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Máquina:</label>
             <input type="number" id="modal-p-psimples" class="modal-field-input" value="0" min="0" step="1" style="color: #0284c7; font-weight: 700;">
           </div>
           <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Dupla:</label>
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Dupla:</label>
             <input type="number" id="modal-p-pdupla" class="modal-field-input" value="0" min="0" step="1" style="color: #16a34a; font-weight: 700;">
-          </div>
-          <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Porca:</label>
-            <input type="number" id="modal-p-porca" class="modal-field-input" value="2" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Arruela:</label>
-            <input type="number" id="modal-p-arr" class="modal-field-input" value="2" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Olhal:</label>
-            <input type="number" id="modal-p-olhal" class="modal-field-input" value="0" min="0" step="1">
-          </div>
-          <div>
-            <label style="font-size: 0.72rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Sobra:</label>
-            <input type="number" id="modal-p-sobra" class="modal-field-input" value="1" min="0" step="1">
           </div>
         </div>
 
@@ -635,23 +577,13 @@ function aoDigitarNomeCustom() {
   calcularTudo();
 }
 
-function criarLinhaVazia(nivel, distProg, face) {
+function criarLinhaVazia(nivel, distProg) {
   return {
     nivel: nivel || 1,
     distancia_prog: distProg || '0.2',
-    face: face || 'B',
     cruzeta: 1,
     p_maquina: 2,
-    porca_m: 2,
-    arruela_m: 2,
-    olhal_m: 0,
-    sobra_m: 1,
-    p_dupla: 0,
-    porca_d: 0,
-    arruela_d: 0,
-    olhal_d: 0,
-    sobra_d: 1,
-    montagem: 'N1'
+    p_dupla: 0
   };
 }
 
@@ -670,56 +602,26 @@ function renderizarGridNiveis() {
     if (distRaw.includes('CH')) temCH = true;
 
     tr.innerHTML = `
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
+      <td style="border: 1px solid var(--border-color); padding: 4px;">
         <input type="number" class="cell-grid-input" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
+      <td style="border: 1px solid var(--border-color); padding: 4px;">
         <input type="text" class="cell-grid-input" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <select class="cell-grid-select" onchange="atualizarCampoLinha(${idx}, 'face', this.value)">
-          <option value="B" ${linha.face === 'B' ? 'selected' : ''}>B (Gaveta)</option>
-          <option value="A" ${linha.face === 'A' ? 'selected' : ''}>A (Topo)</option>
-        </select>
+      <td style="border: 1px solid var(--border-color); padding: 4px; background: rgba(59, 130, 246, 0.04);">
+        <input type="number" class="cell-grid-input" value="${linha.cruzeta != null ? linha.cruzeta : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
       </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(59, 130, 246, 0.04);">
-        <input type="number" class="cell-grid-input" value="${linha.cruzeta}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
+      <!-- Quantidade p/ Máquina -->
+      <td style="border: 1px solid var(--border-color); padding: 4px; background: rgba(56, 189, 248, 0.04);">
+        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #0284c7;" value="${linha.p_maquina != null ? linha.p_maquina : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
       </td>
-      <!-- Máquina -->
-      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(56, 189, 248, 0.04);">
-        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #0284c7;" value="${linha.p_maquina}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.porca_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.arruela_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.olhal_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.sobra_m}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
-      </td>
-      <!-- Rosca Dupla -->
-      <td style="border: 1px solid var(--border-color); padding: 3px; background: rgba(74, 222, 128, 0.04);">
-        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #16a34a;" value="${linha.p_dupla}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.porca_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.arruela_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.olhal_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
-      </td>
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <input type="number" class="cell-grid-input" value="${linha.sobra_d}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
+      <!-- Quantidade p/ Rosca Dupla -->
+      <td style="border: 1px solid var(--border-color); padding: 4px; background: rgba(74, 222, 128, 0.04);">
+        <input type="number" class="cell-grid-input" style="font-weight: 700; color: #16a34a;" value="${linha.p_dupla != null ? linha.p_dupla : 0}" min="0" step="1" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
       </td>
       <!-- Ações -->
-      <td style="border: 1px solid var(--border-color); padding: 3px;">
-        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.75rem; color: var(--danger-color); border-color: transparent;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
+      <td style="border: 1px solid var(--border-color); padding: 4px;">
+        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.85rem; color: var(--danger-color); border-color: transparent;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
           🗑️
         </button>
       </td>
@@ -733,12 +635,8 @@ function renderizarGridNiveis() {
 }
 
 function atualizarCampoLinha(idx, campo, valor) {
-  if (campo === 'nivel' || campo === 'cruzeta' || campo === 'p_maquina' || campo === 'porca_m' ||
-      campo === 'arruela_m' || campo === 'olhal_m' || campo === 'sobra_m' || campo === 'p_dupla' ||
-      campo === 'porca_d' || campo === 'arruela_d' || campo === 'olhal_d' || campo === 'sobra_d') {
+  if (campo === 'nivel' || campo === 'cruzeta' || campo === 'p_maquina' || campo === 'p_dupla') {
     linhasGridAtuais[idx][campo] = parseFloat(valor) || 0;
-  } else if (campo === 'face') {
-    linhasGridAtuais[idx][campo] = valor.toUpperCase();
   } else {
     linhasGridAtuais[idx][campo] = valor;
   }
@@ -747,7 +645,7 @@ function atualizarCampoLinha(idx, campo, valor) {
 
 function adicionarLinhaGrid() {
   const proxNivel = linhasGridAtuais.length > 0 ? Math.max(...linhasGridAtuais.map(l => l.nivel)) + 1 : 1;
-  linhasGridAtuais.push(criarLinhaVazia(proxNivel, '1.4', 'B'));
+  linhasGridAtuais.push(criarLinhaVazia(proxNivel, '1.4'));
   renderizarGridNiveis();
   calcularTudo();
 }
@@ -831,40 +729,40 @@ function renderizarResultados(data) {
 
   renderizarMatrizParafusos();
 
-  // 2. Memória de cálculo passo a passo
+  // 2. Memória de cálculo passo a passo para Topo e Gaveta
   const tbodyMemoria = document.getElementById('tbody-memoria-calculo');
   tbodyMemoria.innerHTML = '';
 
   data.detalhes_niveis.forEach(n => {
-    if (n.detalhes_maquina) {
-      const trM = document.createElement('tr');
-      trM.style.borderBottom = '1px solid var(--border-color)';
-      trM.innerHTML = `
+    (n.detalhes_topo || []).forEach(d => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border-color)';
+      tr.innerHTML = `
         <td style="padding: 4px 6px;"><strong>Nível ${n.nivel}</strong></td>
         <td style="padding: 4px 6px;">${n.distancia_prog_raw} (${n.distancia_m}m)</td>
-        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #0284c7; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">${n.posicao}</span></td>
-        <td style="padding: 4px 6px;">${n.secao_poste_mm} mm</td>
-        <td style="padding: 4px 6px;">+ ${n.detalhes_maquina.esp_ferragens} mm</td>
-        <td style="padding: 4px 6px;">= ${n.detalhes_maquina.comp_calc} mm</td>
-        <td style="padding: 4px 6px;"><strong style="color: #2563eb; font-size: 0.85rem;">${n.detalhes_maquina.comp_comercial} mm</strong> (${n.detalhes_maquina.quantidade} un)</td>
+        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #0284c7; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">TOPO</span> (${d.tipo})</td>
+        <td style="padding: 4px 6px;">${d.secao_poste} mm</td>
+        <td style="padding: 4px 6px;">+ ${d.esp_ferragens} mm</td>
+        <td style="padding: 4px 6px;">= ${d.comp_calc} mm</td>
+        <td style="padding: 4px 6px;"><strong style="color: #2563eb; font-size: 0.85rem;">${d.comp_comercial} mm</strong> (${d.quantidade} un)</td>
       `;
-      tbodyMemoria.appendChild(trM);
-    }
+      tbodyMemoria.appendChild(tr);
+    });
 
-    if (n.detalhes_dupla) {
-      const trD = document.createElement('tr');
-      trD.style.borderBottom = '1px solid var(--border-color)';
-      trD.innerHTML = `
+    (n.detalhes_gaveta || []).forEach(d => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border-color)';
+      tr.innerHTML = `
         <td style="padding: 4px 6px;"><strong>Nível ${n.nivel}</strong></td>
         <td style="padding: 4px 6px;">${n.distancia_prog_raw} (${n.distancia_m}m)</td>
-        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #16a34a; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">${n.posicao}</span></td>
-        <td style="padding: 4px 6px;">${n.secao_poste_mm} mm</td>
-        <td style="padding: 4px 6px;">+ ${n.detalhes_dupla.esp_ferragens} mm</td>
-        <td style="padding: 4px 6px;">= ${n.detalhes_dupla.comp_calc} mm</td>
-        <td style="padding: 4px 6px;"><strong style="color: #16a34a; font-size: 0.85rem;">${n.detalhes_dupla.comp_comercial} mm</strong> (${n.detalhes_dupla.quantidade} un)</td>
+        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #16a34a; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">GAVETA</span> (${d.tipo})</td>
+        <td style="padding: 4px 6px;">${d.secao_poste} mm</td>
+        <td style="padding: 4px 6px;">+ ${d.esp_ferragens} mm</td>
+        <td style="padding: 4px 6px;">= ${d.comp_calc} mm</td>
+        <td style="padding: 4px 6px;"><strong style="color: #16a34a; font-size: 0.85rem;">${d.comp_comercial} mm</strong> (${d.quantidade} un)</td>
       `;
-      tbodyMemoria.appendChild(trD);
-    }
+      tbodyMemoria.appendChild(tr);
+    });
   });
 }
 
@@ -1117,11 +1015,6 @@ function renderizarModalPadroes() {
       <td style="padding: 6px 8px;">${p.cruzeta}</td>
       <td style="padding: 6px 8px; color: #0284c7; font-weight: 600;">${p.parafuso_simples}</td>
       <td style="padding: 6px 8px; color: #16a34a; font-weight: 600;">${p.parafuso_dupla}</td>
-      <td style="padding: 6px 8px;">${p.porca}</td>
-      <td style="padding: 6px 8px;">${p.arruela}</td>
-      <td style="padding: 6px 8px;">${p.porca_olhal}</td>
-      <td style="padding: 6px 8px;">${p.sobra}</td>
-      <td style="padding: 6px 8px;"><span class="badge" style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${p.face_padrao || 'B'}</span></td>
       <td style="padding: 6px 8px; text-align: center; white-space: nowrap;">
         <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="carregarPadraoParaEditar('${p.nome}')" title="Editar este padrão">
           ✏️
@@ -1168,11 +1061,6 @@ function carregarPadraoParaEditar(nome) {
   document.getElementById('modal-p-cruz').value = p.cruzeta || 0;
   document.getElementById('modal-p-psimples').value = p.parafuso_simples || 0;
   document.getElementById('modal-p-pdupla').value = p.parafuso_dupla || 0;
-  document.getElementById('modal-p-porca').value = p.porca || 0;
-  document.getElementById('modal-p-arr').value = p.arruela || 0;
-  document.getElementById('modal-p-olhal').value = p.porca_olhal || 0;
-  document.getElementById('modal-p-sobra').value = p.sobra || 1;
-  document.getElementById('modal-p-face').value = p.face_padrao || 'B';
   document.getElementById('modal-p-nome').focus();
 }
 
@@ -1189,11 +1077,11 @@ async function salvarPadraoMontagemModal() {
     cruzeta: parseFloat(document.getElementById('modal-p-cruz').value) || 0,
     parafuso_simples: parseFloat(document.getElementById('modal-p-psimples').value) || 0,
     parafuso_dupla: parseFloat(document.getElementById('modal-p-pdupla').value) || 0,
-    porca: parseFloat(document.getElementById('modal-p-porca').value) || 0,
-    arruela: parseFloat(document.getElementById('modal-p-arr').value) || 0,
-    porca_olhal: parseFloat(document.getElementById('modal-p-olhal').value) || 0,
-    sobra: parseFloat(document.getElementById('modal-p-sobra').value) || 1,
-    face_padrao: document.getElementById('modal-p-face').value
+    porca: 2,
+    arruela: 2,
+    porca_olhal: 0,
+    sobra: 1,
+    face_padrao: 'B'
   };
 
   try {

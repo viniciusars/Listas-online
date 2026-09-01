@@ -526,8 +526,8 @@ def _seed_calculadora(conn, parque_id):
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (parque_id, nome, p.get('descricao', ''), float(p.get('cruzeta', 0)),
              float(p.get('parafuso_simples', 0)), float(p.get('parafuso_dupla', 0)),
-             float(p.get('arruela', 0)), float(p.get('porca', 0)), float(p.get('porca_olhal', 0)),
-             float(p.get('sobra', 1)), p.get('face_padrao', 'B'))
+             float(p.get('arruela', 2)), float(p.get('porca', 2)), float(p.get('porca_olhal', 0)),
+             float(p.get('sobra', 1)), 'B')
         )
     # 2. Estruturas
     grid_all = calculadora_parafusos.gerar_linhas_iniciais_estruturas()
@@ -540,11 +540,11 @@ def _seed_calculadora(conn, parque_id):
                 "p_dupla, porca_d, arruela_d, olhal_d, sobra_d) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (parque_id, est_nome, int(l['ordem']), int(l['nivel']), str(l['distancia_prog']),
-                 str(l.get('montagem', '')), str(l['face']), float(l['cruzeta']),
-                 float(l['p_maquina']), float(l['porca_m']), float(l['arruela_m']),
-                 float(l['olhal_m']), float(l['sobra_m']), float(l['p_dupla']),
-                 float(l['porca_d']), float(l['arruela_d']), float(l['olhal_d']),
-                 float(l['sobra_d']))
+                 '', 'B', float(l['cruzeta']),
+                 float(l['p_maquina']), 2.0, 2.0,
+                 0.0, 1.0, float(l['p_dupla']),
+                 2.0, 2.0, 0.0,
+                 1.0)
             )
     conn.commit()
     print(f"[BANCO] Seed: {len(grid_all)} estruturas da calculadora no parque {parque_id}")
@@ -1593,12 +1593,12 @@ def salvar_estrutura_calculadora(estrutura_nome, linhas, parque_id=None):
             params = [
                 (parque_id, estrutura_nome, idx, int(l.get('nivel', idx)),
                  str(l.get('distancia_prog', '0.2')), str(l.get('montagem', '')),
-                 str(l.get('face', 'B')).upper(), float(l.get('cruzeta', 0)),
-                 float(l.get('p_maquina', 0)), float(l.get('porca_m', 0)),
-                 float(l.get('arruela_m', 0)), float(l.get('olhal_m', 0)),
-                 float(l.get('sobra_m', 1)), float(l.get('p_dupla', 0)),
-                 float(l.get('porca_d', 0)), float(l.get('arruela_d', 0)),
-                 float(l.get('olhal_d', 0)), float(l.get('sobra_d', 1)))
+                 'B', float(l.get('cruzeta', 0)),
+                 float(l.get('p_maquina', 0)), 2.0,
+                 2.0, 0.0,
+                 1.0, float(l.get('p_dupla', 0)),
+                 2.0, 2.0,
+                 0.0, 1.0)
                 for idx, l in enumerate(linhas, 1)
             ]
             conn.executemany(
