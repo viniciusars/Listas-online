@@ -3,300 +3,689 @@
 {% block title %}Dimensionar Parafusos — Sistema de Quantitativos RMT{% endblock %}
 
 {% block styles %}
-main {
-    max-width: 98% !important;
-    width: 98% !important;
-    margin: 16px auto !important;
-    padding: 0 12px !important;
+/* Esta tela precisa de mais largura que o padrão (grades de 14 e 19 colunas). */
+main { max-width: 1520px; }
+
+/* ── Tokens de cor dos dois grupos de parafuso (claro / escuro) ─────── */
+.dim {
+    --c-maq: #0369a1;
+    --c-maq-soft: rgba(2, 132, 199, 0.08);
+    --c-maq-line: rgba(2, 132, 199, 0.35);
+    --c-dup: #15803d;
+    --c-dup-soft: rgba(22, 163, 74, 0.08);
+    --c-dup-line: rgba(22, 163, 74, 0.35);
 }
-.page-container {
-    max-width: 100% !important;
-    width: 100% !important;
+[data-theme="dark"] .dim {
+    --c-maq: #7dd3fc;
+    --c-maq-soft: rgba(56, 189, 248, 0.10);
+    --c-maq-line: rgba(56, 189, 248, 0.35);
+    --c-dup: #86efac;
+    --c-dup-soft: rgba(74, 222, 128, 0.10);
+    --c-dup-line: rgba(74, 222, 128, 0.35);
 }
-.card select, .card input[type="text"], .card input[type="number"] {
-    box-sizing: border-box !important;
-    line-height: normal !important;
+
+/* ── Cabeçalho da página ───────────────────────────────────────────── */
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
 }
+.page-head h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.page-head p {
+    margin-top: 4px;
+    font-size: 0.87rem;
+    color: var(--text-muted);
+    max-width: 68ch;
+    line-height: 1.5;
+}
+.page-head .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.page-head .btn { padding: 8px 14px; font-size: 0.87rem; }
+
+/* ── Alerta de feedback ────────────────────────────────────────────── */
+.alerta {
+    display: none;
+    padding: 12px 16px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.5;
+    border: 1px solid transparent;
+}
+.alerta.show { display: block; }
+.alerta.success { background: rgba(16, 185, 129, 0.10); border-color: rgba(16, 185, 129, 0.35); color: var(--text-main); }
+.alerta.danger  { background: rgba(239, 68, 68, 0.10);  border-color: rgba(239, 68, 68, 0.35);  color: var(--text-main); }
+.alerta.warning { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.40); color: var(--text-main); }
+.alerta.info    { background: var(--primary-light);      border-color: var(--border-color);       color: var(--text-main); }
+
+/* ── Cabeçalho de card com passo numerado ──────────────────────────── */
+.card-header .step {
+    background: var(--primary-color);
+    color: #fff;
+    width: 24px; height: 24px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+}
+.card-header { padding: 14px 20px; flex-wrap: wrap; }
+.card-header .hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+.card-header .acoes-card {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.card-header .acoes-card .btn { padding: 6px 12px; font-size: 0.82rem; }
+.card-body { padding: 20px; }
+
+.chip {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.76rem;
+    padding: 4px 11px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+/* ── Formulário de parâmetros ──────────────────────────────────────── */
+.params {
+    display: grid;
+    grid-template-columns: minmax(300px, 2.2fr) minmax(180px, 1.2fr) minmax(130px, 0.9fr) minmax(130px, 0.9fr);
+    gap: 16px;
+    align-items: start;
+}
+@media (max-width: 1080px) {
+    .params { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+    .params { grid-template-columns: minmax(0, 1fr); }
+}
+
+.campo > label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.campo select,
+.campo input[type=text],
+.campo input[type=number] {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--surface-color);
+    color: var(--text-main);
+}
+.campo input::placeholder { font-weight: 400; color: var(--text-muted); }
+.campo .linha-controle { display: flex; gap: 6px; }
+.campo .linha-controle select { flex: 1; min-width: 0; }
+
+.btn-icone {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--surface-color);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.btn-icone:hover { border-color: var(--primary-color); background: var(--primary-light); }
+.btn-icone.perigo:hover { border-color: var(--danger-color); background: rgba(239, 68, 68, 0.10); }
+
+.aviso-req {
+    display: none;
+    color: var(--warning-color);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* ── Grades (níveis e matriz) ──────────────────────────────────────── */
+.tbl-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+}
+table.grade {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    background: var(--surface-color);
+}
+table.grade th {
+    background: var(--bg-color);
+    color: var(--text-muted);
+    padding: 8px 6px;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border-color);
+}
+table.grade thead tr:first-child th { border-bottom: 1px solid var(--border-color); }
+table.grade td {
+    padding: 3px 4px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    text-align: center;
+}
+table.grade tbody tr:last-child td { border-bottom: none; }
+table.grade tbody tr:hover td { background: var(--bg-color); }
+
+/* Tinta de grupo: colunas de cabeça quadrada x rosca dupla */
+table.grade th.g-maq { color: var(--c-maq); background: var(--c-maq-soft); }
+table.grade th.g-dup { color: var(--c-dup); background: var(--c-dup-soft); }
+table.grade th.g-titulo { font-size: 0.75rem; letter-spacing: 0.06em; }
+table.grade td.g-maq { background: var(--c-maq-soft); }
+table.grade td.g-dup { background: var(--c-dup-soft); }
+table.grade tbody tr:hover td.g-maq { background: var(--c-maq-soft); }
+table.grade tbody tr:hover td.g-dup { background: var(--c-dup-soft); }
+table.grade th.sep-l, table.grade td.sep-l { border-left: 1px solid var(--border-color); }
+
+/* Células editáveis */
+table.grade input {
+    width: 100%;
+    height: 30px;
+    padding: 0 4px;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    transition: border-color 0.15s, background 0.15s;
+    -moz-appearance: textfield;
+}
+table.grade input::-webkit-outer-spin-button,
+table.grade input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+table.grade input:hover { border-color: var(--border-color); }
+table.grade input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: var(--surface-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+/* Valor zerado, exibido como "—" */
+table.grade input.dash { color: var(--text-muted); font-weight: 400; opacity: 0.65; }
+/* Colunas-âncora de cada grupo (a quantidade de parafusos em si) */
+table.grade input.main-maq { color: var(--c-maq); font-weight: 800; }
+table.grade input.main-dup { color: var(--c-dup); font-weight: 800; }
+table.grade input.main-maq.dash,
+table.grade input.main-dup.dash { color: var(--text-muted); font-weight: 400; }
+
+.btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.btn-del:hover { color: var(--danger-color); background: rgba(239, 68, 68, 0.10); }
+
+/* Larguras da grade de níveis */
+table.niveis { min-width: 1080px; }
+table.niveis col.c-nivel  { width: 62px; }
+table.niveis col.c-cota   { width: 96px; }
+table.niveis col.c-cruz   { width: 80px; }
+table.niveis col.c-item   { width: 78px; }
+table.niveis col.c-main   { width: 92px; }
+table.niveis col.c-del    { width: 44px; }
+
+/* Larguras da grade matricial de resultados */
+table.matriz { min-width: 1080px; }
+table.matriz col.c-pos    { width: 118px; }
+table.matriz col.c-paraf  { width: 190px; }
+table.matriz col.c-classe { width: 78px; }
+table.matriz col.c-compr  { width: 46px; }
+table.matriz col.c-del    { width: 40px; }
+table.matriz th.esq, table.matriz td.esq { text-align: left; }
+table.matriz td.esq { padding-left: 10px; font-weight: 600; }
+table.matriz td.preenchida { background: var(--primary-light); }
+table.matriz tbody tr:hover td.preenchida { background: var(--primary-light); }
+table.matriz td.vazia { color: var(--text-muted); opacity: 0.3; }
+table.matriz td.classe { color: var(--text-muted); }
+table.matriz th.c-compr-h { font-size: 0.72rem; }
+
+.tbl-vazia {
+    padding: 28px 16px !important;
+    text-align: center !important;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+/* ── Memória de cálculo ────────────────────────────────────────────── */
+details.memoria {
+    margin-top: 16px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 10px 14px;
+}
+details.memoria > summary {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+}
+details.memoria > summary::-webkit-details-marker { display: none; }
+details.memoria > summary::before { content: '▸ '; }
+details[open].memoria > summary::before { content: '▾ '; }
+details.memoria > summary:hover { color: var(--primary-color); }
+
+table.memoria {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.79rem;
+    margin-top: 10px;
+    background: var(--surface-color);
+    border-radius: 6px;
+}
+table.memoria th {
+    background: transparent;
+    text-align: left;
+    padding: 7px 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+table.memoria td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    white-space: nowrap;
+}
+table.memoria tbody tr:last-child td { border-bottom: none; }
+table.memoria tbody tr:hover td { background: var(--bg-color); }
+table.memoria .num { font-variant-numeric: tabular-nums; }
+
+.tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+.tag.topo   { background: var(--c-maq-soft); color: var(--c-maq); border: 1px solid var(--c-maq-line); }
+.tag.gaveta { background: var(--c-dup-soft); color: var(--c-dup); border: 1px solid var(--c-dup-line); }
+.res-maq { color: var(--c-maq); font-weight: 700; }
+.res-dup { color: var(--c-dup); font-weight: 700; }
+
+/* ── Modal de padrões de montagem ──────────────────────────────────── */
+.modal-fundo {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-fundo.open { display: flex; }
+.modal-caixa {
+    background: var(--surface-color);
+    color: var(--text-main);
+    width: 100%;
+    max-width: 880px;
+    max-height: 88vh;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-float);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.modal-caixa > header {
+    all: unset;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+}
+.modal-caixa > header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.modal-fechar {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0 4px;
+    border-radius: 6px;
+}
+.modal-fechar:hover { color: var(--danger-color); }
+.modal-corpo { padding: 20px 22px; overflow-y: auto; flex: 1; }
+.modal-rodape {
+    padding: 12px 22px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-color);
+    text-align: right;
+}
+
+.form-padrao {
+    padding: 18px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    margin-top: 18px;
+}
+.form-padrao h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.form-padrao .grid-ident {
+    display: grid;
+    grid-template-columns: minmax(130px, 1fr) minmax(200px, 2.6fr);
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.form-padrao .grid-qtd {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+@media (max-width: 560px) {
+    .form-padrao .grid-ident,
+    .form-padrao .grid-qtd { grid-template-columns: minmax(0, 1fr); }
+}
+.form-padrao label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+.form-padrao input {
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 0.88rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--surface-color);
+    color: var(--text-main);
+    font-family: inherit;
+}
+.form-padrao input.centro { text-align: center; font-weight: 700; }
+.form-padrao input.tinta-maq { color: var(--c-maq); }
+.form-padrao input.tinta-dup { color: var(--c-dup); }
+.form-padrao input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+.form-padrao .acao { display: flex; justify-content: flex-end; }
+
+table.padroes { min-width: 620px; }
+table.padroes td { padding: 7px 8px; }
+table.padroes td.esq { text-align: left; }
+table.padroes td.desc { text-align: left; font-size: 0.76rem; color: var(--text-muted); }
 {% endblock %}
 
 {% block content %}
-<div class="page-container" style="width: 100%; padding-bottom: 2rem;">
+<a class="back-link" href="/">← Início</a>
 
-  <!-- Header da Página -->
-  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+<div class="dim" style="display: flex; flex-direction: column; gap: 20px;">
+
+  <!-- ── Cabeçalho da página ─────────────────────────────────────────── -->
+  <div class="page-head">
     <div>
-      <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
-        <span>📐</span> Dimensionamento Automático de Parafusos
-      </h1>
-      <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted);">
-        Calculadora geométrica por níveis e conicidade do poste duplo T com padrões personalizáveis por parque.
+      <h1><span>📐</span> Dimensionamento Automático de Parafusos</h1>
+      <p>
+        Calculadora geométrica por níveis e conicidade do poste duplo T, com padrões de
+        montagem personalizáveis por parque.
       </p>
     </div>
-    <div style="display: flex; gap: 0.5rem;">
-      <button class="btn btn-secondary" onclick="abrirModalPadroes()" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.5rem 0.9rem;">
-        <span>⚙️</span> Padrões de Montagem
-      </button>
-      <a href="/parafusos" class="btn btn-outline" style="text-decoration: none; font-size: 0.85rem; padding: 0.5rem 0.9rem;">
-        <span>📋</span> Cadastro de Parafusos
-      </a>
+    <div class="acoes">
+      <button class="btn btn-outline" onclick="abrirModalPadroes()">⚙️ Padrões de Montagem</button>
+      <a href="/parafusos" class="btn btn-outline">📋 Cadastro de Parafusos</a>
     </div>
   </div>
 
-  <!-- Alerta de Notificação / Feedback -->
-  <div id="alerta-feedback" style="display: none; padding: 0.85rem 1.25rem; border-radius: var(--border-radius-sm, 8px); margin-bottom: 1rem; font-weight: 500; font-size: 0.9rem;"></div>
+  <div id="alerta-feedback" class="alerta"></div>
 
-  <!-- CARD 1: Parâmetros da Estrutura -->
-  <div class="card" style="margin-bottom: 1.25rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">1</span>
-        <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
-          Parâmetros da Estrutura
-        </h2>
-      </div>
-      <span id="badge-parque-ativo" style="background: var(--primary-light); color: var(--primary-color); font-weight: 600; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px;">
-        Parque Ativo
+  <!-- ── CARD 1: Parâmetros ──────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="step">1</span>
+      <h2>Parâmetros da Estrutura</h2>
+      <span class="acoes-card">
+        <span class="chip" id="badge-parque-ativo">{{ parque_ativo.nome if parque_ativo else 'Sem parque' }}</span>
       </span>
     </div>
 
-    <div style="padding: 1.25rem;">
-      <div style="display: grid; grid-template-columns: minmax(320px, 2.4fr) minmax(200px, 1.4fr) minmax(140px, 1fr) minmax(140px, 1fr); gap: 1.25rem; align-items: start;">
-        
-        <!-- Campo: Tipo da Estrutura -->
-        <div>
-          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
-            Tipo da Estrutura:
-          </label>
-          <div style="display: flex; gap: 0.4rem; width: 100%;">
-            <select id="sel-estrutura" class="form-control" style="flex: 1; font-weight: 600; height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; min-width: 0; box-sizing: border-box;" onchange="aoMudarEstrutura()">
-              <option value="">-- Selecione uma Estrutura --</option>
+    <div class="card-body">
+      <div class="params">
+
+        <div class="campo">
+          <label for="sel-estrutura">Tipo da estrutura</label>
+          <div class="linha-controle">
+            <select id="sel-estrutura" onchange="aoMudarEstrutura()">
+              <option value="">— Selecione uma estrutura —</option>
             </select>
-            <button class="btn btn-outline" id="btn-renomear-est" title="Renomear Estrutura Selecionada" onclick="renomearEstruturaAtual()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
-              ✏️
-            </button>
-            <button class="btn btn-outline" title="Criar Nova Estrutura" onclick="criarNovaEstrutura()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
-              ➕
-            </button>
-            <button class="btn btn-outline" id="btn-excluir-est-card1" title="Excluir Estrutura do Parque" onclick="excluirEstruturaParque()" style="height: 44px; min-height: 44px; padding: 0 0.75rem; flex-shrink: 0; font-size: 1rem; color: var(--danger-color); border-color: var(--border-color); display: flex; align-items: center; justify-content: center;">
-              🗑️
-            </button>
+            <button type="button" class="btn-icone" id="btn-renomear-est"
+                    title="Renomear estrutura selecionada" onclick="renomearEstruturaAtual()">✏️</button>
+            <button type="button" class="btn-icone"
+                    title="Criar nova estrutura" onclick="criarNovaEstrutura()">➕</button>
+            <button type="button" class="btn-icone perigo" id="btn-excluir-est"
+                    title="Excluir estrutura do parque" onclick="excluirEstruturaParque()">🗑️</button>
           </div>
-          <!-- Input de Nome quando for Nova -->
-          <div id="div-nome-custom" style="display: none; margin-top: 0.5rem;">
-            <input type="text" id="input-nome-estrutura" class="form-control" placeholder="Digite o nome da nova estrutura (ex: N4-NOVO)" style="text-transform: uppercase; font-size: 0.9rem; height: 44px; min-height: 44px; padding: 6px 12px; width: 100%; box-sizing: border-box;" oninput="aoDigitarNomeCustom()">
+          <div id="div-nome-custom" style="display: none; margin-top: 8px;">
+            <input type="text" id="input-nome-estrutura"
+                   placeholder="Nome da nova estrutura (ex: N4-NOVO)"
+                   style="text-transform: uppercase;" oninput="aoDigitarNomeCustom()">
           </div>
         </div>
 
-        <!-- Campo: Esforço do Poste (daN) -->
-        <div>
-          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
-            Esforço do Poste (daN):
-          </label>
-          <select id="sel-esforco" class="form-control" style="font-weight: 600; height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; width: 100%; box-sizing: border-box;" onchange="calcularTudo()">
-            <option value="600">600 daN (Fator 0.0)</option>
-            <option value="1000" selected>1000 daN (Fator 1.5)</option>
-            <option value="1500">1500 daN (Fator 3.0)</option>
-            <option value="2000">2000 daN (Fator 4.5)</option>
-            <option value="2500">2500 daN (Fator 6.0)</option>
-            <option value="3000">3000 daN (Fator 7.5)</option>
+        <div class="campo">
+          <label for="sel-esforco">Esforço do poste (daN)</label>
+          <select id="sel-esforco" onchange="calcularTudo()">
+            <option value="600">600 daN (fator 0,0)</option>
+            <option value="1000" selected>1000 daN (fator 1,5)</option>
+            <option value="1500">1500 daN (fator 3,0)</option>
+            <option value="2000">2000 daN (fator 4,5)</option>
+            <option value="2500">2500 daN (fator 6,0)</option>
+            <option value="3000">3000 daN (fator 7,5)</option>
           </select>
         </div>
 
-        <!-- Campo: Altura do Poste (m) -->
-        <div>
-          <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
-            <span>Altura (m):</span>
-            <span id="badge-ch-req" style="display: none; color: var(--warning-color, #f59e0b); font-size: 0.72rem; font-weight: 700;">(Requerida)</span>
+        <div class="campo">
+          <label for="input-altura">
+            <span>Altura (m)</span>
+            <span id="badge-ch-req" class="aviso-req">obrigatória (CH)</span>
           </label>
-          <input type="number" id="input-altura" class="form-control" placeholder="Opcional (ex: 12)" step="0.5" min="6" max="30" style="height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; width: 100%; box-sizing: border-box;" oninput="calcularTudo()">
+          <input type="number" id="input-altura" placeholder="Opcional (ex: 12)"
+                 step="0.5" min="6" max="30" oninput="calcularTudo()">
         </div>
 
-        <!-- Campo: Cruzeta Adicional (Item 36) -->
-        <div>
-          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-main);">
-            Cruzeta Adic. (Item 36):
-          </label>
-          <input type="number" id="input-cruzeta-adic" class="form-control" placeholder="0" min="0" step="1" style="height: 44px; min-height: 44px; padding: 6px 12px; font-size: 0.92rem; width: 100%; box-sizing: border-box;" oninput="calcularTudo()">
+        <div class="campo">
+          <label for="input-cruzeta-adic">Cruzeta adic. (item 36)</label>
+          <input type="number" id="input-cruzeta-adic" placeholder="0" min="0" step="1"
+                 oninput="calcularTudo()">
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- CARD 2: Elementos Construtivos por Nível (Visual 100% Sem Rolagem) -->
-  <div class="card" style="margin-bottom: 1.25rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">2</span>
-        <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
-          Elementos Construtivos por Nível
-        </h2>
-        <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">(Visualização compacta em tela única)</span>
-      </div>
-      <div style="display: flex; gap: 0.4rem;">
-        <button class="btn btn-secondary" onclick="adicionarLinhaGrid()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
-          ➕ Adicionar Nível
-        </button>
-        <button class="btn btn-primary" onclick="salvarPadraoEstruturaParque()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
-          💾 Salvar Padrão no Parque
-        </button>
-        <button class="btn btn-outline" id="btn-excluir-est" onclick="excluirEstruturaParque()" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; color: var(--danger-color); border-color: var(--danger-color);" title="Excluir estrutura do parque">
-          🗑️
-        </button>
-      </div>
+  <!-- ── CARD 2: Elementos construtivos por nível ────────────────────── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="step">2</span>
+      <h2>Elementos Construtivos por Nível</h2>
+      <span class="hint">campos vazios aparecem como “—”</span>
+      <span class="acoes-card">
+        <button class="btn btn-outline" onclick="adicionarLinhaGrid()">➕ Adicionar nível</button>
+        <button class="btn btn-primary" onclick="salvarPadraoEstruturaParque()">💾 Salvar padrão no parque</button>
+      </span>
     </div>
 
-    <!-- Tabela com Fundo Branco nas Informações e Texto Colorido no Cabeçalho -->
-    <div style="padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
-      <table id="tabela-grid-niveis" class="grid-table" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.82rem; table-layout: fixed; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #ffffff;">
-        <colgroup>
-          <col style="width: 6%;">    <!-- Nível -->
-          <col style="width: 8%;">    <!-- Cota (m) -->
-          <col style="width: 6.5%;">  <!-- Cruzeta -->
-          <!-- Cabeça Quadrada (5 colunas = 37.5%) -->
-          <col style="width: 8.5%;">  <!-- Parafuso -->
-          <col style="width: 7.25%;"> <!-- Porca -->
-          <col style="width: 7.25%;"> <!-- Arruela -->
-          <col style="width: 7.25%;"> <!-- Olhal -->
-          <col style="width: 7.25%;"> <!-- Sobra -->
-          <!-- Rosca Dupla (5 colunas = 37.5%) -->
-          <col style="width: 8.5%;">  <!-- Parafuso -->
-          <col style="width: 7.25%;"> <!-- Porca -->
-          <col style="width: 7.25%;"> <!-- Arruela -->
-          <col style="width: 7.25%;"> <!-- Olhal -->
-          <col style="width: 7.25%;"> <!-- Sobra -->
-          <col style="width: 4.5%;">  <!-- Ações -->
-        </colgroup>
-        <thead>
-          <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
-            <th rowspan="2" style="border: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b; font-weight: 700; color: #f8fafc;">NÍVEL</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b; font-weight: 700; color: #f8fafc;">COTA (M)</th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b; font-weight: 700; color: #f8fafc;">CRUZETA</th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 7px 6px; text-align: center; background: #1e293b; color: #38bdf8; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">
-              PARAFUSO CABEÇA QUADRADA
-            </th>
-            <th colspan="5" style="border: 1px solid #334155; padding: 7px 6px; text-align: center; background: #1e293b; color: #4ade80; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">
-              PARAFUSO ROSCA DUPLA
-            </th>
-            <th rowspan="2" style="border: 1px solid #334155; padding: 7px 2px; text-align: center; vertical-align: middle; background: #1e293b;"></th>
-          </tr>
-          <tr style="background: #0f172a; color: #94a3b8; font-size: 0.72rem; text-align: center;">
-            <!-- Cabeça Quadrada -->
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #93c5fd; font-weight: 700;">PARAFUSO</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">ARRUELA</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">SOBRA</th>
-            <!-- Rosca Dupla -->
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #86efac; font-weight: 700;">PARAFUSO</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">PORCA</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">ARRUELA</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">OLHAL</th>
-            <th style="border: 1px solid #334155; padding: 5px 1px; text-align: center; background: #0f172a; color: #cbd5e1; font-weight: 600;">SOBRA</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-grid-niveis" style="background: #ffffff;">
-          <!-- Linhas geradas dinamicamente via JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- CARD 3: Resultados do Dimensionamento (Grade Matricial Idêntica ao Cadastro de Parafusos) -->
-  <div class="card" style="margin-bottom: 1.5rem; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius, 12px); overflow: hidden; box-shadow: var(--shadow-sm);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.02);">
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="background: var(--primary-color); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">3</span>
-        <h2 style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);">
-          Resultados do Dimensionamento (Grade de Parafusos Gerada)
-        </h2>
-      </div>
-      <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()" style="font-weight: 600; font-size: 0.85rem; padding: 0.45rem 1.1rem; display: flex; align-items: center; gap: 0.4rem;">
-        <span>💾</span> Validar e Adicionar à Receita do Parque
-      </button>
-    </div>
-
-    <div style="padding: 1.25rem;">
-
-      <!-- Grade Matricial por Comprimento (Fiel à Página Cadastrar Parafusos) -->
-      <div style="overflow-x: auto; margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px;">
-        <table id="tabela-matriz-parafusos" style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: center; table-layout: fixed;">
+    <div class="card-body">
+      <div class="tbl-wrap">
+        <table class="grade niveis" id="tabela-grid-niveis">
           <colgroup>
-            <col style="width: 11%;">  <!-- POSIÇÃO -->
-            <col style="width: 17%;">  <!-- PARAFUSO -->
-            <col style="width: 8%;">   <!-- CLASSE -->
-            <!-- 15 colunas de comprimento = 4% cada (total 60%) -->
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">
-            <col style="width: 4%;">   <!-- Ações -->
+            <col class="c-nivel"><col class="c-cota"><col class="c-cruz">
+            <col class="c-main"><col class="c-item"><col class="c-item"><col class="c-item"><col class="c-item">
+            <col class="c-main"><col class="c-item"><col class="c-item"><col class="c-item"><col class="c-item">
+            <col class="c-del">
           </colgroup>
           <thead>
-            <tr style="background: #1e293b; color: #f8fafc; text-align: center;">
-              <th style="padding: 8px 6px; text-align: center; border-right: 1px solid #334155;">POSIÇÃO</th>
-              <th style="padding: 8px 6px; text-align: center; border-right: 1px solid #334155;">PARAFUSO</th>
-              <th style="padding: 8px 4px; text-align: center; border-right: 1px solid #334155;">CLASSE (KN)</th>
-              <!-- Comprimentos fixos de 200 a 900 mm -->
-              <th style="padding: 8px 2px; text-align: center;">200</th>
-              <th style="padding: 8px 2px; text-align: center;">250</th>
-              <th style="padding: 8px 2px; text-align: center;">300</th>
-              <th style="padding: 8px 2px; text-align: center;">350</th>
-              <th style="padding: 8px 2px; text-align: center;">400</th>
-              <th style="padding: 8px 2px; text-align: center;">450</th>
-              <th style="padding: 8px 2px; text-align: center;">500</th>
-              <th style="padding: 8px 2px; text-align: center;">550</th>
-              <th style="padding: 8px 2px; text-align: center;">600</th>
-              <th style="padding: 8px 2px; text-align: center;">650</th>
-              <th style="padding: 8px 2px; text-align: center;">700</th>
-              <th style="padding: 8px 2px; text-align: center;">750</th>
-              <th style="padding: 8px 2px; text-align: center;">800</th>
-              <th style="padding: 8px 2px; text-align: center;">850</th>
-              <th style="padding: 8px 2px; text-align: center;">900</th>
-              <th style="padding: 8px 2px; text-align: center;"></th>
+            <tr>
+              <th rowspan="2">Nível</th>
+              <th rowspan="2">Cota (m)</th>
+              <th rowspan="2">Cruzeta</th>
+              <th colspan="5" class="g-maq g-titulo sep-l">Parafuso cabeça quadrada</th>
+              <th colspan="5" class="g-dup g-titulo sep-l">Parafuso rosca dupla</th>
+              <th rowspan="2" class="sep-l"></th>
+            </tr>
+            <tr>
+              <th class="g-maq sep-l">Parafuso</th>
+              <th class="g-maq">Porca</th>
+              <th class="g-maq">Arruela</th>
+              <th class="g-maq">Olhal</th>
+              <th class="g-maq">Sobra</th>
+              <th class="g-dup sep-l">Parafuso</th>
+              <th class="g-dup">Porca</th>
+              <th class="g-dup">Arruela</th>
+              <th class="g-dup">Olhal</th>
+              <th class="g-dup">Sobra</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-grid-niveis"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 3: Resultados ──────────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="step">3</span>
+      <h2>Grade de Parafusos Gerada</h2>
+      <span class="acoes-card">
+        <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()">
+          💾 Validar e adicionar à receita do parque
+        </button>
+      </span>
+    </div>
+
+    <div class="card-body">
+      <div class="tbl-wrap">
+        <table class="grade matriz" id="tabela-matriz-parafusos">
+          <colgroup>
+            <col class="c-pos"><col class="c-paraf"><col class="c-classe">
+            <col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr">
+            <col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr">
+            <col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr">
+            <col class="c-del">
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="esq">Posição</th>
+              <th class="esq">Parafuso</th>
+              <th>Classe (kN)</th>
+              <th class="c-compr-h sep-l">200</th>
+              <th class="c-compr-h">250</th>
+              <th class="c-compr-h">300</th>
+              <th class="c-compr-h">350</th>
+              <th class="c-compr-h">400</th>
+              <th class="c-compr-h">450</th>
+              <th class="c-compr-h">500</th>
+              <th class="c-compr-h">550</th>
+              <th class="c-compr-h">600</th>
+              <th class="c-compr-h">650</th>
+              <th class="c-compr-h">700</th>
+              <th class="c-compr-h">750</th>
+              <th class="c-compr-h">800</th>
+              <th class="c-compr-h">850</th>
+              <th class="c-compr-h">900</th>
+              <th class="sep-l"></th>
             </tr>
           </thead>
           <tbody id="tbody-matriz-parafusos">
-            <tr>
-              <td colspan="19" style="padding: 24px; text-align: center; color: var(--text-muted);">
-                Preencha os parâmetros para calcular os parafusos.
-              </td>
-            </tr>
+            <tr><td colspan="19" class="tbl-vazia">Preencha os parâmetros para calcular os parafusos.</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Detalhes Expansíveis da Memória de Cálculo Geométrica -->
-      <details style="background: rgba(0,0,0,0.015); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.6rem 0.9rem;">
-        <summary style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none;">
-          🔍 Ver Memória de Cálculo Geométrica Passo a Passo (Topo e Gaveta)
-        </summary>
-        <div style="margin-top: 0.75rem; overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: left;">
+      <details class="memoria">
+        <summary>Ver memória de cálculo geométrica passo a passo (topo e gaveta)</summary>
+        <div style="overflow-x: auto;">
+          <table class="memoria">
             <thead>
-              <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
-                <th style="padding: 5px 6px;">Nível</th>
-                <th style="padding: 5px 6px;">Cota</th>
-                <th style="padding: 5px 6px;">Face / Elemento</th>
-                <th style="padding: 5px 6px;">Seção Poste</th>
-                <th style="padding: 5px 6px;">Ferragens Somadas</th>
-                <th style="padding: 5px 6px;">Comp. Calculado</th>
-                <th style="padding: 5px 6px; color: var(--primary-color);">Comp. Comercial</th>
+              <tr>
+                <th>Nível</th>
+                <th>Cota</th>
+                <th>Face / elemento</th>
+                <th>Seção poste</th>
+                <th>Ferragens</th>
+                <th>Comp. calculado</th>
+                <th>Comp. comercial</th>
               </tr>
             </thead>
             <tbody id="tbody-memoria-calculo">
-              <tr><td colspan="7" style="padding: 8px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>
+              <tr><td colspan="7" class="tbl-vazia">Nenhum nível calculado.</td></tr>
             </tbody>
           </table>
         </div>
@@ -307,231 +696,72 @@ main {
 
 </div>
 
-<!-- MODAL: Gerenciar Padrões de Montagem do Parque -->
-<div id="modal-padroes" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
-  <div style="background: var(--surface-color); color: var(--text-main); width: 100%; max-width: 900px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
-    
-    <!-- Modal Header -->
-    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03);">
-      <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
-        <span>⚙️</span> Padrões de Montagem do Parque Ativo
-      </h3>
-      <button onclick="fecharModalPadroes()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
-    </div>
+<!-- ── MODAL: padrões de montagem do parque ──────────────────────────── -->
+<div id="modal-padroes" class="modal-fundo dim" onclick="if(event.target===this)fecharModalPadroes()">
+  <div class="modal-caixa">
 
-    <!-- Modal Body -->
-    <div style="padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1;">
-      
-      <!-- Tabela de Padrões Existentes -->
-      <div style="margin-bottom: 1.25rem; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center;">
+    <header>
+      <h3><span>⚙️</span> Padrões de Montagem do Parque Ativo</h3>
+      <button class="modal-fechar" onclick="fecharModalPadroes()" title="Fechar">&times;</button>
+    </header>
+
+    <div class="modal-corpo">
+      <div class="tbl-wrap">
+        <table class="grade padroes">
           <thead>
-            <tr style="background: #1e293b; color: #f8fafc;">
-              <th style="padding: 8px 6px; text-align: center;">Nome</th>
-              <th style="padding: 8px 6px; text-align: left;">Descrição</th>
-              <th style="padding: 8px 6px; text-align: center;">Cruzeta</th>
-              <th style="padding: 8px 6px; text-align: center;">P. Máquina</th>
-              <th style="padding: 8px 6px; text-align: center;">P. Dupla</th>
-              <th style="padding: 8px 6px; width: 45px;"></th>
+            <tr>
+              <th class="esq">Nome</th>
+              <th class="esq">Descrição</th>
+              <th>Cruzeta</th>
+              <th>P. máquina</th>
+              <th>P. dupla</th>
+              <th style="width: 78px;"></th>
             </tr>
           </thead>
-          <tbody id="tbody-modal-padroes">
-            <!-- Padrões listados dinamicamente -->
-          </tbody>
+          <tbody id="tbody-modal-padroes"></tbody>
         </table>
       </div>
 
-      <!-- Formulário Estruturado para Criar/Editar Padrão -->
-      <div style="padding: 1.25rem; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box;">
-        <h4 style="margin: 0 0 1rem; font-size: 0.92rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
-          <span>✏️</span> Adicionar ou Atualizar Padrão de Montagem
-        </h4>
+      <div class="form-padrao">
+        <h4><span>✏️</span> Adicionar ou atualizar padrão de montagem</h4>
 
-        <!-- Grupo 1: Identificação -->
-        <div style="display: grid; grid-template-columns: minmax(140px, 1.2fr) minmax(200px, 2.8fr); gap: 0.75rem; margin-bottom: 1rem;">
+        <div class="grid-ident">
           <div>
-            <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Nome do Padrão:</label>
-            <input type="text" id="modal-p-nome" class="modal-field-text" placeholder="Ex: N1.ESP" style="text-transform: uppercase;">
+            <label for="modal-p-nome">Nome do padrão</label>
+            <input type="text" id="modal-p-nome" placeholder="Ex: N1.ESP" style="text-transform: uppercase;">
           </div>
           <div>
-            <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Descrição:</label>
-            <input type="text" id="modal-p-desc" class="modal-field-text" placeholder="Descrição clara da montagem">
+            <label for="modal-p-desc">Descrição</label>
+            <input type="text" id="modal-p-desc" placeholder="Descrição clara da montagem">
           </div>
         </div>
 
-        <!-- Grupo 2: Quantidades (3 colunas) -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
+        <div class="grid-qtd">
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">Cruzeta:</label>
-            <input type="number" id="modal-p-cruz" class="modal-field-input" value="1" min="0" step="1">
+            <label for="modal-p-cruz">Cruzeta</label>
+            <input type="number" id="modal-p-cruz" class="centro" value="1" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Máquina:</label>
-            <input type="number" id="modal-p-psimples" class="modal-field-input" value="0" min="0" step="1" style="color: #0284c7; font-weight: 700;">
+            <label for="modal-p-psimples">P. máquina</label>
+            <input type="number" id="modal-p-psimples" class="centro tinta-maq" value="0" min="0" step="1">
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; color: var(--text-main); text-align: center;">P. Dupla:</label>
-            <input type="number" id="modal-p-pdupla" class="modal-field-input" value="0" min="0" step="1" style="color: #16a34a; font-weight: 700;">
+            <label for="modal-p-pdupla">P. dupla</label>
+            <input type="number" id="modal-p-pdupla" class="centro tinta-dup" value="0" min="0" step="1">
           </div>
         </div>
 
-        <!-- Grupo 3: Ação de Salvar -->
-        <div style="display: flex; justify-content: flex-end;">
-          <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()" style="padding: 0.5rem 1.5rem; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
-            <span>💾</span> Salvar Padrão de Montagem
-          </button>
+        <div class="acao">
+          <button class="btn btn-primary" onclick="salvarPadraoMontagemModal()">💾 Salvar padrão de montagem</button>
         </div>
-
       </div>
     </div>
 
-    <!-- Modal Footer -->
-    <div style="padding: 0.75rem 1.5rem; border-top: 1px solid var(--border-color); text-align: right; background: rgba(0,0,0,0.02);">
-      <button class="btn btn-secondary" onclick="fecharModalPadroes()" style="font-size: 0.85rem;">Fechar</button>
+    <div class="modal-rodape">
+      <button class="btn btn-outline" onclick="fecharModalPadroes()">Fechar</button>
     </div>
   </div>
 </div>
-
-<style>
-  /* Inputs do Modal de Padrões */
-  .modal-field-text {
-    width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    padding: 6px 10px !important;
-    font-size: 0.88rem !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    background: var(--surface-color) !important;
-    color: var(--text-main) !important;
-  }
-  .modal-field-input {
-    width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    padding: 4px 6px !important;
-    font-size: 0.88rem !important;
-    text-align: center !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    background: var(--surface-color) !important;
-    color: var(--text-main) !important;
-  }
-  .modal-field-text:focus, .modal-field-input:focus {
-    border-color: var(--primary-color) !important;
-    outline: 2px solid var(--primary-light) !important;
-  }
-
-  /* Estilização da Tabela de Níveis (Fundo Branco em TODAS as Informações) */
-  #tabela-grid-niveis {
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-  }
-  #tbody-grid-niveis,
-  #tbody-grid-niveis tr,
-  #tbody-grid-niveis td {
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
-    border: 1px solid #cbd5e1 !important;
-  }
-  #tbody-grid-niveis tr:hover td {
-    background-color: #f8fafc !important;
-    background: #f8fafc !important;
-  }
-
-  /* Inputs com Fundo Branco Absoluto */
-  #tbody-grid-niveis input,
-  .cell-grid-white {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 5px 2px !important;
-    text-align: center !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 4px !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
-    font-size: 0.85rem !important;
-    font-weight: 600 !important;
-    transition: all 0.15s ease !important;
-  }
-  #tbody-grid-niveis input:focus,
-  .cell-grid-white:focus {
-    outline: none !important;
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
-  }
-
-  /* Elementos zerados exibidos como '-' */
-  #tbody-grid-niveis input.is-dash,
-  .cell-grid-white.is-dash {
-    color: #94a3b8 !important;
-    font-weight: 500 !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-  }
-  #tbody-grid-niveis input.is-active,
-  .cell-grid-white.is-active {
-    color: #0f172a !important;
-    font-weight: 700 !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-  }
-
-  /* Destaque nos textos dos campos de parafuso (com fundo 100% branco) */
-  #tbody-grid-niveis input.maq-main.is-active,
-  .cell-grid-white.maq-main.is-active {
-    color: #0284c7 !important;
-    font-weight: 800 !important;
-    border-color: #38bdf8 !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-  }
-  #tbody-grid-niveis input.dup-main.is-active,
-  .cell-grid-white.dup-main.is-active {
-    color: #16a34a !important;
-    font-weight: 800 !important;
-    border-color: #4ade80 !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-  }
-
-  /* Células da Grade Matricial */
-  .cell-matriz-qtd {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 4px 2px;
-    text-align: center;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--text-main);
-    font-size: 0.85rem;
-    font-weight: 700;
-  }
-  .cell-matriz-qtd:focus {
-    outline: 2px solid var(--primary-color);
-    background: var(--surface-color);
-    border-color: var(--primary-color);
-  }
-  .text-center {
-    text-align: center;
-  }
-  tr.grid-row:hover td {
-    background-color: rgba(255, 255, 255, 0.04) !important;
-  }
-  tr.matriz-row:hover td {
-    background: rgba(59, 130, 246, 0.04);
-  }
-</style>
 
 <script>
 // Lista Fixa de Comprimentos Comerciais (Idêntica à tela Cadastrar Parafusos)
@@ -550,6 +780,13 @@ let linhasGridAtuais = [];
 let resultadoCalculoAtual = null;
 let specsMatrizAtuais = []; // [{posicao, parafuso, esf_parafuso, comprimentos: {350: 3, ...}}, ...]
 
+// Escapa texto vindo do banco/servidor antes de injetar via innerHTML.
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
   await carregarDadosIniciais();
@@ -561,8 +798,8 @@ async function carregarDadosIniciais() {
     dadosGlobais = await res.json();
 
     const selEst = document.getElementById('sel-estrutura');
-    selEst.innerHTML = '<option value="">-- Selecione uma Estrutura --</option>';
-    
+    selEst.innerHTML = '<option value="">— Selecione uma estrutura —</option>';
+
     dadosGlobais.estruturas.forEach(est => {
       const opt = document.createElement('option');
       opt.value = est;
@@ -572,7 +809,7 @@ async function carregarDadosIniciais() {
 
     const optNova = document.createElement('option');
     optNova.value = '__NOVA__';
-    optNova.textContent = '➕ [Nova Estrutura]';
+    optNova.textContent = '➕ [Nova estrutura]';
     selEst.appendChild(optNova);
 
     // Seleciona N1 por padrão se existir
@@ -581,8 +818,16 @@ async function carregarDadosIniciais() {
       await aoMudarEstrutura();
     }
   } catch (e) {
-    exibirAlerta('Erro ao carregar dados iniciais: ' + e.message, 'danger');
+    exibirAlerta('Erro ao carregar dados iniciais: ' + esc(e.message), 'danger');
   }
+}
+
+// Mostra/esconde os botões que só fazem sentido com uma estrutura salva selecionada.
+function alternarBotoesEstrutura(visivel) {
+  ['btn-excluir-est', 'btn-renomear-est'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = visivel ? 'inline-flex' : 'none';
+  });
 }
 
 async function aoMudarEstrutura() {
@@ -590,19 +835,12 @@ async function aoMudarEstrutura() {
   const valor = selEst.value;
   const divCustom = document.getElementById('div-nome-custom');
   const inputCustom = document.getElementById('input-nome-estrutura');
-  const btnExcluir = document.getElementById('btn-excluir-est');
-  const btnExcluir1 = document.getElementById('btn-excluir-est-card1');
-  const btnRenomear1 = document.getElementById('btn-renomear-est');
 
   if (valor === '__NOVA__') {
     divCustom.style.display = 'block';
     inputCustom.value = '';
-    btnExcluir.style.display = 'none';
-    if (btnExcluir1) btnExcluir1.style.display = 'none';
-    if (btnRenomear1) btnRenomear1.style.display = 'none';
-    linhasGridAtuais = [
-      criarLinhaVazia(1, '0.2', 'B')
-    ];
+    alternarBotoesEstrutura(false);
+    linhasGridAtuais = [criarLinhaVazia(1, '0.2')];
     renderizarGridNiveis();
     calcularTudo();
     return;
@@ -610,18 +848,14 @@ async function aoMudarEstrutura() {
 
   divCustom.style.display = 'none';
   if (!valor) {
-    if (btnExcluir) btnExcluir.style.display = 'none';
-    if (btnExcluir1) btnExcluir1.style.display = 'none';
-    if (btnRenomear1) btnRenomear1.style.display = 'none';
+    alternarBotoesEstrutura(false);
     linhasGridAtuais = [];
     renderizarGridNiveis();
     limparResultados();
     return;
   }
 
-  if (btnExcluir) btnExcluir.style.display = 'inline-block';
-  if (btnExcluir1) btnExcluir1.style.display = 'inline-flex';
-  if (btnRenomear1) btnRenomear1.style.display = 'inline-flex';
+  alternarBotoesEstrutura(true);
 
   try {
     const res = await fetch(`/dimensionar-parafusos/api/estrutura?tipo=${encodeURIComponent(valor)}`);
@@ -629,12 +863,12 @@ async function aoMudarEstrutura() {
     if (data.linhas && data.linhas.length > 0) {
       linhasGridAtuais = data.linhas;
     } else {
-      linhasGridAtuais = [criarLinhaVazia(1, '0.2', 'B')];
+      linhasGridAtuais = [criarLinhaVazia(1, '0.2')];
     }
     renderizarGridNiveis();
     calcularTudo();
   } catch (e) {
-    exibirAlerta('Erro ao carregar estrutura: ' + e.message, 'danger');
+    exibirAlerta('Erro ao carregar estrutura: ' + esc(e.message), 'danger');
   }
 }
 
@@ -668,114 +902,112 @@ function criarLinhaVazia(nivel, distProg) {
 }
 
 function formatarDisplayZero(val) {
-  if (val == null || val === '' || Number(val) === 0) return '-';
+  if (val == null || val === '' || Number(val) === 0) return '—';
   return val;
+}
+
+// Uma célula numérica da grade de níveis. `extra` marca as colunas-âncora
+// (a quantidade de parafusos de cada grupo), que ganham cor própria.
+function celulaNivel(idx, campo, valor, grupo, extra) {
+  const zero = Number(valor) === 0;
+  const classes = ['cell'];
+  if (extra) classes.push(extra);
+  if (zero) classes.push('dash');
+  return `
+    <td class="${grupo}">
+      <input type="text" class="${classes.join(' ')}"
+             value="${esc(formatarDisplayZero(valor))}"
+             onfocus="if(this.value==='—')this.value='';"
+             onblur="normalizarCelula(this)"
+             onchange="atualizarCampoLinha(${idx}, '${campo}', this.value, this)">
+    </td>`;
+}
+
+function normalizarCelula(el) {
+  const s = el.value.trim();
+  if (!s || s === '0') {
+    el.value = '—';
+    el.classList.add('dash');
+  }
 }
 
 function renderizarGridNiveis() {
   const tbody = document.getElementById('tbody-grid-niveis');
   tbody.innerHTML = '';
 
-  let temCH = false;
+  if (!linhasGridAtuais.length) {
+    tbody.innerHTML = '<tr><td colspan="14" class="tbl-vazia">Selecione uma estrutura ou crie uma nova para editar os níveis.</td></tr>';
+    atualizarBadgeCH();
+    return;
+  }
 
   linhasGridAtuais.forEach((linha, idx) => {
+    const num = c => (linha[c] != null ? Number(linha[c]) : 0);
     const tr = document.createElement('tr');
-    tr.className = 'grid-row';
-    tr.style.cssText = 'background: #ffffff !important; background-color: #ffffff !important;';
-
-    const distRaw = String(linha.distancia_prog || '').toUpperCase();
-    if (distRaw.includes('CH')) temCH = true;
-
-    const cruz = linha.cruzeta != null ? Number(linha.cruzeta) : 0;
-    const pm = linha.p_maquina != null ? Number(linha.p_maquina) : 0;
-    const porcam = linha.porca_m != null ? Number(linha.porca_m) : 2;
-    const arrm = linha.arruela_m != null ? Number(linha.arruela_m) : 2;
-    const olhalm = linha.olhal_m != null ? Number(linha.olhal_m) : 0;
-    const sobram = linha.sobra_m != null ? Number(linha.sobra_m) : 1;
-
-    const pd = linha.p_dupla != null ? Number(linha.p_dupla) : 0;
-    const porcad = linha.porca_d != null ? Number(linha.porca_d) : 2;
-    const arrd = linha.arruela_d != null ? Number(linha.arruela_d) : 2;
-    const olhald = linha.olhal_d != null ? Number(linha.olhal_d) : 0;
-    const sobrad = linha.sobra_d != null ? Number(linha.sobra_d) : 1;
-
-    const baseInputStyle = 'background: #ffffff !important; background-color: #ffffff !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; text-align: center !important; font-size: 0.85rem !important; padding: 5px 2px !important; width: 100% !important; box-sizing: border-box !important; height: 32px !important;';
-    const tdStyle = 'border: 1px solid #cbd5e1 !important; padding: 4px 2px !important; background: #ffffff !important; background-color: #ffffff !important;';
 
     tr.innerHTML = `
-      <td style="${tdStyle}">
-        <input type="number" class="cell-grid-white" style="${baseInputStyle} color: #0f172a !important; font-weight: 700 !important;" value="${linha.nivel}" min="1" onchange="atualizarCampoLinha(${idx}, 'nivel', this.value)">
+      <td>
+        <input type="text" class="cell" value="${esc(linha.nivel)}"
+               onchange="atualizarCampoLinha(${idx}, 'nivel', this.value, this)">
       </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: #0f172a !important; font-weight: 700 !important;" value="${linha.distancia_prog}" placeholder="0.2" onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value)">
+      <td>
+        <input type="text" class="cell" value="${esc(linha.distancia_prog)}" placeholder="0.2 ou CH+0.2"
+               onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value, this)">
       </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${cruz === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${cruz === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(cruz)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'cruzeta', this.value)">
-      </td>
-      
-      <!-- Cabeça Quadrada -->
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${pm === 0 ? '#94a3b8' : '#0284c7'} !important; font-weight: ${pm === 0 ? '500' : '800'} !important; border: 1px solid ${pm === 0 ? '#cbd5e1' : '#38bdf8'} !important;" value="${formatarDisplayZero(pm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'p_maquina', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${porcam === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${porcam === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(porcam)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'porca_m', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${arrm === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${arrm === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(arrm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'arruela_m', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${olhalm === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${olhalm === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(olhalm)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'olhal_m', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${sobram === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${sobram === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(sobram)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'sobra_m', this.value)">
-      </td>
-      
-      <!-- Rosca Dupla -->
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${pd === 0 ? '#94a3b8' : '#16a34a'} !important; font-weight: ${pd === 0 ? '500' : '800'} !important; border: 1px solid ${pd === 0 ? '#cbd5e1' : '#4ade80'} !important;" value="${formatarDisplayZero(pd)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'p_dupla', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${porcad === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${porcad === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(porcad)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'porca_d', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${arrd === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${arrd === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(arrd)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'arruela_d', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${olhald === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${olhald === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(olhald)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'olhal_d', this.value)">
-      </td>
-      <td style="${tdStyle}">
-        <input type="text" class="cell-grid-white" style="${baseInputStyle} color: ${sobrad === 0 ? '#94a3b8' : '#0f172a'} !important; font-weight: ${sobrad === 0 ? '500' : '700'} !important;" value="${formatarDisplayZero(sobrad)}" onfocus="if(this.value==='-')this.value='';" onblur="if(!this.value.trim()||this.value.trim()==='0')this.value='-';" onchange="atualizarCampoLinha(${idx}, 'sobra_d', this.value)">
-      </td>
-      
-      <!-- Ações -->
-      <td style="${tdStyle}">
-        <button class="btn btn-outline" style="padding: 2px 4px; font-size: 0.85rem; color: var(--danger-color); border-color: transparent; border-radius: 4px; background: transparent !important;" onclick="removerLinhaGrid(${idx})" title="Remover Nível">
-          🗑️
-        </button>
+      ${celulaNivel(idx, 'cruzeta', num('cruzeta'), '', '')}
+
+      ${celulaNivel(idx, 'p_maquina', num('p_maquina'), 'g-maq sep-l', 'main-maq')}
+      ${celulaNivel(idx, 'porca_m',   num('porca_m'),   'g-maq', '')}
+      ${celulaNivel(idx, 'arruela_m', num('arruela_m'), 'g-maq', '')}
+      ${celulaNivel(idx, 'olhal_m',   num('olhal_m'),   'g-maq', '')}
+      ${celulaNivel(idx, 'sobra_m',   num('sobra_m'),   'g-maq', '')}
+
+      ${celulaNivel(idx, 'p_dupla',   num('p_dupla'),   'g-dup sep-l', 'main-dup')}
+      ${celulaNivel(idx, 'porca_d',   num('porca_d'),   'g-dup', '')}
+      ${celulaNivel(idx, 'arruela_d', num('arruela_d'), 'g-dup', '')}
+      ${celulaNivel(idx, 'olhal_d',   num('olhal_d'),   'g-dup', '')}
+      ${celulaNivel(idx, 'sobra_d',   num('sobra_d'),   'g-dup', '')}
+
+      <td class="sep-l">
+        <button class="btn-del" onclick="removerLinhaGrid(${idx})" title="Remover nível">🗑️</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
-  // Atualiza badge de CH
-  const badgeCH = document.getElementById('badge-ch-req');
-  badgeCH.style.display = temCH ? 'inline' : 'none';
+  atualizarBadgeCH();
 }
 
-function atualizarCampoLinha(idx, campo, valor) {
+// A altura só é obrigatória quando alguma cota é relativa ao topo (CH+...).
+function atualizarBadgeCH() {
+  const temCH = linhasGridAtuais.some(
+    l => String(l.distancia_prog || '').toUpperCase().includes('CH')
+  );
+  const badge = document.getElementById('badge-ch-req');
+  if (badge) badge.style.display = temCH ? 'inline' : 'none';
+}
+
+// Atualiza só a célula editada — não re-renderiza a grade toda, para não
+// destruir o campo que o usuário acabou de focar ao tabular.
+function atualizarCampoLinha(idx, campo, valor, el) {
   if (campo === 'nivel') {
-    linhasGridAtuais[idx][campo] = parseInt(valor) || 1;
+    const n = parseInt(valor) || 1;
+    linhasGridAtuais[idx][campo] = n;
+    if (el) el.value = n;
   } else if (campo === 'distancia_prog') {
     linhasGridAtuais[idx][campo] = valor;
+    atualizarBadgeCH();
   } else {
     const s = String(valor).trim();
-    if (s === '-' || s === '' || s === '0') {
-      linhasGridAtuais[idx][campo] = 0;
-    } else {
-      linhasGridAtuais[idx][campo] = parseFloat(s.replace(',', '.')) || 0;
+    const v = (s === '—' || s === '-' || s === '' || s === '0')
+      ? 0
+      : (parseFloat(s.replace(',', '.')) || 0);
+    linhasGridAtuais[idx][campo] = v;
+    if (el) {
+      el.value = formatarDisplayZero(v);
+      el.classList.toggle('dash', v === 0);
     }
   }
-  renderizarGridNiveis();
   calcularTudo();
 }
 
@@ -832,7 +1064,7 @@ async function calcularTudo() {
 
     const data = await res.json();
     if (!res.ok) {
-      exibirAlerta(data.erro || 'Erro no cálculo', 'warning');
+      exibirAlerta(esc(data.erro || 'Erro no cálculo'), 'warning');
       limparResultados();
       return;
     }
@@ -869,37 +1101,31 @@ function renderizarResultados(data) {
   const tbodyMemoria = document.getElementById('tbody-memoria-calculo');
   tbodyMemoria.innerHTML = '';
 
-  data.detalhes_niveis.forEach(n => {
-    (n.detalhes_topo || []).forEach(d => {
-      const tr = document.createElement('tr');
-      tr.style.borderBottom = '1px solid var(--border-color)';
-      tr.innerHTML = `
-        <td style="padding: 4px 6px;"><strong>Nível ${n.nivel}</strong></td>
-        <td style="padding: 4px 6px;">${n.distancia_prog_raw} (${n.distancia_m}m)</td>
-        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #0284c7; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">TOPO</span> (${d.tipo})</td>
-        <td style="padding: 4px 6px;">${d.secao_poste} mm</td>
-        <td style="padding: 4px 6px;">+ ${d.esp_ferragens} mm</td>
-        <td style="padding: 4px 6px;">= ${d.comp_calc} mm</td>
-        <td style="padding: 4px 6px;"><strong style="color: #2563eb; font-size: 0.85rem;">${d.comp_comercial} mm</strong> (${d.quantidade} un)</td>
-      `;
-      tbodyMemoria.appendChild(tr);
-    });
+  const linhaMemoria = (n, d, face) => {
+    const tag = face === 'topo' ? 'topo' : 'gaveta';
+    const res = face === 'topo' ? 'res-maq' : 'res-dup';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>Nível ${esc(n.nivel)}</strong></td>
+      <td class="num">${esc(n.distancia_prog_raw)} (${esc(n.distancia_m)} m)</td>
+      <td><span class="tag ${tag}">${tag.toUpperCase()}</span> ${esc(d.tipo)}</td>
+      <td class="num">${esc(d.secao_poste)} mm</td>
+      <td class="num">+ ${esc(d.esp_ferragens)} mm</td>
+      <td class="num">= ${esc(d.comp_calc)} mm</td>
+      <td class="num"><span class="${res}">${esc(d.comp_comercial)} mm</span> · ${esc(d.quantidade)} un</td>
+    `;
+    return tr;
+  };
 
-    (n.detalhes_gaveta || []).forEach(d => {
-      const tr = document.createElement('tr');
-      tr.style.borderBottom = '1px solid var(--border-color)';
-      tr.innerHTML = `
-        <td style="padding: 4px 6px;"><strong>Nível ${n.nivel}</strong></td>
-        <td style="padding: 4px 6px;">${n.distancia_prog_raw} (${n.distancia_m}m)</td>
-        <td style="padding: 4px 6px;"><span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #16a34a; font-size: 0.72rem; padding: 2px 5px; border-radius: 4px;">GAVETA</span> (${d.tipo})</td>
-        <td style="padding: 4px 6px;">${d.secao_poste} mm</td>
-        <td style="padding: 4px 6px;">+ ${d.esp_ferragens} mm</td>
-        <td style="padding: 4px 6px;">= ${d.comp_calc} mm</td>
-        <td style="padding: 4px 6px;"><strong style="color: #16a34a; font-size: 0.85rem;">${d.comp_comercial} mm</strong> (${d.quantidade} un)</td>
-      `;
-      tbodyMemoria.appendChild(tr);
-    });
+  let total = 0;
+  (data.detalhes_niveis || []).forEach(n => {
+    (n.detalhes_topo || []).forEach(d => { tbodyMemoria.appendChild(linhaMemoria(n, d, 'topo')); total++; });
+    (n.detalhes_gaveta || []).forEach(d => { tbodyMemoria.appendChild(linhaMemoria(n, d, 'gaveta')); total++; });
   });
+
+  if (!total) {
+    tbodyMemoria.innerHTML = '<tr><td colspan="7" class="tbl-vazia">Nenhum nível calculado.</td></tr>';
+  }
 }
 
 function renderizarMatrizParafusos() {
@@ -907,49 +1133,35 @@ function renderizarMatrizParafusos() {
   tbody.innerHTML = '';
 
   if (!specsMatrizAtuais.length) {
-    tbody.innerHTML = '<tr><td colspan="19" style="padding: 24px; text-align: center; color: var(--text-muted);">Nenhum parafuso necessário para esta configuração.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="19" class="tbl-vazia">Nenhum parafuso necessário para esta configuração.</td></tr>';
     return;
   }
 
   specsMatrizAtuais.forEach((spec, sIdx) => {
     const tr = document.createElement('tr');
-    tr.className = 'matriz-row';
-    tr.style.borderBottom = '1px solid var(--border-color)';
 
     let html = `
-      <td style="padding: 6px 8px; text-align: left; font-weight: 700; border-right: 1px solid var(--border-color); color: var(--text-main);">
-        ${spec.posicao}
-      </td>
-      <td style="padding: 6px 8px; text-align: left; font-weight: 600; border-right: 1px solid var(--border-color); color: var(--text-main);">
-        ${spec.parafuso}
-      </td>
-      <td style="padding: 6px 8px; text-align: center; border-right: 1px solid var(--border-color); color: var(--text-muted);">
-        ${spec.esf_parafuso}
-      </td>
+      <td class="esq">${esc(spec.posicao)}</td>
+      <td class="esq">${esc(spec.parafuso)}</td>
+      <td class="classe">${esc(spec.esf_parafuso)}</td>
     `;
 
-    COMPRIMENTOS_GRADE.forEach(c => {
+    COMPRIMENTOS_GRADE.forEach((c, i) => {
+      const sep = i === 0 ? ' sep-l' : '';
       const v = spec.comprimentos[c];
       if (v != null && v > 0) {
         html += `
-          <td style="padding: 3px 2px; background: rgba(37, 99, 235, 0.08);">
-            <input type="number" class="cell-matriz-qtd" value="${v}" min="0" step="1" onchange="atualizarQtdMatriz(${sIdx}, ${c}, this.value)">
-          </td>
-        `;
+          <td class="preenchida${sep}">
+            <input type="text" value="${esc(v)}" onchange="atualizarQtdMatriz(${sIdx}, ${c}, this.value)">
+          </td>`;
       } else {
-        html += `
-          <td style="padding: 3px 2px; color: var(--text-muted); opacity: 0.35;">
-            —
-          </td>
-        `;
+        html += `<td class="vazia${sep}">—</td>`;
       }
     });
 
     html += `
-      <td style="padding: 4px; text-align: center;">
-        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.85rem; color: var(--text-muted); border-color: transparent;" onclick="removerSpecMatriz(${sIdx})" title="Remover linha">
-          ×
-        </button>
+      <td class="sep-l">
+        <button class="btn-del" onclick="removerSpecMatriz(${sIdx})" title="Remover linha">×</button>
       </td>
     `;
 
@@ -959,9 +1171,10 @@ function renderizarMatrizParafusos() {
 }
 
 function atualizarQtdMatriz(sIdx, comp, valor) {
-  const v = parseFloat(valor);
+  const v = parseFloat(String(valor).replace(',', '.'));
   if (isNaN(v) || v <= 0) {
     delete specsMatrizAtuais[sIdx].comprimentos[comp];
+    renderizarMatrizParafusos();
   } else {
     specsMatrizAtuais[sIdx].comprimentos[comp] = v;
   }
@@ -974,8 +1187,10 @@ function removerSpecMatriz(sIdx) {
 
 function limparResultados() {
   specsMatrizAtuais = [];
-  document.getElementById('tbody-matriz-parafusos').innerHTML = '<tr><td colspan="19" style="padding: 24px; text-align: center; color: var(--text-muted);">Preencha os parâmetros para calcular os parafusos.</td></tr>';
-  document.getElementById('tbody-memoria-calculo').innerHTML = '<tr><td colspan="7" style="padding: 8px; text-align: center; color: var(--text-muted);">Nenhum nível calculado.</td></tr>';
+  document.getElementById('tbody-matriz-parafusos').innerHTML =
+    '<tr><td colspan="19" class="tbl-vazia">Preencha os parâmetros para calcular os parafusos.</td></tr>';
+  document.getElementById('tbody-memoria-calculo').innerHTML =
+    '<tr><td colspan="7" class="tbl-vazia">Nenhum nível calculado.</td></tr>';
 }
 
 // Ações de Persistência no Parque
@@ -998,14 +1213,16 @@ async function salvarPadraoEstruturaParque() {
 
     const data = await res.json();
     if (res.ok && data.ok) {
-      exibirAlerta(`Padrão da estrutura "${tipo}" salvo com sucesso no parque ativo (${data.count} níveis)!`, 'success');
+      exibirAlerta(`Padrão da estrutura <strong>${esc(tipo)}</strong> salvo no parque ativo (${esc(data.count)} níveis).`, 'success');
       await carregarDadosIniciais();
       document.getElementById('sel-estrutura').value = tipo;
+      alternarBotoesEstrutura(true);
+      document.getElementById('div-nome-custom').style.display = 'none';
     } else {
-      exibirAlerta(data.erro || 'Erro ao salvar estrutura', 'danger');
+      exibirAlerta(esc(data.erro || 'Erro ao salvar estrutura'), 'danger');
     }
   } catch (e) {
-    exibirAlerta('Erro de comunicação: ' + e.message, 'danger');
+    exibirAlerta('Erro de comunicação: ' + esc(e.message), 'danger');
   }
 }
 
@@ -1026,13 +1243,13 @@ async function excluirEstruturaParque() {
 
     const data = await res.json();
     if (res.ok && data.ok) {
-      exibirAlerta(`Estrutura "${tipo}" excluída da calculadora deste parque.`, 'info');
+      exibirAlerta(`Estrutura <strong>${esc(tipo)}</strong> excluída da calculadora deste parque.`, 'info');
       await carregarDadosIniciais();
     } else {
-      exibirAlerta(data.erro || 'Erro ao excluir estrutura', 'danger');
+      exibirAlerta(esc(data.erro || 'Erro ao excluir estrutura'), 'danger');
     }
   } catch (e) {
-    exibirAlerta('Erro de comunicação: ' + e.message, 'danger');
+    exibirAlerta('Erro de comunicação: ' + esc(e.message), 'danger');
   }
 }
 
@@ -1058,15 +1275,15 @@ async function renomearEstruturaAtual() {
 
     const data = await res.json();
     if (res.ok && data.ok) {
-      exibirAlerta(`Estrutura "${tipoAtual}" renomeada para "${tipoNovo}" com sucesso!`, 'success');
+      exibirAlerta(`Estrutura <strong>${esc(tipoAtual)}</strong> renomeada para <strong>${esc(tipoNovo)}</strong>.`, 'success');
       await carregarDadosIniciais();
       document.getElementById('sel-estrutura').value = tipoNovo;
       await aoMudarEstrutura();
     } else {
-      exibirAlerta(data.erro || 'Erro ao renomear estrutura', 'danger');
+      exibirAlerta(esc(data.erro || 'Erro ao renomear estrutura'), 'danger');
     }
   } catch (e) {
-    exibirAlerta('Erro de comunicação: ' + e.message, 'danger');
+    exibirAlerta('Erro de comunicação: ' + esc(e.message), 'danger');
   }
 }
 
@@ -1116,52 +1333,59 @@ async function salvarParafusosNaReceita() {
     const data = await res.json();
     if (res.ok && data.ok) {
       exibirAlerta(
-        `✅ Estrutura <strong>${data.tipo}</strong> (${data.esforco} daN${data.altura ? ', ' + data.altura + 'm' : ''}) com ${data.count} linhas de parafusos foi ADICIONADA À RECEITA com sucesso! <a href="/parafusos" style="text-decoration: underline; margin-left: 8px; font-weight: bold; color: inherit;">Ver em Cadastrar Parafusos ➔</a>`,
+        `Estrutura <strong>${esc(data.tipo)}</strong> (${esc(data.esforco)} daN${data.altura ? ', ' + esc(data.altura) + ' m' : ''}) ` +
+        `com ${esc(data.count)} linhas de parafusos adicionada à receita. ` +
+        `<a href="/parafusos" style="color: var(--primary-color); font-weight: 700;">Ver em Cadastrar Parafusos →</a>`,
         'success'
       );
     } else {
-      exibirAlerta(data.erro || 'Erro ao salvar na receita.', 'danger');
+      exibirAlerta(esc(data.erro || 'Erro ao salvar na receita.'), 'danger');
     }
   } catch (e) {
-    exibirAlerta('Erro de comunicação: ' + e.message, 'danger');
+    exibirAlerta('Erro de comunicação: ' + esc(e.message), 'danger');
   }
 }
 
 // Modal de Padrões
 function abrirModalPadroes() {
   renderizarModalPadroes();
-  document.getElementById('modal-padroes').style.display = 'flex';
+  document.getElementById('modal-padroes').classList.add('open');
 }
 
 function fecharModalPadroes() {
-  document.getElementById('modal-padroes').style.display = 'none';
+  document.getElementById('modal-padroes').classList.remove('open');
 }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fecharModalPadroes();
+});
 
 function renderizarModalPadroes() {
   const tbody = document.getElementById('tbody-modal-padroes');
   tbody.innerHTML = '';
 
-  for (const nome in dadosGlobais.padroes) {
+  const nomes = Object.keys(dadosGlobais.padroes || {});
+  if (!nomes.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="tbl-vazia">Nenhum padrão de montagem cadastrado neste parque.</td></tr>';
+    return;
+  }
+
+  nomes.forEach(nome => {
     const p = dadosGlobais.padroes[nome];
     const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid var(--border-color)';
     tr.innerHTML = `
-      <td style="padding: 6px 8px; text-align: left;"><strong>${p.nome}</strong></td>
-      <td style="padding: 6px 8px; text-align: left; font-size: 0.75rem; color: var(--text-muted);">${p.descricao || ''}</td>
-      <td style="padding: 6px 8px;">${p.cruzeta}</td>
-      <td style="padding: 6px 8px; color: #0284c7; font-weight: 600;">${p.parafuso_simples}</td>
-      <td style="padding: 6px 8px; color: #16a34a; font-weight: 600;">${p.parafuso_dupla}</td>
-      <td style="padding: 6px 8px; text-align: center; white-space: nowrap;">
-        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="carregarPadraoParaEditar('${p.nome}')" title="Editar este padrão">
-          ✏️
-        </button>
-        <button class="btn btn-outline" style="padding: 2px 6px; font-size: 0.75rem; color: var(--danger-color); border-color: transparent;" onclick="excluirPadraoMontagemModal('${p.nome}')" title="Excluir este padrão do parque">
-          🗑️
-        </button>
+      <td class="esq"><strong>${esc(p.nome)}</strong></td>
+      <td class="desc">${esc(p.descricao || '')}</td>
+      <td>${esc(p.cruzeta)}</td>
+      <td><span class="res-maq">${esc(p.parafuso_simples)}</span></td>
+      <td><span class="res-dup">${esc(p.parafuso_dupla)}</span></td>
+      <td style="white-space: nowrap;">
+        <button class="btn-del" onclick="carregarPadraoParaEditar('${esc(p.nome)}')" title="Editar este padrão">✏️</button>
+        <button class="btn-del" onclick="excluirPadraoMontagemModal('${esc(p.nome)}')" title="Excluir este padrão do parque">🗑️</button>
       </td>
     `;
     tbody.appendChild(tr);
-  }
+  });
 }
 
 async function excluirPadraoMontagemModal(nome) {
@@ -1178,7 +1402,7 @@ async function excluirPadraoMontagemModal(nome) {
 
     const data = await res.json();
     if (res.ok && data.ok) {
-      exibirAlerta(`Padrão "${nome}" excluído do parque ativo.`, 'info');
+      exibirAlerta(`Padrão <strong>${esc(nome)}</strong> excluído do parque ativo.`, 'info');
       await carregarDadosIniciais();
       renderizarModalPadroes();
     } else {
@@ -1231,7 +1455,7 @@ async function salvarPadraoMontagemModal() {
     if (res.ok && data.ok) {
       await carregarDadosIniciais();
       renderizarModalPadroes();
-      exibirAlerta(`Padrão "${nome}" salvo no parque ativo com sucesso!`, 'success');
+      exibirAlerta(`Padrão <strong>${esc(nome)}</strong> salvo no parque ativo.`, 'success');
     } else {
       alert(data.erro || 'Erro ao salvar padrão');
     }
@@ -1240,19 +1464,17 @@ async function salvarPadraoMontagemModal() {
   }
 }
 
+let timerAlerta = null;
+
 function exibirAlerta(msg, tipo) {
   const el = document.getElementById('alerta-feedback');
-  el.className = `alert alert-${tipo}`;
+  el.className = `alerta show ${tipo}`;
   el.innerHTML = msg;
-  el.style.display = 'block';
-  el.style.background = tipo === 'success' ? '#ecfdf5' : (tipo === 'danger' ? '#fef2f2' : '#fffbeb');
-  el.style.color = tipo === 'success' ? '#065f46' : (tipo === 'danger' ? '#991b1b' : '#92400e');
-  el.style.border = `1px solid ${tipo === 'success' ? '#a7f3d0' : (tipo === 'danger' ? '#fecaca' : '#fde68a')}`;
-  
+  el.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+
+  clearTimeout(timerAlerta);
   if (tipo === 'success' || tipo === 'info') {
-    setTimeout(() => {
-      el.style.display = 'none';
-    }, 8000);
+    timerAlerta = setTimeout(() => { el.className = 'alerta'; }, 8000);
   }
 }
 </script>
