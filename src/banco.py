@@ -541,10 +541,10 @@ def _seed_calculadora(conn, parque_id):
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (parque_id, est_nome, int(l['ordem']), int(l['nivel']), str(l['distancia_prog']),
                  '', 'B', float(l['cruzeta']),
-                 float(l['p_maquina']), 2.0, 2.0,
-                 0.0, 1.0, float(l['p_dupla']),
-                 2.0, 2.0, 0.0,
-                 1.0)
+                 float(l['p_maquina']), float(l.get('porca_m', 2)), float(l.get('arruela_m', 2)),
+                 float(l.get('olhal_m', 0)), float(l.get('sobra_m', 1)), float(l['p_dupla']),
+                 float(l.get('porca_d', 2)), float(l.get('arruela_d', 2)), float(l.get('olhal_d', 0)),
+                 float(l.get('sobra_d', 1)))
             )
     conn.commit()
     print(f"[BANCO] Seed: {len(grid_all)} estruturas da calculadora no parque {parque_id}")
@@ -1594,11 +1594,11 @@ def salvar_estrutura_calculadora(estrutura_nome, linhas, parque_id=None):
                 (parque_id, estrutura_nome, idx, int(l.get('nivel', idx)),
                  str(l.get('distancia_prog', '0.2')), str(l.get('montagem', '')),
                  'B', float(l.get('cruzeta', 0)),
-                 float(l.get('p_maquina', 0)), 2.0,
-                 2.0, 0.0,
-                 1.0, float(l.get('p_dupla', 0)),
-                 2.0, 2.0,
-                 0.0, 1.0)
+                 float(l.get('p_maquina', 0)), float(l.get('porca_m', 2)),
+                 float(l.get('arruela_m', 2)), float(l.get('olhal_m', 0)),
+                 float(l.get('sobra_m', 1)), float(l.get('p_dupla', 0)),
+                 float(l.get('porca_d', 2)), float(l.get('arruela_d', 2)),
+                 float(l.get('olhal_d', 0)), float(l.get('sobra_d', 1)))
                 for idx, l in enumerate(linhas, 1)
             ]
             conn.executemany(

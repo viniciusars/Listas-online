@@ -116,110 +116,110 @@ PADROES_MONTAGEM: Dict[str, Dict[str, Any]] = {
 
 ESTRUTURAS_PADRAO: Dict[str, List[Dict[str, Any]]] = {
     'N1': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2N1': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N4': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
     ],
     '2N4': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
     ],
     '(N3-N3)': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2(N3-N3)': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': '3.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': '3.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N4(N3-N3)': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N4-N3': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '(N3-N3)-N4-N3': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 4, 'distancia_prog': '3.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': '3.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N3-CHP': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': 'CH+1.2', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': 'CH+1.2', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N3.TR': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': 'CH+1.2', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': 'CH+1.2', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2N3-2CHP': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2N3-2TR': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
-        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N3-CHP-02': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': 'CH+1.2', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': 'CH+1.2', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2N3-2CHP-02': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.2', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 5, 'distancia_prog': 'CH+3.9', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.2', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 5, 'distancia_prog': 'CH+3.9', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N4-CHP': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': 'CH+1.2', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': 'CH+1.2', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.9', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2N4-CHP': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     '2(N3-N3)-CHP': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': '3.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 5, 'distancia_prog': '4.4', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 6, 'distancia_prog': 'CH+4.4', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 7, 'distancia_prog': 'CH+6.1', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.2', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': '3.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 5, 'distancia_prog': '4.4', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 6, 'distancia_prog': 'CH+4.4', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 7, 'distancia_prog': 'CH+6.1', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
     'N4-N3-CHP': [
-        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'p_dupla': 3},
-        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 1, 'p_maquina': 3, 'p_dupla': 0},
-        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 2, 'p_maquina': 4, 'p_dupla': 0},
-        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'p_dupla': 0},
+        {'nivel': 1, 'distancia_prog': '0.2', 'cruzeta': 2, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1},
+        {'nivel': 2, 'distancia_prog': '1.4', 'cruzeta': 2, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 3, 'distancia_prog': '2.4', 'cruzeta': 1, 'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 4, 'distancia_prog': 'CH+2.4', 'cruzeta': 2, 'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
+        {'nivel': 5, 'distancia_prog': 'CH+4.1', 'cruzeta': 0, 'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1},
     ],
 }
 
@@ -236,7 +236,15 @@ def gerar_linhas_iniciais_estruturas() -> Dict[str, List[Dict[str, Any]]]:
                 'distancia_prog': str(n.get('distancia_prog', '0.2')),
                 'cruzeta': float(n.get('cruzeta', 0)),
                 'p_maquina': float(n.get('p_maquina', 0)),
+                'porca_m': float(n.get('porca_m', 2)),
+                'arruela_m': float(n.get('arruela_m', 2)),
+                'olhal_m': float(n.get('olhal_m', 0)),
+                'sobra_m': float(n.get('sobra_m', 1)),
                 'p_dupla': float(n.get('p_dupla', 0)),
+                'porca_d': float(n.get('porca_d', 2)),
+                'arruela_d': float(n.get('arruela_d', 2)),
+                'olhal_d': float(n.get('olhal_d', 0)),
+                'sobra_d': float(n.get('sobra_d', 1)),
             })
         res[est_nome] = linhas
     return res
@@ -249,74 +257,68 @@ def calcular_engaste(altura_m: float) -> float:
     return round((altura_m / 10.0) + 0.60, 2)
 
 
-def calcular_ch(altura_m: float) -> float:
-    """Calcula a cota base da chave (CH): H - 0.20 - 6.80 - Engaste."""
-    engaste = calcular_engaste(altura_m)
-    ch = altura_m - 0.20 - 6.80 - engaste
-    return round(max(ch, 0.0), 3)
+def calcular_altura_util(altura_m: float) -> float:
+    """Calcula a altura útil (comprimento nominal menos engaste)."""
+    return round(altura_m - calcular_engaste(altura_m), 2)
+
+
+def resolver_distancia_metros(distancia_prog: str, altura_m: Optional[float] = None) -> float:
+    """Converte expressão de cota de progressão geométrica em metros a partir do topo."""
+    s = str(distancia_prog).strip().upper()
+    if not s:
+        return 0.2
+
+    if s.startswith('CH'):
+        if altura_m is None or altura_m <= 0:
+            raise ValueError("A cota com referência 'CH' requer a informação da altura nominal do poste.")
+        hu = calcular_altura_util(altura_m)
+        ch_base = hu - 6.0
+        s_rest = s[2:].strip()
+        if not s_rest:
+            return max(0.0, ch_base)
+        if s_rest.startswith('+'):
+            val = float(s_rest[1:].replace(',', '.'))
+            return max(0.0, ch_base + val)
+        elif s_rest.startswith('-'):
+            val = float(s_rest[1:].replace(',', '.'))
+            return max(0.0, ch_base - val)
+        else:
+            val = float(s_rest.replace(',', '.'))
+            return max(0.0, ch_base + val)
+
+    try:
+        return max(0.0, float(s.replace(',', '.')))
+    except ValueError:
+        return 0.2
 
 
 def estrutura_depende_altura(niveis: List[Dict[str, Any]]) -> bool:
-    """Verifica se algum nível possui distância expressa com 'CH'."""
+    """Retorna True se algum nível da estrutura contiver cota 'CH'."""
     for n in niveis:
-        d = str(n.get('distancia_prog', '')).upper()
-        if 'CH' in d:
+        dp = str(n.get('distancia_prog', '')).upper()
+        if 'CH' in dp:
             return True
     return False
 
 
-def resolver_distancia_metros(dist_prog: Any, altura_m: Optional[float] = None) -> float:
-    """Resolve expressões como '0.2', '1.4', 'CH+1.2', 'CH+2.4' em metros."""
-    if isinstance(dist_prog, (int, float)):
-        return float(dist_prog)
-    
-    txt = str(dist_prog).strip().upper().replace(' ', '')
-    if 'CH' in txt:
-        if altura_m is None or altura_m <= 0:
-            raise ValueError(f"A cota '{dist_prog}' depende da altura do poste, mas a altura não foi informada.")
-        ch_val = calcular_ch(altura_m)
-        if txt == 'CH':
-            return ch_val
-        match = re.search(r'CH([\+\-])([0-9\.]+)', txt)
-        if match:
-            sinal = match.group(1)
-            valor = float(match.group(2))
-            return round(ch_val + valor if sinal == '+' else ch_val - valor, 3)
-        return ch_val
-    try:
-        return float(txt)
-    except ValueError:
-        raise ValueError(f"Distância inválida: '{dist_prog}'.")
-
-
-def obter_coeficiente_esforco(esforco_dan: float) -> float:
-    """Retorna o coeficiente de esforço do poste duplo T (interpolação linear se fora da tabela)."""
-    esf_int = int(esforco_dan)
-    if esf_int in COEFICIENTES_ESFORCO:
-        return COEFICIENTES_ESFORCO[esf_int]
-    if esforco_dan <= 600:
-        return 0.0
-    return ((esforco_dan - 600.0) / 500.0) * 1.5
-
-
-def arredondar_comprimento_comercial(comp_mm: float) -> int:
-    """Arredonda para cima para o próximo comprimento comercial padrão."""
+def arredondar_comprimento_comercial(comp_calculado: float) -> int:
+    """Retorna o menor comprimento comercial maior ou igual a comp_calculado."""
     for c in COMPRIMENTOS_COMERCIAIS:
-        if c >= comp_mm:
+        if c >= comp_calculado:
             return c
     return COMPRIMENTOS_COMERCIAIS[-1]
 
 
 def calcular_secao_poste(distancia_m: float, esforco_dan: float, face: str) -> float:
-    """Calcula a largura da seção do poste duplo T na cota (mm).
-    
-    Face A (Topo):   Largura = 140 + 28 * Coef_Esforco + 28 * distancia_m
-    Face B (Gaveta): Largura = 110 + 20 * Coef_Esforco + 20 * distancia_m
-    """
-    face_key = 'A' if str(face).upper() in ('A', 'TOPO') else 'B'
-    params = POSTE_DT[face_key]
-    coef_esf = obter_coeficiente_esforco(esforco_dan)
-    largura = params['topo'] + (params['conicidade'] * coef_esf) + (params['conicidade'] * distancia_m)
+    """Calcula a seção física da face A (Topo) ou B (Gaveta) em mm."""
+    face = face.upper()
+    if face not in POSTE_DT:
+        face = 'B'
+    topo_base = POSTE_DT[face]['topo']
+    conicidade = POSTE_DT[face]['conicidade']
+
+    coef_esf = COEFICIENTES_ESFORCO.get(int(esforco_dan), 1.5)
+    largura = topo_base + (conicidade * coef_esf) + (conicidade * distancia_m)
     return round(largura, 2)
 
 
@@ -327,14 +329,33 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
     
     cruzeta = float(linha.get('cruzeta', 0))
     p_maq = float(linha.get('p_maquina', 0))
+    porca_m = float(linha.get('porca_m', 2))
+    arr_m = float(linha.get('arruela_m', 2))
+    olhal_m = float(linha.get('olhal_m', 0))
+    sobra_m = float(linha.get('sobra_m', 1))
+
     p_dup = float(linha.get('p_dupla', 0))
+    porca_d = float(linha.get('porca_d', 2))
+    arr_d = float(linha.get('arruela_d', 2))
+    olhal_d = float(linha.get('olhal_d', 0))
+    sobra_d = float(linha.get('sobra_d', 1))
 
     # Dimensões de seções do poste
     w_topo = calcular_secao_poste(dist_m, esforco_dan, 'A')
     w_gaveta = calcular_secao_poste(dist_m, esforco_dan, 'B')
 
-    # Espessuras somadas de ferragens (cruzeta + 2 porcas + 2 arruelas + 1 sobra = cruzeta*105 + 22 + 8 + 30 = cruzeta*105 + 60)
-    esp_ferragens = (cruzeta * DIMENSOES_FERRAGENS['cruzeta']) + (2.0 * DIMENSOES_FERRAGENS['porca']) + (2.0 * DIMENSOES_FERRAGENS['arruela']) + (1.0 * DIMENSOES_FERRAGENS['sobra'])
+    # Espessuras somadas de ferragens para Cabeça Quadrada e Rosca Dupla
+    esp_m = (cruzeta * DIMENSOES_FERRAGENS['cruzeta']) + \
+            (porca_m * DIMENSOES_FERRAGENS['porca']) + \
+            (arr_m * DIMENSOES_FERRAGENS['arruela']) + \
+            (olhal_m * DIMENSOES_FERRAGENS['porca_olhal']) + \
+            (sobra_m * DIMENSOES_FERRAGENS['sobra'])
+
+    esp_d = (cruzeta * DIMENSOES_FERRAGENS['cruzeta']) + \
+            (porca_d * DIMENSOES_FERRAGENS['porca']) + \
+            (arr_d * DIMENSOES_FERRAGENS['arruela']) + \
+            (olhal_d * DIMENSOES_FERRAGENS['porca_olhal']) + \
+            (sobra_d * DIMENSOES_FERRAGENS['sobra'])
 
     parafusos = []
     detalhes_topo = []
@@ -342,7 +363,7 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
 
     # 1. FACE A (TOPO)
     if p_maq > 0:
-        comp_calc = w_topo + esp_ferragens
+        comp_calc = w_topo + esp_m
         comercial = arredondar_comprimento_comercial(comp_calc)
         parafusos.append({
             'posicao': 'TOPO',
@@ -356,14 +377,14 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
             'tipo': 'CABEÇA QUADRADA',
             'posicao': 'TOPO',
             'secao_poste': w_topo,
-            'esp_ferragens': round(esp_ferragens, 2),
+            'esp_ferragens': round(esp_m, 2),
             'comp_calc': round(comp_calc, 2),
             'comp_comercial': comercial,
             'quantidade': p_maq
         })
 
     if p_dup > 0:
-        comp_calc = w_topo + esp_ferragens
+        comp_calc = w_topo + esp_d
         comercial = arredondar_comprimento_comercial(comp_calc)
         parafusos.append({
             'posicao': 'TOPO',
@@ -377,7 +398,7 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
             'tipo': 'ROSCA DUPLA',
             'posicao': 'TOPO',
             'secao_poste': w_topo,
-            'esp_ferragens': round(esp_ferragens, 2),
+            'esp_ferragens': round(esp_d, 2),
             'comp_calc': round(comp_calc, 2),
             'comp_comercial': comercial,
             'quantidade': p_dup
@@ -385,7 +406,7 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
 
     # 2. FACE B (GAVETA)
     if p_maq > 0:
-        comp_calc = w_gaveta + esp_ferragens
+        comp_calc = w_gaveta + esp_m
         comercial = arredondar_comprimento_comercial(comp_calc)
         parafusos.append({
             'posicao': 'GAVETA',
@@ -399,14 +420,14 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
             'tipo': 'CABEÇA QUADRADA',
             'posicao': 'GAVETA',
             'secao_poste': w_gaveta,
-            'esp_ferragens': round(esp_ferragens, 2),
+            'esp_ferragens': round(esp_m, 2),
             'comp_calc': round(comp_calc, 2),
             'comp_comercial': comercial,
             'quantidade': p_maq
         })
 
     if p_dup > 0:
-        comp_calc = w_gaveta + esp_ferragens
+        comp_calc = w_gaveta + esp_d
         comercial = arredondar_comprimento_comercial(comp_calc)
         parafusos.append({
             'posicao': 'GAVETA',
@@ -420,7 +441,7 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
             'tipo': 'ROSCA DUPLA',
             'posicao': 'GAVETA',
             'secao_poste': w_gaveta,
-            'esp_ferragens': round(esp_ferragens, 2),
+            'esp_ferragens': round(esp_d, 2),
             'comp_calc': round(comp_calc, 2),
             'comp_comercial': comercial,
             'quantidade': p_dup
@@ -432,10 +453,19 @@ def calcular_linha_grid(linha: Dict[str, Any], esforco_dan: float, altura_m: Opt
         'distancia_m': round(dist_m, 3),
         'cruzeta': cruzeta,
         'p_maquina': p_maq,
+        'porca_m': porca_m,
+        'arruela_m': arr_m,
+        'olhal_m': olhal_m,
+        'sobra_m': sobra_m,
         'p_dupla': p_dup,
+        'porca_d': porca_d,
+        'arruela_d': arr_d,
+        'olhal_d': olhal_d,
+        'sobra_d': sobra_d,
         'secao_topo_mm': w_topo,
         'secao_gaveta_mm': w_gaveta,
-        'esp_ferragens_mm': round(esp_ferragens, 2),
+        'esp_ferragens_m_mm': round(esp_m, 2),
+        'esp_ferragens_d_mm': round(esp_d, 2),
         'detalhes_topo': detalhes_topo,
         'detalhes_gaveta': detalhes_gaveta,
         'parafusos': parafusos,
