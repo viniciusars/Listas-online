@@ -41,7 +41,9 @@ TABELAS_RECEITA = (
     'parafusos_receita',
     'alcas_lacos_receita',
     'estais_receita',
+    'calculadora_montagens',
     'calculadora_estruturas',
+    'calculadora_conicidade',
 )
 
 
@@ -235,6 +237,27 @@ _DDL = {
             qtd_por_estai REAL    NOT NULL
         )
     """,
+    'calculadora_montagens': """
+        CREATE TABLE IF NOT EXISTS calculadora_montagens (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            parque_id  INTEGER NOT NULL REFERENCES parques(id) ON DELETE CASCADE,
+            nome       TEXT    NOT NULL,
+            cruzeta    REAL    NOT NULL DEFAULT 0,
+            p_maquina  REAL    NOT NULL DEFAULT 0,
+            porca_m    REAL    NOT NULL DEFAULT 0,
+            arruela_m  REAL    NOT NULL DEFAULT 0,
+            olhal_m    REAL    NOT NULL DEFAULT 0,
+            sobra_m    REAL    NOT NULL DEFAULT 1,
+            esf_maq    REAL    NOT NULL DEFAULT 50.0,
+            p_dupla    REAL    NOT NULL DEFAULT 0,
+            porca_d    REAL    NOT NULL DEFAULT 0,
+            arruela_d  REAL    NOT NULL DEFAULT 0,
+            olhal_d    REAL    NOT NULL DEFAULT 0,
+            sobra_d    REAL    NOT NULL DEFAULT 1,
+            esf_dup    REAL    NOT NULL DEFAULT 70.0,
+            UNIQUE (parque_id, nome)
+        )
+    """,
     'calculadora_estruturas': """
         CREATE TABLE IF NOT EXISTS calculadora_estruturas (
             id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -245,27 +268,43 @@ _DDL = {
             distancia_prog TEXT    NOT NULL DEFAULT '0.2',
             montagem       TEXT,
             face           TEXT    NOT NULL DEFAULT 'B',
+            face_oposta    INTEGER NOT NULL DEFAULT 0,
             cruzeta        REAL    NOT NULL DEFAULT 0,
             p_maquina      REAL    NOT NULL DEFAULT 0,
             porca_m        REAL    NOT NULL DEFAULT 0,
             arruela_m      REAL    NOT NULL DEFAULT 0,
             olhal_m        REAL    NOT NULL DEFAULT 0,
             sobra_m        REAL    NOT NULL DEFAULT 1,
+            esf_maq        REAL    NOT NULL DEFAULT 50.0,
             p_dupla        REAL    NOT NULL DEFAULT 0,
             porca_d        REAL    NOT NULL DEFAULT 0,
             arruela_d      REAL    NOT NULL DEFAULT 0,
             olhal_d        REAL    NOT NULL DEFAULT 0,
-            sobra_d        REAL    NOT NULL DEFAULT 1
+            sobra_d        REAL    NOT NULL DEFAULT 1,
+            esf_dup        REAL    NOT NULL DEFAULT 70.0
+        )
+    """,
+    'calculadora_conicidade': """
+        CREATE TABLE IF NOT EXISTS calculadora_conicidade (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            parque_id     INTEGER NOT NULL REFERENCES parques(id) ON DELETE CASCADE,
+            topo_a        REAL NOT NULL DEFAULT 140.0,
+            conicidade_a  REAL NOT NULL DEFAULT 28.0,
+            topo_b        REAL NOT NULL DEFAULT 110.0,
+            conicidade_b  REAL NOT NULL DEFAULT 20.0,
+            UNIQUE (parque_id)
         )
     """,
 }
 
 _DDL_INDICES = (
-    "CREATE INDEX IF NOT EXISTS idx_materiais_parque_tipo   ON materiais_poste(parque_id, tipo)",
-    "CREATE INDEX IF NOT EXISTS idx_parafusos_parque_tipo   ON parafusos_receita(parque_id, tipo)",
-    "CREATE INDEX IF NOT EXISTS idx_alcas_parque_tipo       ON alcas_lacos_receita(parque_id, tipo)",
-    "CREATE INDEX IF NOT EXISTS idx_estais_parque           ON estais_receita(parque_id)",
-    "CREATE INDEX IF NOT EXISTS idx_calc_estruturas_parque  ON calculadora_estruturas(parque_id, estrutura)",
+    "CREATE INDEX IF NOT EXISTS idx_materiais_parque_tipo    ON materiais_poste(parque_id, tipo)",
+    "CREATE INDEX IF NOT EXISTS idx_parafusos_parque_tipo    ON parafusos_receita(parque_id, tipo)",
+    "CREATE INDEX IF NOT EXISTS idx_alcas_parque_tipo        ON alcas_lacos_receita(parque_id, tipo)",
+    "CREATE INDEX IF NOT EXISTS idx_estais_parque            ON estais_receita(parque_id)",
+    "CREATE INDEX IF NOT EXISTS idx_calc_montagens_parque    ON calculadora_montagens(parque_id, nome)",
+    "CREATE INDEX IF NOT EXISTS idx_calc_estruturas_parque   ON calculadora_estruturas(parque_id, estrutura)",
+    "CREATE INDEX IF NOT EXISTS idx_calc_conicidade_parque   ON calculadora_conicidade(parque_id)",
 )
 
 
@@ -407,18 +446,35 @@ def inicializar():
         print("[BANCO] Criando índices...", flush=True)
         _criar_indices(conn)
 
+        # Migração incremental: garante que colunas de classe de esforço (esf_maq, esf_dup) existam
+        for tabela in ('calculadora_montagens', 'calculadora_estruturas'):
+            if _tabela_existe(conn, tabela):
+                if not _tem_coluna(conn, tabela, 'esf_maq'):
+                    conn.execute(f"ALTER TABLE {tabela} ADD COLUMN esf_maq REAL NOT NULL DEFAULT 50.0")
+                if not _tem_coluna(conn, tabela, 'esf_dup'):
+                    conn.execute(f"ALTER TABLE {tabela} ADD COLUMN esf_dup REAL NOT NULL DEFAULT 70.0")
+        if _tabela_existe(conn, 'calculadora_estruturas') and not _tem_coluna(conn, 'calculadora_estruturas', 'face_oposta'):
+            conn.execute("ALTER TABLE calculadora_estruturas ADD COLUMN face_oposta INTEGER NOT NULL DEFAULT 0")
+        conn.commit()
+
         total_parques = conn.execute("SELECT COUNT(*) FROM parques").fetchone()[0]
         print(f"[BANCO] Parques existentes: {total_parques}", flush=True)
         if total_parques == 0:
             print("[BANCO] Semeando dados iniciais no banco...", flush=True)
             _seed_banco_novo(conn)
 
-        # Garante que a calculadora esteja semeada em parques existentes
+        # Garante que as montagens padrão da calculadora estejam semeadas em todos os parques
         for r_p in conn.execute("SELECT id FROM parques").fetchall():
-            pid = r_p['id']
-            cnt = conn.execute("SELECT COUNT(*) FROM calculadora_estruturas WHERE parque_id = ?", (pid,)).fetchone()[0]
-            if cnt == 0:
-                _seed_calculadora(conn, pid)
+            _seed_montagens(conn, r_p['id'])
+
+        # Garante que a calculadora esteja semeada em parques existentes apenas na 1ª vez
+        if not _ler_estado(conn, 'calculadora_semeada'):
+            for r_p in conn.execute("SELECT id FROM parques").fetchall():
+                pid = r_p['id']
+                cnt = conn.execute("SELECT COUNT(*) FROM calculadora_estruturas WHERE parque_id = ?", (pid,)).fetchone()[0]
+                if cnt == 0:
+                    _seed_calculadora(conn, pid)
+            _gravar_estado(conn, 'calculadora_semeada', '1')
 
         _garantir_parque_ativo(conn)
         print("[BANCO] Banco de dados pronto e operacional!", flush=True)
@@ -455,6 +511,7 @@ def _seed_banco_novo(conn):
 
     _seed_alcas(conn, parque_id)
     _seed_estais(conn, parque_id)
+    _seed_montagens(conn, parque_id)
     _seed_calculadora(conn, parque_id)
     conn.commit()
 
@@ -495,6 +552,69 @@ def _seed_estais(conn, parque_id):
     print(f"[BANCO] Seed: {len(linhas)} materiais de estais de {CAMINHO_SEED_ESTAIS}")
 
 
+MONTAGENS_PADRAO_SEED = [
+    {
+        'nome': 'N1',
+        'cruzeta': 1,
+        'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1,
+        'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1,
+    },
+    {
+        'nome': 'N3',
+        'cruzeta': 2,
+        'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1,
+        'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1,
+    },
+    {
+        'nome': 'N4',
+        'cruzeta': 2,
+        'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1,
+        'p_dupla': 3, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 2, 'sobra_d': 1,
+    },
+    {
+        'nome': 'CRUZETA AUXILIAR',
+        'cruzeta': 1,
+        'p_maquina': 3, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1,
+        'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1,
+    },
+    {
+        'nome': 'CHAVE FUSÍVEL',
+        'cruzeta': 2,
+        'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1,
+        'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1,
+    },
+    {
+        'nome': 'TRANSFORMADOR',
+        'cruzeta': 0,
+        'p_maquina': 2, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1,
+        'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1,
+    },
+    {
+        'nome': 'CRUZETA ADICIONAL',
+        'cruzeta': 2,
+        'p_maquina': 4, 'porca_m': 2, 'arruela_m': 2, 'olhal_m': 0, 'sobra_m': 1, 'esf_maq': 50.0,
+        'p_dupla': 0, 'porca_d': 2, 'arruela_d': 2, 'olhal_d': 0, 'sobra_d': 1, 'esf_dup': 70.0,
+    },
+]
+
+
+def _seed_montagens(conn, parque_id):
+    for m in MONTAGENS_PADRAO_SEED:
+        conn.execute(
+            "INSERT OR IGNORE INTO calculadora_montagens "
+            "(parque_id, nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+            "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (parque_id, m['nome'], float(m.get('cruzeta', 0)),
+             float(m.get('p_maquina', 0)), float(m.get('porca_m', 2)), float(m.get('arruela_m', 2)),
+             float(m.get('olhal_m', 0)), float(m.get('sobra_m', 1)), float(m.get('esf_maq', 50.0)),
+             float(m.get('p_dupla', 0)), float(m.get('porca_d', 2)), float(m.get('arruela_d', 2)),
+             float(m.get('olhal_d', 0)), float(m.get('sobra_d', 1)), float(m.get('esf_dup', 70.0)))
+        )
+    conn.commit()
+    print(f"[BANCO] Seed: {len(MONTAGENS_PADRAO_SEED)} montagens da calculadora no parque {parque_id}")
+
+
 def _seed_calculadora(conn, parque_id):
     from src import calculadora_parafusos
     grid_all = calculadora_parafusos.gerar_linhas_iniciais_estruturas()
@@ -502,16 +622,16 @@ def _seed_calculadora(conn, parque_id):
         for l in linhas:
             conn.execute(
                 "INSERT INTO calculadora_estruturas "
-                "(parque_id, estrutura, ordem, nivel, distancia_prog, montagem, face, "
-                "cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, "
-                "p_dupla, porca_d, arruela_d, olhal_d, sobra_d) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "(parque_id, estrutura, ordem, nivel, distancia_prog, montagem, face, face_oposta, "
+                "cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+                "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (parque_id, est_nome, int(l['ordem']), int(l['nivel']), str(l['distancia_prog']),
-                 '', 'B', float(l['cruzeta']),
+                 '', 'B', int(bool(l.get('face_oposta', 0))), float(l['cruzeta']),
                  float(l['p_maquina']), float(l.get('porca_m', 2)), float(l.get('arruela_m', 2)),
-                 float(l.get('olhal_m', 0)), float(l.get('sobra_m', 1)), float(l['p_dupla']),
-                 float(l.get('porca_d', 2)), float(l.get('arruela_d', 2)), float(l.get('olhal_d', 0)),
-                 float(l.get('sobra_d', 1)))
+                 float(l.get('olhal_m', 0)), float(l.get('sobra_m', 1)), float(l.get('esf_maq', 50.0)),
+                 float(l['p_dupla']), float(l.get('porca_d', 2)), float(l.get('arruela_d', 2)),
+                 float(l.get('olhal_d', 0)), float(l.get('sobra_d', 1)), float(l.get('esf_dup', 70.0)))
             )
     conn.commit()
     print(f"[BANCO] Seed: {len(grid_all)} estruturas da calculadora no parque {parque_id}")
@@ -643,9 +763,11 @@ def _copiar_receitas(conn, origem_id, destino_id):
                               'comprimento, quantidade, cruzeta_adicional'),
         'alcas_lacos_receita': 'tipo, nivel, direcao, qtd_alcas, qtd_lacos',
         'estais_receita': 'ordem, material, unidade, qtd_por_estai',
+        'calculadora_montagens': ('nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, '
+                                  'p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup'),
         'calculadora_estruturas': ('estrutura, ordem, nivel, distancia_prog, montagem, face, '
-                                   'cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, '
-                                   'p_dupla, porca_d, arruela_d, olhal_d, sobra_d'),
+                                   'cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, '
+                                   'p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup'),
     }
     for tabela, cols in copias.items():
         conn.execute(
@@ -1533,9 +1655,9 @@ def obter_estrutura_calculadora(estrutura_nome, parque_id=None):
     conn = conectar()
     try:
         rows = conn.execute(
-            "SELECT ordem, nivel, distancia_prog, montagem, face, cruzeta, "
-            "p_maquina, porca_m, arruela_m, olhal_m, sobra_m, "
-            "p_dupla, porca_d, arruela_d, olhal_d, sobra_d "
+            "SELECT ordem, nivel, distancia_prog, montagem, face, face_oposta, cruzeta, "
+            "p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+            "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup "
             "FROM calculadora_estruturas "
             "WHERE parque_id = ? AND estrutura = ? ORDER BY ordem, nivel",
             (parque_id, estrutura_nome)
@@ -1558,20 +1680,22 @@ def salvar_estrutura_calculadora(estrutura_nome, linhas, parque_id=None):
             params = [
                 (parque_id, estrutura_nome, idx, int(l.get('nivel', idx)),
                  str(l.get('distancia_prog', '0.2')), str(l.get('montagem', '')),
-                 'B', float(l.get('cruzeta', 0)),
-                 float(l.get('p_maquina', 0)), float(l.get('porca_m', 2)),
-                 float(l.get('arruela_m', 2)), float(l.get('olhal_m', 0)),
-                 float(l.get('sobra_m', 1)), float(l.get('p_dupla', 0)),
-                 float(l.get('porca_d', 2)), float(l.get('arruela_d', 2)),
-                 float(l.get('olhal_d', 0)), float(l.get('sobra_d', 1)))
+                 'B', int(bool(l.get('face_oposta', 0))), float(l.get('cruzeta', 0)),
+                 float(l.get('p_maquina', 0)), float(l.get('porca_m', 0)),
+                 float(l.get('arruela_m', 0)), float(l.get('olhal_m', 0)),
+                 float(l.get('sobra_m', 0)), float(l.get('esf_maq', 50.0)),
+                 float(l.get('p_dupla', 0)),
+                 float(l.get('porca_d', 0)), float(l.get('arruela_d', 0)),
+                 float(l.get('olhal_d', 0)), float(l.get('sobra_d', 0)),
+                 float(l.get('esf_dup', 70.0)))
                 for idx, l in enumerate(linhas, 1)
             ]
             conn.executemany(
                 "INSERT INTO calculadora_estruturas "
-                "(parque_id, estrutura, ordem, nivel, distancia_prog, montagem, face, "
-                "cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, "
-                "p_dupla, porca_d, arruela_d, olhal_d, sobra_d) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "(parque_id, estrutura, ordem, nivel, distancia_prog, montagem, face, face_oposta, "
+                "cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+                "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 params
             )
         conn.commit()
@@ -1608,6 +1732,220 @@ def renomear_estrutura_calculadora(tipo_antigo, tipo_novo, parque_id=None):
         affected = conn.execute("SELECT changes()").fetchone()[0]
         conn.commit()
         return affected
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Montagens Padrão da Calculadora (Por Parque)
+# ---------------------------------------------------------------------------
+
+def listar_montagens_calculadora(parque_id=None):
+    """Lista as montagens padrão cadastradas para o parque."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        rows = conn.execute(
+            "SELECT id, nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+            "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup "
+            "FROM calculadora_montagens WHERE parque_id = ? "
+            "ORDER BY nome COLLATE NOCASE",
+            (parque_id,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def obter_montagem_calculadora(nome, parque_id=None):
+    """Retorna os dados de uma montagem padrão pelo nome."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        row = conn.execute(
+            "SELECT id, nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+            "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup "
+            "FROM calculadora_montagens WHERE parque_id = ? AND nome = ?",
+            (parque_id, nome)
+        ).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def salvar_montagem_calculadora(nome, dados, parque_id=None, nome_antigo=None, propagar=True):
+    """Cria ou atualiza uma montagem padrão no parque.
+    
+    Se propagar=True, atualiza todas as linhas de estruturas que usam essa montagem
+    no parque ativo para refletir os novos valores de ferragens/parafusos.
+    """
+    parque_id = _pid(parque_id)
+    nome = (nome or '').strip().upper()
+    if not nome:
+        raise ValueError("O nome da montagem padrão é obrigatório.")
+
+    cruzeta   = float(dados.get('cruzeta', 0))
+    p_maquina = float(dados.get('p_maquina', 0))
+    porca_m   = float(dados.get('porca_m', 0))
+    arruela_m = float(dados.get('arruela_m', 0))
+    olhal_m   = float(dados.get('olhal_m', 0))
+    sobra_m   = float(dados.get('sobra_m', 0))
+    esf_maq   = float(dados.get('esf_maq', 50.0))
+    p_dupla   = float(dados.get('p_dupla', 0))
+    porca_d   = float(dados.get('porca_d', 0))
+    arruela_d = float(dados.get('arruela_d', 0))
+    olhal_d   = float(dados.get('olhal_d', 0))
+    sobra_d   = float(dados.get('sobra_d', 0))
+    esf_dup   = float(dados.get('esf_dup', 70.0))
+
+    conn = conectar()
+    try:
+        nome_busca = (nome_antigo or nome).strip().upper()
+        row = conn.execute(
+            "SELECT id FROM calculadora_montagens WHERE parque_id = ? AND nome = ?",
+            (parque_id, nome_busca)
+        ).fetchone()
+
+        if row:
+            conn.execute(
+                "UPDATE calculadora_montagens SET "
+                "nome = ?, cruzeta = ?, p_maquina = ?, porca_m = ?, arruela_m = ?, "
+                "olhal_m = ?, sobra_m = ?, esf_maq = ?, p_dupla = ?, porca_d = ?, arruela_d = ?, "
+                "olhal_d = ?, sobra_d = ?, esf_dup = ? WHERE id = ?",
+                (nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq,
+                 p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup, row['id'])
+            )
+            if nome_busca != nome:
+                conn.execute(
+                    "UPDATE calculadora_estruturas SET montagem = ? "
+                    "WHERE parque_id = ? AND montagem = ?",
+                    (nome, parque_id, nome_busca)
+                )
+        else:
+            conn.execute(
+                "INSERT INTO calculadora_montagens "
+                "(parque_id, nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq, "
+                "p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (parque_id, nome, cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq,
+                 p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup)
+            )
+
+        afetados_estruturas = 0
+        if propagar:
+            conn.execute(
+                "UPDATE calculadora_estruturas SET "
+                "cruzeta = ?, p_maquina = ?, porca_m = ?, arruela_m = ?, olhal_m = ?, sobra_m = ?, esf_maq = ?, "
+                "p_dupla = ?, porca_d = ?, arruela_d = ?, olhal_d = ?, sobra_d = ?, esf_dup = ? "
+                "WHERE parque_id = ? AND montagem = ?",
+                (cruzeta, p_maquina, porca_m, arruela_m, olhal_m, sobra_m, esf_maq,
+                 p_dupla, porca_d, arruela_d, olhal_d, sobra_d, esf_dup, parque_id, nome)
+            )
+            afetados_estruturas = conn.execute("SELECT changes()").fetchone()[0]
+
+        conn.commit()
+        return {'ok': True, 'nome': nome, 'propagados': afetados_estruturas}
+    finally:
+        conn.close()
+
+
+def excluir_montagem_calculadora(nome, parque_id=None):
+    """Exclui uma montagem padrão e desvincula os níveis de estruturas que a usavam."""
+    parque_id = _pid(parque_id)
+    nome = (nome or '').strip().upper()
+    conn = conectar()
+    try:
+        conn.execute(
+            "DELETE FROM calculadora_montagens WHERE parque_id = ? AND nome = ?",
+            (parque_id, nome)
+        )
+        del_count = conn.execute("SELECT changes()").fetchone()[0]
+        # Limpa o vínculo nas estruturas (elas mantêm os valores como personalizados)
+        conn.execute(
+            "UPDATE calculadora_estruturas SET montagem = '' WHERE parque_id = ? AND montagem = ?",
+            (parque_id, nome)
+        )
+        conn.commit()
+        return del_count
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Conicidade e Parâmetros Físicos do Poste (Por Parque)
+# ---------------------------------------------------------------------------
+
+def obter_conicidade_calculadora(parque_id=None):
+    """Retorna os fatores de conicidade e dimensões do topo do parque ou valores padrão."""
+    parque_id = _pid(parque_id)
+    padrao = {
+        'topo_a': 140.0,
+        'conicidade_a': 28.0,
+        'topo_b': 110.0,
+        'conicidade_b': 20.0
+    }
+    if not parque_id:
+        return padrao
+    conn = conectar()
+    try:
+        row = conn.execute(
+            "SELECT topo_a, conicidade_a, topo_b, conicidade_b FROM calculadora_conicidade WHERE parque_id = ?",
+            (parque_id,)
+        ).fetchone()
+        if row:
+            return {
+                'topo_a': float(row['topo_a']),
+                'conicidade_a': float(row['conicidade_a']),
+                'topo_b': float(row['topo_b']),
+                'conicidade_b': float(row['conicidade_b'])
+            }
+        return padrao
+    finally:
+        conn.close()
+
+
+def salvar_conicidade_calculadora(dados, parque_id=None):
+    """Salva os fatores de conicidade e dimensões do poste para o parque."""
+    parque_id = _pid(parque_id)
+    topo_a = float(dados.get('topo_a', 140.0))
+    conicidade_a = float(dados.get('conicidade_a', 28.0))
+    topo_b = float(dados.get('topo_b', 110.0))
+    conicidade_b = float(dados.get('conicidade_b', 20.0))
+
+    conn = conectar()
+    try:
+        conn.execute(
+            "INSERT INTO calculadora_conicidade (parque_id, topo_a, conicidade_a, topo_b, conicidade_b) "
+            "VALUES (?, ?, ?, ?, ?) "
+            "ON CONFLICT(parque_id) DO UPDATE SET "
+            "topo_a = excluded.topo_a, conicidade_a = excluded.conicidade_a, "
+            "topo_b = excluded.topo_b, conicidade_b = excluded.conicidade_b",
+            (parque_id, topo_a, conicidade_a, topo_b, conicidade_b)
+        )
+        conn.commit()
+        return {
+            'topo_a': topo_a,
+            'conicidade_a': conicidade_a,
+            'topo_b': topo_b,
+            'conicidade_b': conicidade_b
+        }
+    finally:
+        conn.close()
+
+
+def restaurar_conicidade_calculadora(parque_id=None):
+    """Restaura os valores padrão de conicidade removendo a personalização do parque."""
+    parque_id = _pid(parque_id)
+    conn = conectar()
+    try:
+        conn.execute("DELETE FROM calculadora_conicidade WHERE parque_id = ?", (parque_id,))
+        conn.commit()
+        return {
+            'topo_a': 140.0,
+            'conicidade_a': 28.0,
+            'topo_b': 110.0,
+            'conicidade_b': 20.0
+        }
     finally:
         conn.close()
 

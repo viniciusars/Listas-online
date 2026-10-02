@@ -245,7 +245,10 @@ table.grade .col-del    { width: 32px; text-align: center; }
 
         <!-- Rodapé -->
         <div class="tbl-footer" id="tbl-footer" style="display:none">
-            <button class="btn btn-add" onclick="adicionarLinha()">+ Nova linha de especificação</button>
+            <div style="display:flex;gap:8px">
+                <button class="btn btn-add" onclick="adicionarLinha()">+ Nova linha de especificação</button>
+                <button type="button" class="btn btn-outline" style="font-size:0.82rem;padding:6px 12px" onclick="adicionarColunaComprimento()" title="Adicionar próxima coluna de comprimento comercial (+50 mm)">➕ Coluna (+50 mm)</button>
+            </div>
             <div style="margin-left:auto;display:flex;gap:8px">
                 <button class="btn btn-danger" onclick="excluirEstrutura()">Excluir estrutura</button>
                 <button class="btn btn-outline" onclick="descartar()">Descartar</button>
@@ -264,8 +267,48 @@ table.grade .col-del    { width: 32px; text-align: center; }
 
 {% block scripts %}
 <script>
-// Comprimentos comerciais padrão (mm) — colunas fixas da grade.
-const COMPRIMENTOS = [200,250,300,350,400,450,500,550,600,650,700,750,800,850,900];
+// Comprimentos comerciais (mm) — passos de 50 mm iniciando em 200 mm
+const COMPRIMENTOS_BASE = [200,250,300,350,400,450,500,550,600,650,700,750,800,850,900];
+let maxComprimentoParafusos = 900;
+
+function obterComprimentos() {
+    let maxC = Math.max(900, maxComprimentoParafusos || 900);
+    (linhasAtual || []).forEach(spec => {
+        if (spec.comprimentos) {
+            Object.keys(spec.comprimentos).forEach(c => {
+                const num = parseInt(c, 10);
+                if (!isNaN(num) && num > maxC && spec.comprimentos[c] > 0) {
+                    maxC = num;
+                }
+            });
+        }
+    });
+    maxC = Math.ceil(maxC / 50) * 50;
+
+    const colunas = [];
+    for (let c = 200; c <= maxC; c += 50) {
+        colunas.push(c);
+    }
+    (linhasAtual || []).forEach(spec => {
+        if (spec.comprimentos) {
+            Object.keys(spec.comprimentos).forEach(c => {
+                const num = parseInt(c, 10);
+                if (!isNaN(num) && !colunas.includes(num) && spec.comprimentos[c] > 0) {
+                    colunas.push(num);
+                }
+            });
+        }
+    });
+    colunas.sort((a, b) => a - b);
+    return colunas;
+}
+
+function adicionarColunaComprimento() {
+    const colunas = obterComprimentos();
+    const ultimo = colunas.length > 0 ? colunas[colunas.length - 1] : 900;
+    maxComprimentoParafusos = ultimo + 50;
+    renderGrade();
+}
 
 // ── Estado ──────────────────────────────────────────────────────────────────
 let estruturas   = [];   // [{tipo, esforco, altura}, ...] vindas do banco
@@ -401,9 +444,10 @@ function renderVazio() {
 function renderGrade() {
     const head = document.getElementById('tbl-head');
     head.style.display = '';
+    const comprimentos = obterComprimentos();
     let headHtml = '<tr><th class="col-spec col-pos">Posição</th><th class="col-spec col-paraf">Parafuso</th>' +
                    '<th class="col-classe">Classe (kN)</th>';
-    COMPRIMENTOS.forEach(c => headHtml += '<th class="col-compr">' + c + '</th>');
+    comprimentos.forEach(c => headHtml += '<th class="col-compr">' + c + '</th>');
     headHtml += '<th class="col-del"></th></tr>';
     head.innerHTML = headHtml;
 
@@ -417,7 +461,7 @@ function renderGrade() {
             '<td class="col-pos"><input type="text" value="' + esc(spec.posicao) + '" data-campo="posicao" placeholder="TOPO"></td>' +
             '<td class="col-paraf"><input type="text" value="' + esc(spec.parafuso) + '" data-campo="parafuso" placeholder="CABEÇA QUADRADA"></td>' +
             '<td class="col-classe"><input type="number" value="' + (spec.esf_parafuso ?? '') + '" data-campo="esf_parafuso" step="any"></td>';
-        COMPRIMENTOS.forEach(c => {
+        comprimentos.forEach(c => {
             const v = spec.comprimentos[c];
             html += '<td class="col-compr"><input type="number" value="' + (v != null ? v : '') +
                     '" data-comprimento="' + c + '" min="0" step="any" placeholder="—"></td>';
@@ -430,7 +474,7 @@ function renderGrade() {
     });
 
     if (!linhasAtual.length) {
-        tbody.innerHTML = '<tr><td colspan="' + (4 + COMPRIMENTOS.length) + '" style="text-align:center;padding:20px;' +
+        tbody.innerHTML = '<tr><td colspan="' + (4 + comprimentos.length) + '" style="text-align:center;padding:20px;' +
             'color:var(--text-muted)">Nenhuma linha ainda — clique em "+ Nova linha de especificação".</td></tr>';
     }
 }

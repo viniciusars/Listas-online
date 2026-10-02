@@ -167,8 +167,21 @@ def exportar_parafusos(parque_id=None):
             }
         linhas[chave][int(r['comprimento'])] = r['quantidade']
 
+    comprimentos_presentes = set()
+    for c in df['comprimento'].dropna():
+        try:
+            comprimentos_presentes.add(int(float(c)))
+        except (ValueError, TypeError):
+            pass
+    max_c = max(max(comprimentos_presentes, default=900), 900)
+    comprs_colunas = list(range(200, max_c + 1, 50))
+    for c in sorted(comprimentos_presentes):
+        if c not in comprs_colunas:
+            comprs_colunas.append(c)
+    comprs_colunas.sort()
+
     tabela = pd.DataFrame(list(linhas.values()),
-                          columns=COLS_PARAFUSOS_META + COMPRIMENTOS_PARAFUSOS)
+                          columns=COLS_PARAFUSOS_META + comprs_colunas)
     tabela = tabela.sort_values(['TIPO', 'ESFORCO', 'ALTURA', 'POSIÇÃO'],
                                 na_position='first').reset_index(drop=True)
 

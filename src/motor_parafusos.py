@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 
 from src import banco
@@ -18,19 +19,40 @@ def _split_altura_carga(valor):
         return None, None
 
 
+def eh_tipo_ambiguo(tipo, bases_cadastradas=None):
+    """Verifica se um TIPO de estrutura requer confirmação do sentido de chegada dos cabos (.C ou .I).
+
+    Critérios:
+    1. Não se aplica se já possuir sufixo explícito (.C ou .I).
+    2. Contém 'N3-3' em qualquer parte da nomenclatura (ex: 'N3-3', '2N3-3', 'N4-N3-3', 'N4/N3-3', etc.); OU
+    3. Coincide com alguma base ambígua cadastrada no banco de dados.
+    """
+    t = str(tipo).strip()
+    t_up = t.upper()
+    if not t or t_up in ('', 'NAN', 'NONE', '<NA>'):
+        return False
+    if t_up.endswith(('.C', '.I')):
+        return False
+    if re.search(r'N3\s*-\s*3', t_up):
+        return True
+    if bases_cadastradas and t in bases_cadastradas:
+        return True
+    return False
+
+
 def identificar_estruturas_ambiguas(df_locacao, parque_id=None):
-    """Retorna as estruturas cujo TIPO está numa família ambígua (ex: N3-3) e ainda
+    """Retorna as estruturas cujo TIPO está numa família ambígua (ex: contém N3-3) e ainda
     não foi digitado com o sufixo .C/.I na Locação — precisam de confirmação manual,
     pois essa informação só é visível na planta perfil (DWG)."""
-    bases = banco.listar_tipos_ambiguos_parafusos(parque_id)
-    if not bases or 'TIPO' not in df_locacao.columns:
+    if 'TIPO' not in df_locacao.columns:
         return []
 
+    bases = banco.listar_tipos_ambiguos_parafusos(parque_id)
     col_num = detectar_coluna_numero(df_locacao)
     ambiguos = []
     for _, row in df_locacao.iterrows():
         tipo = str(row.get('TIPO', '')).strip()
-        if tipo in bases:
+        if eh_tipo_ambiguo(tipo, bases):
             numero = str(row.get(col_num, '')).strip() if col_num else ''
             ambiguos.append({'numero': numero, 'tipo': tipo})
     return ambiguos
@@ -68,10 +90,10 @@ def calcular_parafusos(df_locacao, resolucoes=None, parque_id=None):
     df = df_locacao.copy()
     df['_tipo_parafuso'] = df['TIPO'].astype(str).str.strip()
 
-    if bases_ambiguas and col_num:
+    if col_num:
         for idx, row in df.iterrows():
             tipo = row['_tipo_parafuso']
-            if tipo in bases_ambiguas:
+            if eh_tipo_ambiguo(tipo, bases_ambiguas):
                 numero = str(row.get(col_num, '')).strip()
                 escolha = resolucoes.get(numero)
                 if escolha in ('C', 'I'):
@@ -151,7 +173,7 @@ def calcular_parafusos(df_locacao, resolucoes=None, parque_id=None):
     for tipo, numeros in tipos_sem_receita.items():
         onde = formatar_numeros_postes(numeros)
         sufixo_onde = f" [{onde}]" if onde else ''
-        if tipo in bases_ambiguas:
+        if eh_tipo_ambiguo(tipo, bases_ambiguas):
             avisos.append(f"Estrutura '{tipo}' com sentido de chegada dos cabos não "
                           f"confirmado — parafusos não calculados{sufixo_onde}")
         else:

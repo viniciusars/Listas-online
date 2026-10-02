@@ -102,6 +102,13 @@ As receitas são separadas por **parque** (obra/cliente), escolhido num seletor 
 
 * **Fase 16: Calculadora e Dimensionamento Automático de Parafusos:** Implementação de uma nova aba interativa no menu (`/dimensionar-parafusos`) baseada na modelagem modular do Google Sheets do usuário (abas `PADRAO` e `ESTRUTURAS`). A engine geométrica (`src/calculadora_parafusos.py`) calcula a seção do poste duplo T (Faces A e B) a partir do esforço (600 a 3000 daN) e da cota de cada nível (distância ou `CH+...`), soma as espessuras de ferragens (cruzetas, porcas, arruelas, olhais e sobra) e arredonda para o comprimento comercial padrão. O usuário pode selecionar estruturas do catálogo (19 estruturas embutidas) ou criar novas, editar cotas e montagens em tempo real, visualizar o cálculo nível a nível e, ao validar, clicar em "Validar e Adicionar à Receita" para gravar a estrutura dimensionada diretamente em `parafusos_receita` do parque ativo sem alterar as demais estruturas.
 
+* **Fase 17: Detecção Ampla de Ambiguidades N3-3:** A detecção de estruturas ambíguas que exigem a escolha do sentido de chegada dos cabos (.C ou .I) no motor de parafusos foi ampliada. Em vez de depender exclusivamente da correspondência exata com as receitas cadastradas no banco, o motor passou a utilizar a função `eh_tipo_ambiguo()`, que reconhece qualquer estrutura que contenha "N3-3" em qualquer parte da sua nomenclatura (e que ainda não possua sufixo .C ou .I), além de manter o suporte às bases cadastradas no banco.
+
+* **Fase 18: Conicidade Paramétrica, Comprimentos Comerciais Dinâmicos (>900 mm) e Cruzetas Adicionais:**
+  1. **Comprimentos Comerciais Flexíveis:** O dimensionamento e a matriz comercial de parafusos deixaram de ter um teto rígido em 900 mm, passando a suportar comprimentos variáveis em passos contínuos de 50 mm (200, 250, ..., 900, 950, 1000, 1050 mm...). A expansão é automática tanto na grade web quanto na exportação Excel (`planilhas.py`), além de botões para inserção manual de colunas adicionais.
+  2. **Parametrização de Conicidade e Dimensões do Poste:** Adicionado modal de configuração rápida para inspeção e ajuste das dimensões de topo e conicidades das Faces A (Topo) e B (Gaveta), com persistência por parque e explicação detalhada da metodologia física no memorial de cálculo.
+  3. **Cruzetas Adicionais e Agrupamento de Níveis:** Lógica aprimorada para expansão de cruzetas adicionais por cota variável (CH), cálculo cumulativo arredondado em passos de 0,1 m, alinhamento visual no resumo e consolidação de múltiplas linhas de montagem pertencentes a um mesmo nível físico.
+
 ---
 
 ## 3. Alternativas Consideradas e Descartadas

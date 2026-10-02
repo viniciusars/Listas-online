@@ -3,108 +3,195 @@
 {% block title %}Dimensionar Parafusos — Sistema de Quantitativos RMT{% endblock %}
 
 {% block styles %}
-/* Esta tela precisa de mais largura que o padrão (grades de 14 e 19 colunas). */
-main { max-width: 1520px; }
+/* Largura expandida para visualização confortável de grades técnicas */
+main { max-width: 1540px; }
 
-/* ── Tokens de cor dos dois grupos de parafuso (claro / escuro) ─────── */
+/* ── Tokens de Cor do Módulo (Claro / Escuro) ───────────────────────── */
 .dim {
-    --c-maq: #0369a1;
+    --c-maq: #0284c7;
     --c-maq-soft: rgba(2, 132, 199, 0.08);
-    --c-maq-line: rgba(2, 132, 199, 0.35);
-    --c-dup: #15803d;
-    --c-dup-soft: rgba(22, 163, 74, 0.08);
-    --c-dup-line: rgba(22, 163, 74, 0.35);
+    --c-maq-line: rgba(2, 132, 199, 0.28);
+    --c-dup: #059669;
+    --c-dup-soft: rgba(16, 185, 129, 0.08);
+    --c-dup-line: rgba(16, 185, 129, 0.28);
+    --grad-maq: linear-gradient(135deg, rgba(2,132,199,0.12) 0%, rgba(2,132,199,0.03) 100%);
+    --grad-dup: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.03) 100%);
 }
 [data-theme="dark"] .dim {
-    --c-maq: #7dd3fc;
-    --c-maq-soft: rgba(56, 189, 248, 0.10);
+    --c-maq: #38bdf8;
+    --c-maq-soft: rgba(56, 189, 248, 0.12);
     --c-maq-line: rgba(56, 189, 248, 0.35);
-    --c-dup: #86efac;
-    --c-dup-soft: rgba(74, 222, 128, 0.10);
-    --c-dup-line: rgba(74, 222, 128, 0.35);
+    --c-dup: #34d399;
+    --c-dup-soft: rgba(52, 211, 153, 0.12);
+    --c-dup-line: rgba(52, 211, 153, 0.35);
+    --grad-maq: linear-gradient(135deg, rgba(56,189,248,0.15) 0%, rgba(56,189,248,0.04) 100%);
+    --grad-dup: linear-gradient(135deg, rgba(52,211,153,0.15) 0%, rgba(52,211,153,0.04) 100%);
 }
 
-/* ── Cabeçalho da página ───────────────────────────────────────────── */
+/* ── Cabeçalho Moderno ─────────────────────────────────────────────── */
 .page-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     flex-wrap: wrap;
     gap: 16px;
+    margin-bottom: 4px;
 }
 .page-head h1 {
-    font-size: 1.45rem;
+    font-size: 1.55rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+}
+.page-head h1 .icon-badge {
+    width: 40px; height: 40px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
 }
 .page-head p {
     margin-top: 4px;
-    font-size: 0.87rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
-    max-width: 68ch;
+    max-width: 72ch;
     line-height: 1.5;
 }
 .page-head .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
-.page-head .btn { padding: 8px 14px; font-size: 0.87rem; }
+.page-head .btn { padding: 9px 16px; font-size: 0.88rem; font-weight: 600; border-radius: var(--border-radius-sm); }
 
-/* ── Alerta de feedback ────────────────────────────────────────────── */
+/* ── KPI Summary Cards (Barra de Visão Rápida) ─────────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+.kpi-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+.kpi-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+.kpi-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+.kpi-icon.blue   { background: var(--c-maq-soft); color: var(--c-maq); border: 1px solid var(--c-maq-line); }
+.kpi-icon.green  { background: var(--c-dup-soft); color: var(--c-dup); border: 1px solid var(--c-dup-line); }
+.kpi-icon.purple { background: rgba(168, 85, 247, 0.10); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.25); }
+.kpi-icon.amber  { background: rgba(245, 158, 11, 0.10); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25); }
+
+.kpi-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.kpi-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+.kpi-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.kpi-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* ── Alertas com Animação ──────────────────────────────────────────── */
 .alerta {
     display: none;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: var(--border-radius-sm);
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     font-weight: 500;
     line-height: 1.5;
     border: 1px solid transparent;
+    animation: fadeIn 0.25s ease forwards;
 }
-.alerta.show { display: block; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.alerta.show { display: flex; align-items: center; gap: 10px; }
 .alerta.success { background: rgba(16, 185, 129, 0.10); border-color: rgba(16, 185, 129, 0.35); color: var(--text-main); }
 .alerta.danger  { background: rgba(239, 68, 68, 0.10);  border-color: rgba(239, 68, 68, 0.35);  color: var(--text-main); }
 .alerta.warning { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.40); color: var(--text-main); }
 .alerta.info    { background: var(--primary-light);      border-color: var(--border-color);       color: var(--text-main); }
 
-/* ── Cabeçalho de card com passo numerado ──────────────────────────── */
-.card-header .step {
-    background: var(--primary-color);
-    color: #fff;
-    width: 24px; height: 24px;
-    border-radius: 7px;
-    font-size: 0.78rem;
+/* ── Cards e Passos Estruturados ───────────────────────────────────── */
+.card-header {
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-color);
 }
-.card-header { padding: 14px 20px; flex-wrap: wrap; }
-.card-header .hint {
+.card-header .step-badge {
+    background: var(--primary-color);
+    color: #ffffff;
+    width: 26px; height: 26px;
+    border-radius: 8px;
     font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+}
+.card-header h2 {
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+.card-header .hint {
+    font-size: 0.82rem;
     color: var(--text-muted);
     font-weight: 400;
 }
 .card-header .acoes-card {
     margin-left: auto;
     display: flex;
-    gap: 6px;
+    gap: 8px;
     align-items: center;
     flex-wrap: wrap;
 }
-.card-header .acoes-card .btn { padding: 6px 12px; font-size: 0.82rem; }
-.card-body { padding: 20px; }
+.card-body { padding: 22px; }
 
-.chip {
-    background: var(--primary-light);
-    color: var(--primary-color);
-    font-weight: 600;
-    font-size: 0.76rem;
-    padding: 4px 11px;
-    border-radius: 99px;
-    white-space: nowrap;
-}
-
-/* ── Formulário de parâmetros ──────────────────────────────────────── */
+/* ── Formulário de Parâmetros (Card 1) ──────────────────────────────── */
 .params {
     display: grid;
-    grid-template-columns: minmax(300px, 2.2fr) minmax(180px, 1.2fr) minmax(130px, 0.9fr) minmax(130px, 0.9fr);
-    gap: 16px;
+    grid-template-columns: minmax(300px, 2.2fr) minmax(190px, 1.2fr) minmax(130px, 1fr) minmax(160px, 1.1fr);
+    gap: 18px;
     align-items: start;
 }
 @media (max-width: 1080px) {
@@ -114,89 +201,230 @@ main { max-width: 1520px; }
     .params { grid-template-columns: minmax(0, 1fr); }
 }
 
+.campo {
+    display: flex;
+    flex-direction: column;
+}
 .campo > label {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 6px;
-    font-size: 0.74rem;
+    font-size: 0.76rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.045em;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    height: 20px;
+    line-height: 20px;
+    white-space: nowrap;
 }
 .campo select,
 .campo input[type=text],
 .campo input[type=number] {
     width: 100%;
-    height: 42px;
-    padding: 0 12px;
-    font-size: 0.92rem;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 0.94rem;
     font-weight: 600;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
     background: var(--surface-color);
     color: var(--text-main);
+    transition: all 0.15s ease;
+}
+.campo select:focus,
+.campo input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
 .campo input::placeholder { font-weight: 400; color: var(--text-muted); }
-.campo .linha-controle { display: flex; gap: 6px; }
+.campo .linha-controle { display: flex; gap: 8px; }
 .campo .linha-controle select { flex: 1; min-width: 0; }
 
 .btn-icone {
     flex-shrink: 0;
-    width: 42px; height: 42px;
+    width: 44px; height: 44px;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
     background: var(--surface-color);
     color: var(--text-main);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.15s ease;
 }
-.btn-icone:hover { border-color: var(--primary-color); background: var(--primary-light); }
-.btn-icone.perigo:hover { border-color: var(--danger-color); background: rgba(239, 68, 68, 0.10); }
+.btn-icone:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+.btn-icone.perigo:hover {
+    border-color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.10);
+    color: var(--danger-color);
+}
 
 .aviso-req {
     display: none;
     color: var(--warning-color);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: none;
     letter-spacing: 0;
 }
 
-/* ── Grades (níveis e matriz) ──────────────────────────────────────── */
+/* ── Resumo dos Parafusos Gerados (Visual Cards) ────────────────────── */
+.resumo-section {
+    margin-bottom: 22px;
+}
+.resumo-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.resumo-parafusos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+.parafuso-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.parafuso-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+}
+.parafuso-card.tipo-maq::before { background: var(--c-maq); }
+.parafuso-card.tipo-dup::before { background: var(--c-dup); }
+.parafuso-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+}
+.parafuso-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.parafuso-card-tag {
+    font-size: 0.70rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.parafuso-card.tipo-maq .parafuso-card-tag { background: var(--c-maq-soft); color: var(--c-maq); border: 1px solid var(--c-maq-line); }
+.parafuso-card.tipo-dup .parafuso-card-tag { background: var(--c-dup-soft); color: var(--c-dup); border: 1px solid var(--c-dup-line); }
+.parafuso-card-qtd {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+.parafuso-card-body {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.parafuso-card-compr {
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+.parafuso-card.tipo-maq .parafuso-card-compr { color: var(--c-maq); }
+.parafuso-card.tipo-dup .parafuso-card-compr { color: var(--c-dup); }
+.parafuso-card-meta {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ── Alternador de Visualização em Abas (Tabs) ──────────────────────── */
+.tabs-container {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+}
+.tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+}
+.tab-btn:hover {
+    color: var(--text-main);
+    background: var(--bg-color);
+}
+.tab-btn.active {
+    color: var(--primary-color);
+    background: var(--primary-light);
+    border-color: var(--border-color);
+}
+
+/* ── Grades Técnicas (Tabelas) ──────────────────────────────────────── */
 .tbl-wrap {
     overflow-x: auto;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
+    background: var(--surface-color);
 }
 table.grade {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     background: var(--surface-color);
 }
 table.grade th {
     background: var(--bg-color);
     color: var(--text-muted);
-    padding: 8px 6px;
+    padding: 10px 8px;
     text-align: center;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
     border-bottom: 1px solid var(--border-color);
 }
-table.grade thead tr:first-child th { border-bottom: 1px solid var(--border-color); }
 table.grade td {
-    padding: 3px 4px;
+    padding: 4px 6px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
     text-align: center;
@@ -204,44 +432,55 @@ table.grade td {
 table.grade tbody tr:last-child td { border-bottom: none; }
 table.grade tbody tr:hover td { background: var(--bg-color); }
 
-/* Tinta de grupo: colunas de cabeça quadrada x rosca dupla */
-table.grade th.g-maq { color: var(--c-maq); background: var(--c-maq-soft); }
-table.grade th.g-dup { color: var(--c-dup); background: var(--c-dup-soft); }
-table.grade th.g-titulo { font-size: 0.75rem; letter-spacing: 0.06em; }
+/* Grupos de Parafuso: Cabeça Quadrada x Rosca Dupla */
+table.grade th.g-maq { color: var(--c-maq); background: var(--grad-maq); border-bottom: 2px solid var(--c-maq-line); }
+table.grade th.g-dup { color: var(--c-dup); background: var(--grad-dup); border-bottom: 2px solid var(--c-dup-line); }
+table.grade th.g-titulo { font-size: 0.78rem; letter-spacing: 0.06em; font-weight: 800; }
 table.grade td.g-maq { background: var(--c-maq-soft); }
 table.grade td.g-dup { background: var(--c-dup-soft); }
-table.grade tbody tr:hover td.g-maq { background: var(--c-maq-soft); }
-table.grade tbody tr:hover td.g-dup { background: var(--c-dup-soft); }
+table.grade tbody tr:hover td.g-maq { background: rgba(2, 132, 199, 0.12); }
+table.grade tbody tr:hover td.g-dup { background: rgba(16, 185, 129, 0.12); }
 table.grade th.sep-l, table.grade td.sep-l { border-left: 1px solid var(--border-color); }
 
-/* Células editáveis */
+/* Células Editáveis da Grade */
 table.grade input {
     width: 100%;
-    height: 30px;
+    height: 32px;
     padding: 0 4px;
     text-align: center;
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: 0.86rem;
     font-weight: 600;
     color: var(--text-main);
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 5px;
-    transition: border-color 0.15s, background 0.15s;
+    border-radius: 6px;
+    transition: all 0.15s ease;
     -moz-appearance: textfield;
 }
 table.grade input::-webkit-outer-spin-button,
 table.grade input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-table.grade input:hover { border-color: var(--border-color); }
+table.grade input:hover {
+    border-color: var(--border-color);
+    background: var(--surface-color);
+}
 table.grade input:focus {
     outline: none;
     border-color: var(--primary-color);
     background: var(--surface-color);
-    box-shadow: 0 0 0 2px var(--primary-light);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
-/* Valor zerado, exibido como "—" */
-table.grade input.dash { color: var(--text-muted); font-weight: 400; opacity: 0.65; }
-/* Colunas-âncora de cada grupo (a quantidade de parafusos em si) */
+table.grade td.g-maq input:focus {
+    border-color: var(--c-maq);
+    box-shadow: 0 0 0 3px var(--c-maq-soft);
+}
+table.grade td.g-dup input:focus {
+    border-color: var(--c-dup);
+    box-shadow: 0 0 0 3px var(--c-dup-soft);
+}
+
+/* Valor Zerado */
+table.grade input.dash { color: var(--text-muted); font-weight: 400; opacity: 0.5; }
 table.grade input.main-maq { color: var(--c-maq); font-weight: 800; }
 table.grade input.main-dup { color: var(--c-dup); font-weight: 800; }
 table.grade input.main-maq.dash,
@@ -255,75 +494,218 @@ table.grade input.main-dup.dash { color: var(--text-muted); font-weight: 400; }
     font-size: 1rem;
     line-height: 1;
     padding: 4px 6px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+.btn-del:hover {
+    color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.12);
+    transform: scale(1.1);
+}
+
+/* Larguras Grade de Níveis */
+table.niveis { min-width: 1380px; }
+table.niveis col.c-nivel  { width: 55px; }
+table.niveis col.c-cota   { width: 95px; }
+table.niveis col.c-face   { width: 85px; }
+table.niveis col.c-mont   { width: 145px; }
+table.niveis col.c-cruz   { width: 70px; }
+table.niveis col.c-esf    { width: 72px; }
+table.niveis col.c-main   { width: 75px; }
+table.niveis col.c-item   { width: 68px; }
+table.niveis col.c-del    { width: 40px; }
+
+.chk-face-oposta {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    vertical-align: middle;
+}
+.badge-oposta {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 6px;
     border-radius: 4px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    margin-left: 4px;
 }
-.btn-del:hover { color: var(--danger-color); background: rgba(239, 68, 68, 0.10); }
-
-/* Larguras da grade de níveis */
-table.niveis { min-width: 1080px; }
-table.niveis col.c-nivel  { width: 62px; }
-table.niveis col.c-cota   { width: 96px; }
-table.niveis col.c-cruz   { width: 80px; }
-table.niveis col.c-item   { width: 78px; }
-table.niveis col.c-main   { width: 92px; }
-table.niveis col.c-del    { width: 44px; }
-
-/* Larguras da grade matricial de resultados */
-table.matriz { min-width: 1080px; }
-table.matriz col.c-pos    { width: 118px; }
-table.matriz col.c-paraf  { width: 190px; }
-table.matriz col.c-classe { width: 78px; }
-table.matriz col.c-compr  { width: 46px; }
-table.matriz col.c-del    { width: 40px; }
-table.matriz th.esq, table.matriz td.esq { text-align: left; }
-table.matriz td.esq { padding-left: 10px; font-weight: 600; }
-table.matriz td.preenchida { background: var(--primary-light); }
-table.matriz tbody tr:hover td.preenchida { background: var(--primary-light); }
-table.matriz td.vazia { color: var(--text-muted); opacity: 0.3; }
-table.matriz td.classe { color: var(--text-muted); }
-table.matriz th.c-compr-h { font-size: 0.72rem; }
-
-.tbl-vazia {
-    padding: 28px 16px !important;
-    text-align: center !important;
-    color: var(--text-muted);
-    font-size: 0.88rem;
+.badge-auto-cruzeta {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    margin-left: 4px;
+}
+tr.linha-auto-cruzeta td {
+    background: rgba(16, 185, 129, 0.08) !important;
+}
+tr.linha-auto-cruzeta td:first-child {
+    border-left: 4px solid #10b981;
+}
+tr.linha-auto-cruzeta:hover td {
+    background: rgba(16, 185, 129, 0.15) !important;
 }
 
-/* ── Memória de cálculo ────────────────────────────────────────────── */
-details.memoria {
-    margin-top: 16px;
-    background: var(--bg-color);
+.select-esf {
+    width: 100%;
+    height: 30px;
+    padding: 0 2px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: var(--surface-color);
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
 }
-details.memoria > summary {
-    font-size: 0.84rem;
+.select-esf:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.select-montagem {
+    width: 100%;
+    height: 32px;
+    padding: 2px 6px;
+    font-family: inherit;
+    font-size: 0.82rem;
     font-weight: 600;
+    color: var(--text-main);
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.select-montagem:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+.select-montagem.ativo {
+    color: var(--primary-color);
+    font-weight: 700;
+    border-color: rgba(37, 99, 235, 0.4);
+    background: var(--primary-light);
+}
+
+/* ── Modal de Montagens Padrão ─────────────────────────────────────── */
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.2s ease forwards;
+}
+.modal-dialog {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 780px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: modalSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+.btn-fechar-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
     color: var(--text-muted);
     cursor: pointer;
-    user-select: none;
-    list-style: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
 }
-details.memoria > summary::-webkit-details-marker { display: none; }
-details.memoria > summary::before { content: '▸ '; }
-details[open].memoria > summary::before { content: '▾ '; }
-details.memoria > summary:hover { color: var(--primary-color); }
+.btn-fechar-modal:hover {
+    color: var(--text-main);
+    background: var(--bg-color);
+}
 
+/* Larguras Grade Matricial de Resultados */
+table.matriz { min-width: 1080px; }
+table.matriz col.c-pos    { width: 130px; }
+table.matriz col.c-paraf  { width: 210px; }
+table.matriz col.c-classe { width: 85px; }
+table.matriz col.c-compr  { width: 48px; }
+table.matriz col.c-del    { width: 44px; }
+table.matriz th.esq, table.matriz td.esq { text-align: left; }
+table.matriz td.esq { padding-left: 12px; font-weight: 600; }
+table.matriz td.preenchida {
+    background: var(--primary-light);
+    font-weight: 700;
+}
+table.matriz td.preenchida input {
+    color: var(--primary-color);
+    font-weight: 800;
+}
+table.matriz td.vazia { color: var(--text-muted); opacity: 0.35; font-size: 0.80rem; }
+table.matriz td.classe { color: var(--text-muted); font-weight: 600; }
+
+.tbl-vazia {
+    padding: 36px 16px !important;
+    text-align: center !important;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+/* ── Memória de Cálculo Visual ─────────────────────────────────────── */
+.memoria-card-container {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 16px;
+}
 table.memoria {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.79rem;
-    margin-top: 10px;
-    background: var(--surface-color);
-    border-radius: 6px;
+    font-size: 0.82rem;
 }
 table.memoria th {
-    background: transparent;
+    background: var(--bg-color);
     text-align: left;
-    padding: 7px 8px;
-    font-size: 0.68rem;
+    padding: 10px 10px;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -332,7 +714,7 @@ table.memoria th {
     white-space: nowrap;
 }
 table.memoria td {
-    padding: 6px 8px;
+    padding: 8px 10px;
     border-bottom: 1px solid var(--border-color);
     color: var(--text-main);
     white-space: nowrap;
@@ -343,16 +725,332 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
 
 .tag {
     display: inline-block;
-    font-size: 0.68rem;
+    font-size: 0.70rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    padding: 2px 7px;
+    padding: 2px 8px;
     border-radius: 4px;
 }
 .tag.topo   { background: var(--c-maq-soft); color: var(--c-maq); border: 1px solid var(--c-maq-line); }
 .tag.gaveta { background: var(--c-dup-soft); color: var(--c-dup); border: 1px solid var(--c-dup-line); }
-.res-maq { color: var(--c-maq); font-weight: 700; }
-.res-dup { color: var(--c-dup); font-weight: 700; }
+.res-maq { color: var(--c-maq); font-weight: 800; font-size: 0.90rem; }
+.res-dup { color: var(--c-dup); font-weight: 800; font-size: 0.90rem; }
+
+/* ── Badges de Posição (TOPO / GAVETA) ────────────────────────────── */
+.badge-posicao {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+.badge-posicao.topo {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.35);
+}
+.badge-posicao.gaveta {
+    background: rgba(217, 119, 6, 0.12);
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.35);
+}
+
+/* ── Blocos de Cenário do Memorial ────────────────────────────────── */
+.memoria-filtros {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.memoria-filtro-btn {
+    padding: 7px 15px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: var(--surface-color);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.memoria-filtro-btn:hover {
+    color: var(--text-main);
+    border-color: var(--primary-color);
+}
+.memoria-filtro-btn.active {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.memoria-secao-bloco {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+.memoria-secao-bloco.bloco-topo {
+    border-left: 4px solid #2563eb;
+}
+.memoria-secao-bloco.bloco-gaveta {
+    border-left: 4px solid #d97706;
+}
+
+.memoria-secao-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.memoria-secao-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.memoria-secao-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+.memoria-secao-resumo {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: var(--bg-color);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+/* ── Cenários de Resumo Visual (TOPO vs GAVETA) ────────────────────── */
+.resumo-cenarios-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+.cenario-coluna {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+.cenario-coluna.cenario-topo {
+    border-top: 3px solid #2563eb;
+}
+.cenario-coluna.cenario-gaveta {
+    border-top: 3px solid #d97706;
+}
+.cenario-coluna-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.cenario-total-badge {
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+.cenario-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .resumo-cenarios-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── Botão de Destaque Salvar ──────────────────────────────────────── */
+.btn-salvar-destaque {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border-radius: var(--border-radius-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+    transition: all 0.2s ease;
+}
+.btn-salvar-destaque:hover {
+    box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+    transform: translateY(-1px);
+/* ── Estilos de Conicidade & Guia de Dimensionamento ───────────────── */
+.kpi-card.kpi-clicavel {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+.kpi-card.kpi-clicavel:hover {
+    border-color: #a855f7;
+    background: rgba(168, 85, 247, 0.03);
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.12);
+}
+.badge-edit-kpi {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(168, 85, 247, 0.12);
+    color: #9333ea;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.modal-dialog.modal-lg {
+    max-width: 880px;
+}
+.modal-subtabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+.modal-subtab-btn {
+    background: none;
+    border: 1px solid transparent;
+    padding: 7px 14px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+.modal-subtab-btn:hover {
+    color: var(--text-main);
+    background: var(--bg-color);
+}
+.modal-subtab-btn.active {
+    color: var(--primary-color);
+    background: var(--primary-light);
+    border-color: var(--border-color);
+}
+.guia-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+.guia-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 16px 18px;
+}
+.guia-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.guia-card-header h3 {
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+.guia-step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+.guia-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+@media (max-width: 768px) {
+    .guia-grid-2 { grid-template-columns: 1fr !important; }
+}
+.formula-box {
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin: 10px 0;
+    border: 1px solid #1e293b;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    overflow-x: auto;
+}
+.formula-box .comment {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+.tabela-espessuras {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    margin-top: 8px;
+}
+.tabela-espessuras th, .tabela-espessuras td {
+    padding: 7px 10px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+.tabela-espessuras th {
+    background: var(--bg-color);
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+}
+.simulador-preview-box {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 14px 16px;
+    margin-top: 14px;
+}
 {% endblock %}
 
 {% block content %}
@@ -363,14 +1061,71 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
   <!-- ── Cabeçalho da página ─────────────────────────────────────────── -->
   <div class="page-head">
     <div>
-      <h1><span>📐</span> Dimensionamento Automático de Parafusos</h1>
+      <h1>
+        <span class="icon-badge">📐</span>
+        Dimensionamento Automático de Parafusos
+      </h1>
       <p>
         Calculadora geométrica por níveis e conicidade do poste duplo T, com padrões de
-        montagem personalizáveis por parque.
+        montagem personalizáveis por obra.
       </p>
     </div>
     <div class="acoes">
-      <a href="/parafusos" class="btn btn-outline">📋 Cadastro de Parafusos</a>
+      <button type="button" class="btn btn-outline" onclick="abrirModalConicidade()" title="Configurar Fatores de Conicidade e Dimensões do Poste">⚙️ Conicidade do Poste</button>
+      <a href="/parafusos" class="btn btn-outline">📋 Cadastrar Parafusos (Manual)</a>
+    </div>
+  </div>
+
+  <!-- ── Barra de Métricas Rápidas (KPIs) ────────────────────────────── -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon blue">🏗️</div>
+      <div class="kpi-content">
+        <span class="kpi-label">Estrutura Ativa</span>
+        <span class="kpi-value" id="kpi-estrutura">—</span>
+        <span class="kpi-sub">Parque: <strong id="kpi-parque">{{ parque_ativo.nome if parque_ativo else 'Sem parque' }}</strong></span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon green">⚡</div>
+      <div class="kpi-content">
+        <span class="kpi-label">Esforço do Poste</span>
+        <span class="kpi-value" id="kpi-esforco">1000 daN</span>
+        <span class="kpi-sub">Fator de acréscimo: <strong id="kpi-fator">+1.5 mm/m</strong></span>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-clicavel" id="kpi-card-conicidade" onclick="abrirModalConicidade()" title="Clique para editar dimensões de topo e conicidade">
+      <div class="kpi-icon purple">📏</div>
+      <div class="kpi-content" style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+          <span class="kpi-label">Seção & Conicidade</span>
+          <span class="badge-edit-kpi" title="Clique para editar">⚙️ Editar</span>
+        </div>
+        <span class="kpi-value" id="kpi-secao-topo">A: 140 mm · B: 110 mm</span>
+        <span class="kpi-sub" id="kpi-conicidade-sub">Conicidade: 28 mm/m (A) · 20 mm/m (B)</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon amber">🔩</div>
+      <div class="kpi-content">
+        <span class="kpi-label">Parafusos Gerados</span>
+        <span class="kpi-value" id="kpi-total-parafusos">0 un.</span>
+        <span class="kpi-sub" id="kpi-niveis-calc">0 nível(is) calculados</span>
+      </div>
+    </div>
+
+    <div class="kpi-card" id="kpi-card-cruzetas" style="display: none;">
+      <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 7h16M7 12h10"/></svg>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Cruzetas Adicionais</span>
+        <span class="kpi-value" id="kpi-qtd-cruzetas" style="color: #059669;">0 un.</span>
+        <span class="kpi-sub" id="kpi-sub-cruzetas">Item 36 mobilizado</span>
+      </div>
     </div>
   </div>
 
@@ -379,7 +1134,7 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
   <!-- ── CARD 1: Parâmetros ──────────────────────────────────────────── -->
   <div class="card">
     <div class="card-header">
-      <span class="step">1</span>
+      <span class="step-badge">1</span>
       <h2>Parâmetros da Estrutura</h2>
       <span class="acoes-card">
         <span class="chip" id="badge-parque-ativo">{{ parque_ativo.nome if parque_ativo else 'Sem parque' }}</span>
@@ -411,7 +1166,7 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
 
         <div class="campo">
           <label for="sel-esforco">Esforço do poste (daN)</label>
-          <select id="sel-esforco" onchange="calcularTudo()">
+          <select id="sel-esforco" onchange="atualizarKpiEsforco(); calcularTudo()">
             <option value="600">600 daN (fator 0,0)</option>
             <option value="1000" selected>1000 daN (fator 1,5)</option>
             <option value="1500">1500 daN (fator 3,0)</option>
@@ -431,52 +1186,74 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
         </div>
 
         <div class="campo">
-          <label for="input-cruzeta-adic">Cruzeta adic. (item 36)</label>
+          <label for="input-cruzeta-adic">
+            <span>Cruzeta adic.</span>
+            <span id="badge-cruzeta-auto" class="aviso-auto" style="display:none; color:#059669; font-weight:700; font-size:0.72rem; text-transform:none;">⚡ Auto (Item 36)</span>
+            <span id="label-item-36" style="color:var(--text-muted); font-size:0.72rem; font-weight:600; text-transform:none;">(Item 36)</span>
+          </label>
           <input type="number" id="input-cruzeta-adic" placeholder="0" min="0" step="1"
                  oninput="calcularTudo()">
         </div>
 
       </div>
+
+      <div id="aviso-ch-info" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: var(--border-radius-sm); font-size: 0.82rem; color: var(--text-main);"></div>
     </div>
   </div>
 
   <!-- ── CARD 2: Elementos construtivos por nível ────────────────────── -->
   <div class="card">
     <div class="card-header">
-      <span class="step">2</span>
+      <span class="step-badge">2</span>
       <h2>Elementos Construtivos por Nível</h2>
       <span class="hint">campos vazios aparecem como “—”</span>
       <span class="acoes-card">
-        <button class="btn btn-outline" onclick="adicionarLinhaGrid()">➕ Adicionar nível</button>
-        <button class="btn btn-primary" onclick="salvarPadraoEstruturaParque()">💾 Salvar padrão no parque</button>
+        <button type="button" class="btn btn-outline" onclick="abrirModalMontagens()">⚙️ Padrões de Montagem</button>
+        <button type="button" class="btn btn-outline" onclick="adicionarLinhaGrid()">➕ Adicionar nível</button>
+        <button type="button" class="btn btn-primary" onclick="salvarPadraoEstruturaParque()">💾 Salvar padrão no parque</button>
       </span>
     </div>
 
     <div class="card-body">
+      <div id="aviso-nivel-inserido-grid" style="display: none; margin-bottom: 14px; padding: 12px 16px; background: rgba(16, 185, 129, 0.10); border: 1px solid rgba(16, 185, 129, 0.35); border-left: 4px solid #10b981; border-radius: var(--border-radius-sm); font-size: 0.86rem; color: var(--text-main);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">⚡</span>
+          <div>
+            <strong>Inserção Automática de Nível Intermediário:</strong> Vão variável CH ≥ 5,0 m detectado.
+            O dimensionamento inseriu automaticamente <strong><span id="txt-niveis-extras-grid">1</span> nível(is) adicional(is) de suporte</strong> (<span id="txt-cruzetas-extras-grid">2</span> cruzetas metálicas do Item 36).
+            Confira o detalhamento na <strong>Memória de Cálculo e Resultados (Passo 3)</strong>.
+          </div>
+        </div>
+      </div>
+
       <div class="tbl-wrap">
         <table class="grade niveis" id="tabela-grid-niveis">
           <colgroup>
-            <col class="c-nivel"><col class="c-cota"><col class="c-cruz">
-            <col class="c-main"><col class="c-item"><col class="c-item"><col class="c-item"><col class="c-item">
-            <col class="c-main"><col class="c-item"><col class="c-item"><col class="c-item"><col class="c-item">
+            <col class="c-nivel"><col class="c-cota"><col class="c-face"><col class="c-mont"><col class="c-cruz">
+            <col class="c-esf"><col class="c-main"><col class="c-item"><col class="c-item"><col class="c-item"><col class="c-item">
+            <col class="c-esf"><col class="c-main"><col class="c-item"><col class="c-item"><col class="c-item"><col class="c-item">
             <col class="c-del">
           </colgroup>
           <thead>
             <tr>
               <th rowspan="2">Nível</th>
               <th rowspan="2">Cota (m)</th>
+              <th rowspan="2" title="Marque se este nível for montado na face oposta (90° transversal) à posição padrão do poste">Face Oposta</th>
+              <th rowspan="2">Montagem Padrão</th>
               <th rowspan="2">Cruzeta</th>
-              <th colspan="5" class="g-maq g-titulo sep-l">Parafuso cabeça quadrada</th>
-              <th colspan="5" class="g-dup g-titulo sep-l">Parafuso rosca dupla</th>
+              <th colspan="6" class="g-maq g-titulo sep-l">🔩 Parafuso Cabeça Quadrada</th>
+              <th colspan="6" class="g-dup g-titulo sep-l">🔗 Parafuso Rosca Dupla</th>
               <th rowspan="2" class="sep-l"></th>
             </tr>
             <tr>
-              <th class="g-maq sep-l">Parafuso</th>
+              <th class="g-maq sep-l" title="Classe de esforço mecânico">Classe</th>
+              <th class="g-maq">Qtd</th>
               <th class="g-maq">Porca</th>
               <th class="g-maq">Arruela</th>
               <th class="g-maq">Olhal</th>
               <th class="g-maq">Sobra</th>
-              <th class="g-dup sep-l">Parafuso</th>
+              <th class="g-dup sep-l" title="Classe de esforço mecânico">Classe</th>
+              <th class="g-dup">Qtd</th>
               <th class="g-dup">Porca</th>
               <th class="g-dup">Arruela</th>
               <th class="g-dup">Olhal</th>
@@ -492,96 +1269,787 @@ table.memoria .num { font-variant-numeric: tabular-nums; }
   <!-- ── CARD 3: Resultados ──────────────────────────────────────────── -->
   <div class="card">
     <div class="card-header">
-      <span class="step">3</span>
-      <h2>Grade de Parafusos Gerada</h2>
+      <span class="step-badge">3</span>
+      <h2>Resultados do Dimensionamento</h2>
       <span class="acoes-card">
-        <button class="btn btn-primary" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()">
-          💾 Validar e adicionar à receita do parque
+        <button class="btn-salvar-destaque" id="btn-salvar-receita" onclick="salvarParafusosNaReceita()">
+          💾 Validar e Adicionar à Receita do Parque
         </button>
       </span>
     </div>
 
     <div class="card-body">
-      <div class="tbl-wrap">
-        <table class="grade matriz" id="tabela-matriz-parafusos">
-          <colgroup>
-            <col class="c-pos"><col class="c-paraf"><col class="c-classe">
-            <col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr">
-            <col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr">
-            <col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr"><col class="c-compr">
-            <col class="c-del">
-          </colgroup>
-          <thead>
-            <tr>
-              <th class="esq">Posição</th>
-              <th class="esq">Parafuso</th>
-              <th>Classe (kN)</th>
-              <th class="c-compr-h sep-l">200</th>
-              <th class="c-compr-h">250</th>
-              <th class="c-compr-h">300</th>
-              <th class="c-compr-h">350</th>
-              <th class="c-compr-h">400</th>
-              <th class="c-compr-h">450</th>
-              <th class="c-compr-h">500</th>
-              <th class="c-compr-h">550</th>
-              <th class="c-compr-h">600</th>
-              <th class="c-compr-h">650</th>
-              <th class="c-compr-h">700</th>
-              <th class="c-compr-h">750</th>
-              <th class="c-compr-h">800</th>
-              <th class="c-compr-h">850</th>
-              <th class="c-compr-h">900</th>
-              <th class="sep-l"></th>
-            </tr>
-          </thead>
-          <tbody id="tbody-matriz-parafusos">
-            <tr><td colspan="19" class="tbl-vazia">Preencha os parâmetros para calcular os parafusos.</td></tr>
-          </tbody>
-        </table>
+
+      <!-- Seção Destacada: Cruzetas Adicionais Mobilizadas -->
+      <div id="secao-cruzetas-mobilizadas" style="display: none; margin-bottom: 22px; background: rgba(16, 185, 129, 0.10); border: 1px solid rgba(16, 185, 129, 0.35); border-left: 5px solid #10b981; border-radius: var(--border-radius-sm); padding: 14px 18px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #059669;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 7h16M7 12h10"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 1.05rem; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="txt-qtd-cruzetas-mobilizadas">0 un.</span> de Cruzetas Adicionais Mobilizadas (Item 36)
+                <span class="tag" style="background: #059669; color: #ffffff; border: none; font-size: 0.70rem; padding: 2px 8px; font-weight: 800;">MOBILIZAÇÃO AUTOMÁTICA</span>
+              </div>
+              <div style="font-size: 0.84rem; color: var(--text-muted); margin-top: 4px;" id="txt-desc-cruzetas-mobilizadas">
+                Inserção de nível(is) intermediário(s) para suporte dos cabos condutores devido ao vão CH ≥ 5,0 m (espaçamento ≤ 3,0 m).
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--surface-color); padding: 8px 14px; border-radius: 6px; border: 1px solid var(--border-color); text-align: right;">
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block;">Padrão por Nível Intermediário</span>
+            <div style="font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">2 Cruzetas Metálicas · 4 Parafusos Máquina 50 kN</div>
+          </div>
+        </div>
       </div>
 
-      <details class="memoria">
-        <summary>Ver memória de cálculo geométrica passo a passo (topo e gaveta)</summary>
-        <div style="overflow-x: auto;">
-          <table class="memoria">
-            <thead>
-              <tr>
-                <th>Nível</th>
-                <th>Cota</th>
-                <th>Face / elemento</th>
-                <th>Seção poste</th>
-                <th>Ferragens</th>
-                <th>Comp. calculado</th>
-                <th>Comp. comercial</th>
-              </tr>
+      <!-- Resumo Rápido dos Parafusos Calculados -->
+      <div class="resumo-section">
+        <div class="resumo-section-title">
+          <span>📦</span> Parafusos Finais Necessários
+        </div>
+        <div class="resumo-parafusos-grid" id="container-resumo-parafusos">
+          <div style="color: var(--text-muted); font-size: 0.88rem;">Nenhum parafuso calculado ainda.</div>
+        </div>
+      </div>
+
+      <!-- Alternador de Abas de Visualização -->
+      <div class="tabs-container">
+        <button type="button" class="tab-btn active" id="tab-btn-grade" onclick="alternarAbaResultados('grade')">
+          <span>📊</span> Grade de Comprimentos Comerciais
+        </button>
+        <button type="button" class="tab-btn" id="tab-btn-memoria" onclick="alternarAbaResultados('memoria')">
+          <span>📐</span> Memória de Cálculo Passo a Passo
+        </button>
+        <button type="button" class="tab-btn" id="tab-btn-guia" onclick="alternarAbaResultados('guia')">
+          <span>📖</span> Como Funciona o Dimensionamento
+        </button>
+      </div>
+
+      <!-- Aba 1: Grade de Comprimentos Comerciais -->
+      <div id="aba-conteudo-grade">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+            <span>ℹ️</span> Comprimentos comerciais de <strong>50 em 50 mm</strong> (mínimo 200 mm). A grade expande automaticamente conforme os parafusos calculados.
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="adicionarColunaComprimentoGrade()" title="Adicionar próxima coluna comercial (+50 mm)">
+              ➕ Coluna (+50 mm)
+            </button>
+            <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="resetarColunasGrade()" title="Ajustar colunas automaticamente com base nos parafusos da estrutura">
+              🔄 Ajustar Colunas
+            </button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="grade matriz" id="tabela-matriz-parafusos">
+            <colgroup id="colgroup-matriz-parafusos">
+            </colgroup>
+            <thead id="thead-matriz-parafusos">
             </thead>
-            <tbody id="tbody-memoria-calculo">
-              <tr><td colspan="7" class="tbl-vazia">Nenhum nível calculado.</td></tr>
+            <tbody id="tbody-matriz-parafusos">
+              <tr><td colspan="19" class="tbl-vazia">Preencha os parâmetros para calcular os parafusos.</td></tr>
             </tbody>
           </table>
         </div>
-      </details>
+      </div>
+
+      <!-- Aba 2: Memória de Cálculo Passo a Passo -->
+      <div id="aba-conteudo-memoria" style="display: none;">
+        <!-- Filtros de Visualização dos Cenários -->
+        <div class="memoria-filtros">
+          <button type="button" class="memoria-filtro-btn active" id="btn-filtro-mem-todos" onclick="filtrarMemorial('todos')">
+            👁️ Ver Ambos os Cenários
+          </button>
+          <button type="button" class="memoria-filtro-btn" id="btn-filtro-mem-topo" onclick="filtrarMemorial('topo')">
+            🟦 Somente Posição TOPO
+          </button>
+          <button type="button" class="memoria-filtro-btn" id="btn-filtro-mem-gaveta" onclick="filtrarMemorial('gaveta')">
+            🟧 Somente Posição GAVETA
+          </button>
+        </div>
+
+        <!-- Bloco 1: Cenário Posição TOPO -->
+        <div class="memoria-secao-bloco bloco-topo" id="secao-memoria-topo">
+          <div class="memoria-secao-header">
+            <div class="memoria-secao-titulo">
+              <span class="badge-posicao topo">POSIÇÃO: TOPO</span>
+              <span class="memoria-secao-desc">Dimensionamento para instalação em <strong>TOPO</strong> (Face A como orientação principal)</span>
+            </div>
+            <div class="memoria-secao-resumo" id="resumo-topo-badge">0 un. de parafusos</div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="memoria">
+              <thead>
+                <tr>
+                  <th>Nível</th>
+                  <th>Cota (m)</th>
+                  <th>Face Furada</th>
+                  <th>Tipo Parafuso</th>
+                  <th>Classe</th>
+                  <th>Seção Poste</th>
+                  <th>Esp. Ferragens</th>
+                  <th>Comp. Calculado</th>
+                  <th>Comprimento Comercial</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-memoria-topo">
+                <tr><td colspan="9" class="tbl-vazia">Nenhum nível calculado para TOPO.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bloco 2: Cenário Posição GAVETA -->
+        <div class="memoria-secao-bloco bloco-gaveta" id="secao-memoria-gaveta">
+          <div class="memoria-secao-header">
+            <div class="memoria-secao-titulo">
+              <span class="badge-posicao gaveta">POSIÇÃO: GAVETA</span>
+              <span class="memoria-secao-desc">Dimensionamento para instalação em <strong>GAVETA</strong> (Face B como orientação principal)</span>
+            </div>
+            <div class="memoria-secao-resumo" id="resumo-gaveta-badge">0 un. de parafusos</div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="memoria">
+              <thead>
+                <tr>
+                  <th>Nível</th>
+                  <th>Cota (m)</th>
+                  <th>Face Furada</th>
+                  <th>Tipo Parafuso</th>
+                  <th>Classe</th>
+                  <th>Seção Poste</th>
+                  <th>Esp. Ferragens</th>
+                  <th>Comp. Calculado</th>
+                  <th>Comprimento Comercial</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-memoria-gaveta">
+                <tr><td colspan="9" class="tbl-vazia">Nenhum nível calculado para GAVETA.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba 3: Como Funciona o Dimensionamento -->
+      <div id="aba-conteudo-guia" style="display: none;">
+        <div class="guia-container">
+          <!-- Cabeçalho do Guia -->
+          <div class="guia-card" style="background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(168,85,247,0.06) 100%); border-left: 4px solid var(--primary-color);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.5rem;">📖</span>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.12rem; font-weight: 700;">Como Funciona o Dimensionamento dos Parafusos</h3>
+                  <span style="font-size: 0.82rem; color: var(--text-muted);">
+                    Memória analítica, conceitos geométricos e formulações normativas aplicadas aos postes Duplo T (DT).
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 6px 12px;" onclick="abrirModalConicidade()">
+                ⚙️ Alterar Fatores do Poste
+              </button>
+            </div>
+          </div>
+
+          <!-- Passo 1: Geometria e Conicidade do Poste DT -->
+          <div class="guia-card">
+            <div class="guia-card-header">
+              <span class="guia-step-num">1</span>
+              <h3>Geometria das Faces e Fator de Conicidade</h3>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 12px;">
+              O poste de concreto armado <strong>Duplo T (DT)</strong> possui seção transversal trapezoidal variável. Cada uma de suas faces possui dimensões e taxas de abertura (conicidade) próprias:
+            </p>
+            <div class="guia-grid-2">
+              <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px;">
+                <div style="color: #2563eb; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px;">🟦 Face A (Posição TOPO / Centro)</div>
+                <ul style="font-size: 0.84rem; padding-left: 18px; margin: 0; color: var(--text-main); line-height: 1.5;">
+                  <li><strong>Largura no Topo:</strong> Padrão <strong>140 mm</strong> (personalizável por parque).</li>
+                  <li><strong>Taxa de Conicidade:</strong> Padrão <strong>28 mm/m</strong> (aumento de 28 mm a cada metro de descida).</li>
+                  <li>Utilizada convencionalmente para parafusos na orientação <strong>TOPO</strong>.</li>
+                </ul>
+              </div>
+              <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px;">
+                <div style="color: #d97706; font-weight: 700; font-size: 0.92rem; margin-bottom: 4px;">🟧 Face B (Posição GAVETA / Alma)</div>
+                <ul style="font-size: 0.84rem; padding-left: 18px; margin: 0; color: var(--text-main); line-height: 1.5;">
+                  <li><strong>Largura no Topo:</strong> Padrão <strong>110 mm</strong> (personalizável por parque).</li>
+                  <li><strong>Taxa de Conicidade:</strong> Padrão <strong>20 mm/m</strong> (aumento de 20 mm a cada metro de descida).</li>
+                  <li>Utilizada convencionalmente para parafusos na orientação <strong>GAVETA</strong>.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="margin-top: 14px;">
+              <strong style="font-size: 0.88rem;">Fórmula da Seção do Poste em um determinado Nível:</strong>
+              <div class="formula-box">
+Largura_Poste(d) = Topo_Base + (Conicidade × Fator_Esforço) + (Conicidade × d)
+<span class="comment">// d = Cota acumulada a partir do topo do poste (em metros)</span>
+<span class="comment">// Fator_Esforço: 600 daN (1.0) | 1000 daN (1.5) | 1500 daN (2.0) | 2000 daN (2.5) | 2500 daN (3.0) | 3000 daN (3.5)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passo 2: Regra da Face Oposta (Giro de 90°) -->
+          <div class="guia-card">
+            <div class="guia-card-header">
+              <span class="guia-step-num">2</span>
+              <h3>Orientação dos Furos e Regra da Face Oposta (Giro de 90°)</h3>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 10px;">
+              A furação do poste duplo T depende da orientação construtiva do nível. Em situações de cruzamento de redes, ângulos ou montagens específicas, a cruzeta é fixada girada em 90° (marcada como <strong>Face Oposta</strong> no nível correspondente):
+            </p>
+            <div class="tbl-wrap">
+              <table class="tabela-espessuras">
+                <thead>
+                  <tr>
+                    <th>Posição Selecionada</th>
+                    <th>Face Oposta MARCADA?</th>
+                    <th>Face Física Atravessada</th>
+                    <th>Fórmula da Largura do Poste</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>TOPO</strong></td>
+                    <td>❌ Não (Padrão)</td>
+                    <td><strong style="color: #2563eb;">Face A</strong> (140 mm + 28 mm/m)</td>
+                    <td><code>140 + (28 × F_esf) + (28 × d)</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>TOPO</strong></td>
+                    <td>✅ Sim (Girada 90°)</td>
+                    <td><strong style="color: #d97706;">Face B</strong> (110 mm + 20 mm/m)</td>
+                    <td><code>110 + (20 × F_esf) + (20 × d)</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>GAVETA</strong></td>
+                    <td>❌ Não (Padrão)</td>
+                    <td><strong style="color: #d97706;">Face B</strong> (110 mm + 20 mm/m)</td>
+                    <td><code>110 + (20 × F_esf) + (20 × d)</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>GAVETA</strong></td>
+                    <td>✅ Sim (Girada 90°)</td>
+                    <td><strong style="color: #2563eb;">Face A</strong> (140 mm + 28 mm/m)</td>
+                    <td><code>140 + (28 × F_esf) + (28 × d)</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Passo 3: Espessura de Ferragens e Acessórios -->
+          <div class="guia-card">
+            <div class="guia-card-header">
+              <span class="guia-step-num">3</span>
+              <h3>Pacote Construtivo de Ferragens e Acessórios</h3>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 10px;">
+              O comprimento mínimo do parafuso deve abranger não somente a espessura do poste, mas todo o pacote de peças metálicas que ele atravessa, incluindo aperto e folga técnica de segurança:
+            </p>
+            <div class="tbl-wrap">
+              <table class="tabela-espessuras">
+                <thead>
+                  <tr>
+                    <th>Componente / Ferragem</th>
+                    <th>Espessura Unitária Adicionada</th>
+                    <th>Finalidade Técnica</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cruzeta Metálica</strong></td>
+                    <td><strong>+100 mm</strong> por unidade</td>
+                    <td>Largura da cruzeta metálica padrão atravessada (Cruzeta dupla = +200 mm)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Porca Sextavada</strong></td>
+                    <td><strong>+16 mm</strong> por unidade</td>
+                    <td>Espessura de pega da porca roscada</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Arruela (Quadrada / Curva)</strong></td>
+                    <td><strong>+6 mm</strong> por unidade</td>
+                    <td>Distribuição de carga na superfície de concreto ou chapa metálica</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Olhal de Suspensão</strong></td>
+                    <td><strong>+25 mm</strong> por unidade</td>
+                    <td>Ponto de ancoragem/suspensão fixado ao parafuso</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sobra Técnica de Rosca</strong></td>
+                    <td><strong>+25 mm</strong></td>
+                    <td>Extensão mínima de rosca para além da porca necessária para montagem e torque</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="formula-box" style="margin-top: 14px;">
+Comprimento_Calculado = Largura_Poste(d) + Σ(Cruzeta × 100) + Σ(Porca × 16) + Σ(Arruela × 6) + Σ(Olhal × 25) + Sobra
+            </div>
+          </div>
+
+          <!-- Passo 4: Padronização Comercial -->
+          <div class="guia-card">
+            <div class="guia-card-header">
+              <span class="guia-step-num">4</span>
+              <h3>Padronização para Comprimento Comercial (Passos de 50 mm)</h3>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 10px;">
+              Parafusos de cabeça quadrada e de rosca dupla são padronizados em <strong>passos de 50 em 50 mm</strong>, iniciando em 200 mm e com tamanhos variáveis sem limite superior (acompanhando qualquer necessidade dimensional do poste). O sistema seleciona automaticamente o <strong>menor comprimento comercial que seja maior ou igual ao comprimento calculado</strong>:
+            </p>
+            <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+              <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Série de Comprimentos Comerciais (mm) — Variável de 50 em 50 mm</div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <span class="chip" style="font-weight: 700;">200</span>
+                <span class="chip" style="font-weight: 700;">250</span>
+                <span class="chip" style="font-weight: 700;">300</span>
+                <span class="chip" style="font-weight: 700;">350</span>
+                <span class="chip" style="font-weight: 700;">400</span>
+                <span class="chip" style="font-weight: 700;">450</span>
+                <span class="chip" style="font-weight: 700;">500</span>
+                <span class="chip" style="font-weight: 700;">550</span>
+                <span class="chip" style="font-weight: 700;">600</span>
+                <span class="chip" style="font-weight: 700;">650</span>
+                <span class="chip" style="font-weight: 700;">700</span>
+                <span class="chip" style="font-weight: 700;">750</span>
+                <span class="chip" style="font-weight: 700;">800</span>
+                <span class="chip" style="font-weight: 700;">850</span>
+                <span class="chip" style="font-weight: 700;">900</span>
+                <span class="chip" style="font-weight: 700; background: var(--primary-light); color: var(--primary-color);">950</span>
+                <span class="chip" style="font-weight: 700; background: var(--primary-light); color: var(--primary-color);">1000</span>
+                <span class="chip" style="font-weight: 700; background: var(--primary-light); color: var(--primary-color);">1050</span>
+                <span class="chip" style="font-weight: 700; background: var(--primary-light); color: var(--primary-color);">1100</span>
+                <span class="chip" style="font-weight: 700; background: var(--primary-light); color: var(--primary-color);">1150+</span>
+              </div>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-main); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; padding: 10px 14px;">
+              💡 <strong>Exemplo Prático:</strong> Em um nível a 2.0 m de distância, com esforço de 1000 daN, Face A (140 + 28×1.5 + 28×2.0 = 238 mm), com 1 cruzeta (100 mm), 2 porcas (32 mm), 2 arruelas (12 mm) e sobra (25 mm), o total calculado resulta em <strong>407 mm</strong> $\to$ Parafuso comercial de <strong>450 mm</strong>. Se a soma calculada for <strong>918 mm</strong>, o parafuso comercial adotado será de <strong>950 mm</strong> (e a grade expande a coluna automaticamente).
+            </div>
+          </div>
+
+          <!-- Passo 5: Vãos Variáveis (CH) e Cruzetas Adicionais -->
+          <div class="guia-card">
+            <div class="guia-card-header">
+              <span class="guia-step-num">5</span>
+              <h3>Vãos Variáveis (CH) e Cruzetas Adicionais Automatizadas</h3>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 8px;">
+              Quando uma estrutura possui cota com código <strong>CH</strong> (Chave Seccionadora), a distância real entre níveis é calculada proporcionalmente à altura do poste informada.
+            </p>
+            <ul style="font-size: 0.84rem; padding-left: 20px; margin: 0 0 10px 0; color: var(--text-main); line-height: 1.6;">
+              <li><strong>Regra dos 5 Metros:</strong> Se o vão entre o nível da chave seccionadora e o nível imediatamente anterior for maior do que 5 metros, torna-se obrigatória a instalação de cruzetas intermediárias de suporte.</li>
+              <li><strong>Espaçamento a cada 3 Metros:</strong> A cada 3 metros adicionais de vão, o sistema insere automaticamente um nível auxiliar com cruzeta adicional igualmente espaçado.</li>
+              <li><strong>Padrão de Montagem da Cruzeta Adicional:</strong> Cada nível adicional recebe 2 cruzetas metálicas, 4 parafusos de cabeça quadrada 50 kN, porcas, arruelas e sobra técnica, além de mobilizar as unidades correspondentes no quantitativo final (Item 36 da RMT).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>
 
 </div>
 
+<!-- ── MODAL: Gerenciar Padrões de Montagem ───────────────────────── -->
+<div id="modal-montagens" class="modal-backdrop" style="display: none;" onclick="fecharModalMontagensAoClicarFora(event)">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.3rem;">⚙️</span>
+        <div>
+          <h3 style="margin: 0; font-size: 1.12rem; font-weight: 700;">Padrões de Montagem</h3>
+          <span style="font-size: 0.78rem; color: var(--text-muted);">
+            Configurações padronizadas de ferragens e parafusos por nível no parque ativo
+          </span>
+        </div>
+      </div>
+      <button type="button" class="btn-fechar-modal" onclick="fecharModalMontagens()" title="Fechar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Visão 1: Lista de Padrões -->
+      <div id="view-montagens-lista">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+            Padrões cadastrados (<strong id="total-montagens-cadastradas">0</strong>)
+          </span>
+          <button type="button" class="btn btn-primary" onclick="abrirFormularioNovaMontagem()">
+            ➕ Novo Padrão
+          </button>
+        </div>
+
+        <div class="tbl-wrap" style="max-height: 380px; overflow-y: auto;">
+          <table class="grade">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding-left: 12px;">Nome do Padrão</th>
+                <th>Cruzeta</th>
+                <th class="g-maq sep-l">Paraf. Máq</th>
+                <th class="g-maq">Porca/Arr/Olh</th>
+                <th class="g-dup sep-l">Rosca Dupla</th>
+                <th class="g-dup">Porca/Arr/Olh</th>
+                <th class="sep-l">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-lista-montagens">
+              <!-- Preenchido via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Visão 2: Formulário Criar/Editar Padrão -->
+      <div id="view-montagens-form" style="display: none;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <h4 id="titulo-form-montagem" style="margin: 0; font-size: 0.98rem; font-weight: 700;">
+            Novo Padrão de Montagem
+          </h4>
+          <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="voltarParaListaMontagens()">
+            ← Voltar à Lista
+          </button>
+        </div>
+
+        <form id="form-montagem" onsubmit="salvarPadraoMontagemModal(event)">
+          <input type="hidden" id="input-montagem-nome-antigo" value="">
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 16px;">
+            <div class="campo">
+              <label for="input-montagem-nome">Nome do Padrão *</label>
+              <input type="text" id="input-montagem-nome" required
+                     placeholder="Ex: N4, N1, CHAVE FUSÍVEL..."
+                     style="text-transform: uppercase;">
+            </div>
+            <div class="campo">
+              <label for="input-montagem-cruzeta">Cruzeta (Qtd)</label>
+              <input type="number" id="input-montagem-cruzeta" min="0" step="1" value="0" required>
+            </div>
+          </div>
+
+          <!-- Grade Parafuso Cabeça Quadrada -->
+          <div style="background: var(--c-maq-soft); border: 1px solid var(--c-maq-line); border-radius: var(--border-radius-sm); padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--c-maq); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <span>🔩</span> Parafuso Cabeça Quadrada (Máquina)
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;">
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Classe (kN)</label>
+                <select id="input-montagem-esf-maq" style="height: 38px; font-size: 0.82rem; font-weight: 700;">
+                  <option value="50">50 kN</option>
+                  <option value="70">70 kN</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Parafusos</label>
+                <input type="number" id="input-montagem-p-maq" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Porcas</label>
+                <input type="number" id="input-montagem-porca-m" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Arruelas</label>
+                <input type="number" id="input-montagem-arruela-m" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Olhais</label>
+                <input type="number" id="input-montagem-olhal-m" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Sobra (cm)</label>
+                <input type="number" id="input-montagem-sobra-m" min="0" step="0.5" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Grade Parafuso Rosca Dupla -->
+          <div style="background: var(--c-dup-soft); border: 1px solid var(--c-dup-line); border-radius: var(--border-radius-sm); padding: 12px; margin-bottom: 16px;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--c-dup); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <span>🔗</span> Parafuso Rosca Dupla
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;">
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Classe (kN)</label>
+                <select id="input-montagem-esf-dup" style="height: 38px; font-size: 0.82rem; font-weight: 700;">
+                  <option value="70">70 kN</option>
+                  <option value="50">50 kN</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Parafusos</label>
+                <input type="number" id="input-montagem-p-dup" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Porcas</label>
+                <input type="number" id="input-montagem-porca-d" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Arruelas</label>
+                <input type="number" id="input-montagem-arruela-d" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Olhais</label>
+                <input type="number" id="input-montagem-olhal-d" min="0" step="1" value="0">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.68rem;">Sobra (cm)</label>
+                <input type="number" id="input-montagem-sobra-d" min="0" step="0.5" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkbox de Propagação -->
+          <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 10px;">
+            <input type="checkbox" id="chk-montagem-propagar" checked style="margin-top: 3px; cursor: pointer;">
+            <label for="chk-montagem-propagar" style="font-size: 0.82rem; color: var(--text-main); font-weight: 500; cursor: pointer; line-height: 1.4;">
+              <strong>Propagar alterações automaticamente:</strong> atualizar todos os níveis de estruturas neste parque que utilizam este padrão de montagem.
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn btn-outline" onclick="voltarParaListaMontagens()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-montagem">Salvar Padrão</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: Conicidade & Regras de Dimensionamento ──────────────── -->
+<div id="modal-conicidade" class="modal-backdrop" style="display: none;" onclick="fecharModalConicidadeAoClicarFora(event)">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.3rem;">⚙️</span>
+        <div>
+          <h3 style="margin: 0; font-size: 1.12rem; font-weight: 700;">Conicidade do Poste & Regras de Cálculo</h3>
+          <span style="font-size: 0.78rem; color: var(--text-muted);">
+            Configuração geométrica do poste Duplo T por parque e guia de dimensionamento
+          </span>
+        </div>
+      </div>
+      <button type="button" class="btn-fechar-modal" onclick="fecharModalConicidade()" title="Fechar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Abas internas do Modal -->
+      <div class="modal-subtabs">
+        <button type="button" class="modal-subtab-btn active" id="modal-tab-btn-fatores" onclick="alternarAbaModalConicidade('fatores')">
+          ⚙️ Fatores de Conicidade e Dimensões
+        </button>
+        <button type="button" class="modal-subtab-btn" id="modal-tab-btn-guia" onclick="alternarAbaModalConicidade('guia')">
+          📖 Explicação do Dimensionamento
+        </button>
+      </div>
+
+      <!-- Visão 1: Configuração dos Fatores de Conicidade -->
+      <div id="modal-view-conicidade-fatores">
+        <div style="background: var(--primary-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text-main);">
+          🏢 Parque Atual: <strong id="modal-conicidade-parque-nome">{{ parque_ativo.nome if parque_ativo else 'Sem parque' }}</strong>. 
+          As alterações salvas afetarão todas as estruturas e cálculos deste parque.
+        </div>
+
+        <form id="form-conicidade" onsubmit="event.preventDefault(); salvarConicidadeParque();">
+          <div class="guia-grid-2">
+            <!-- Face A -->
+            <div class="guia-card" style="border-top: 3px solid #2563eb;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="margin: 0; color: #2563eb; font-size: 0.95rem; font-weight: 700;">Face A (Posição TOPO / Centro)</h4>
+                <span class="chip" style="font-size: 0.72rem;">Principal</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                Utilizada para fixação na posição TOPO (ou GAVETA quando Face Oposta estiver ativa).
+              </p>
+              <div class="campo" style="margin-bottom: 10px;">
+                <label for="input-topo-a" style="font-size: 0.8rem; font-weight: 600;">Largura no Topo (mm)</label>
+                <input type="number" id="input-topo-a" step="0.5" min="20" max="1000" value="140" required
+                       oninput="atualizarPreviewConicidade()">
+                <small style="font-size: 0.72rem; color: var(--text-muted);">Padrão de catálogo: 140 mm</small>
+              </div>
+              <div class="campo">
+                <label for="input-conicidade-a" style="font-size: 0.8rem; font-weight: 600;">Taxa de Conicidade (mm/m)</label>
+                <input type="number" id="input-conicidade-a" step="0.1" min="0" max="200" value="28" required
+                       oninput="atualizarPreviewConicidade()">
+                <small style="font-size: 0.72rem; color: var(--text-muted);">Padrão de catálogo: 28 mm/m</small>
+              </div>
+            </div>
+
+            <!-- Face B -->
+            <div class="guia-card" style="border-top: 3px solid #d97706;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="margin: 0; color: #d97706; font-size: 0.95rem; font-weight: 700;">Face B (Posição GAVETA / Alma)</h4>
+                <span class="chip" style="font-size: 0.72rem;">Secundária</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                Utilizada para fixação na posição GAVETA (ou TOPO quando Face Oposta estiver ativa).
+              </p>
+              <div class="campo" style="margin-bottom: 10px;">
+                <label for="input-topo-b" style="font-size: 0.8rem; font-weight: 600;">Largura no Topo (mm)</label>
+                <input type="number" id="input-topo-b" step="0.5" min="20" max="1000" value="110" required
+                       oninput="atualizarPreviewConicidade()">
+                <small style="font-size: 0.72rem; color: var(--text-muted);">Padrão de catálogo: 110 mm</small>
+              </div>
+              <div class="campo">
+                <label for="input-conicidade-b" style="font-size: 0.8rem; font-weight: 600;">Taxa de Conicidade (mm/m)</label>
+                <input type="number" id="input-conicidade-b" step="0.1" min="0" max="200" value="20" required
+                       oninput="atualizarPreviewConicidade()">
+                <small style="font-size: 0.72rem; color: var(--text-muted);">Padrão de catálogo: 20 mm/m</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulador / Preview Interativo -->
+          <div class="simulador-preview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <strong style="font-size: 0.85rem; color: var(--text-main);">🧪 Teste Rápido de Seção do Poste</strong>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Cálculo em tempo real com os valores acima</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+              <div class="campo">
+                <label style="font-size: 0.76rem;">Distância do Nível (m):</label>
+                <input type="number" id="sim-dist" step="0.1" min="0" max="20" value="2.0" oninput="atualizarPreviewConicidade()" style="height: 30px;">
+              </div>
+              <div class="campo">
+                <label style="font-size: 0.76rem;">Esforço Nominal (daN):</label>
+                <select id="sim-esf" onchange="atualizarPreviewConicidade()" style="height: 30px; font-size: 0.82rem;">
+                  <option value="600">600 daN (Fator 1.0)</option>
+                  <option value="1000" selected>1000 daN (Fator 1.5)</option>
+                  <option value="1500">1500 daN (Fator 2.0)</option>
+                  <option value="2000">2000 daN (Fator 2.5)</option>
+                  <option value="2500">2500 daN (Fator 3.0)</option>
+                  <option value="3000">3000 daN (Fator 3.5)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.82rem;">
+              <div style="background: var(--surface-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px;">
+                <span style="color: #2563eb; font-weight: 700;">Face A Calculada:</span>
+                <div id="sim-res-a" style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-top: 2px;">— mm</div>
+                <div id="sim-det-a" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">—</div>
+              </div>
+              <div style="background: var(--surface-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px;">
+                <span style="color: #d97706; font-weight: 700;">Face B Calculada:</span>
+                <div id="sim-res-b" style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-top: 2px;">— mm</div>
+                <div id="sim-det-b" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" onclick="restaurarConicidadePadrao()" title="Restaura os valores originais de catálogo (140/28 e 110/20)">
+              🔄 Restaurar Padrões de Fábrica
+            </button>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" onclick="aplicarConicidadeSessao()" title="Aplica os novos valores sem gravar no banco de dados">
+                ⚡ Aplicar Nesta Tela
+              </button>
+              <button type="submit" class="btn btn-primary" title="Salva os novos fatores no banco para o parque ativo">
+                💾 Salvar Padrão no Parque
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Visão 2: Guia Técnico Ilustrado dentro do Modal -->
+      <div id="modal-view-conicidade-guia" style="display: none;">
+        <div id="modal-guia-conteudo-wrapper">
+          <!-- Conteúdo populado via JS ou direto -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-// Lista Fixa de Comprimentos Comerciais (Idêntica à tela Cadastrar Parafusos)
-const COMPRIMENTOS_GRADE = [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900];
+// Comprimentos Comerciais da Grade: passos de 50 em 50 mm (iniciando em 200 mm)
+const COMPRIMENTOS_BASE = [200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900];
+let maxComprimentoConfigurado = 900;
+
+function obterComprimentosGrade() {
+  let maxC = Math.max(900, maxComprimentoConfigurado || 900);
+  (specsMatrizAtuais || []).forEach(spec => {
+    if (spec.comprimentos) {
+      Object.keys(spec.comprimentos).forEach(c => {
+        const num = parseInt(c, 10);
+        if (!isNaN(num) && num > maxC && spec.comprimentos[c] > 0) {
+          maxC = num;
+        }
+      });
+    }
+  });
+
+  // Garante múltiplo de 50 mm
+  maxC = Math.ceil(maxC / 50) * 50;
+
+  const colunas = [];
+  for (let c = 200; c <= maxC; c += 50) {
+    colunas.push(c);
+  }
+
+  // Se houver algum comprimento extra registrado
+  (specsMatrizAtuais || []).forEach(spec => {
+    if (spec.comprimentos) {
+      Object.keys(spec.comprimentos).forEach(c => {
+        const num = parseInt(c, 10);
+        if (!isNaN(num) && !colunas.includes(num) && spec.comprimentos[c] > 0) {
+          colunas.push(num);
+        }
+      });
+    }
+  });
+
+  colunas.sort((a, b) => a - b);
+  return colunas;
+}
+
+function adicionarColunaComprimentoGrade() {
+  const colunas = obterComprimentosGrade();
+  const ultimo = colunas.length > 0 ? colunas[colunas.length - 1] : 900;
+  maxComprimentoConfigurado = ultimo + 50;
+  renderizarMatrizParafusos();
+}
+
+function resetarColunasGrade() {
+  maxComprimentoConfigurado = 900;
+  renderizarMatrizParafusos();
+}
+
+// Fatores de esforço para visualização no KPI
+const FATORES_ESFORCO = {
+  600: '0,0 mm/m',
+  1000: '+1,5 mm/m',
+  1500: '+3,0 mm/m',
+  2000: '+4,5 mm/m',
+  2500: '+6,0 mm/m',
+  3000: '+7,5 mm/m'
+};
 
 // Estado Global
 let dadosGlobais = {
   estruturas: [],
   esforcos: [600, 1000, 1500, 2000, 2500, 3000],
   dimensoes: {},
-  comprimentos: []
+  comprimentos: [],
+  conicidade: null
+};
+
+let conicidadeAtual = {
+  topo_a: 140.0,
+  conicidade_a: 28.0,
+  topo_b: 110.0,
+  conicidade_b: 20.0
 };
 
 let linhasGridAtuais = [];
 let resultadoCalculoAtual = null;
-let specsMatrizAtuais = []; // [{posicao, parafuso, esf_parafuso, comprimentos: {350: 3, ...}}, ...]
+let specsMatrizAtuais = [];
 
 // Escapa texto vindo do banco/servidor antes de injetar via innerHTML.
 function esc(v) {
@@ -592,13 +2060,90 @@ function esc(v) {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
+  atualizarKpiEsforco();
   await carregarDadosIniciais();
 });
+
+function atualizarKpiEsforco() {
+  const esf = document.getElementById('sel-esforco').value;
+  const kpiEsf = document.getElementById('kpi-esforco');
+  const kpiFat = document.getElementById('kpi-fator');
+  if (kpiEsf) kpiEsf.textContent = `${esf} daN`;
+  if (kpiFat) kpiFat.textContent = FATORES_ESFORCO[esf] ? `Fator: ${FATORES_ESFORCO[esf]}` : '';
+}
+
+function atualizarKpiConicidade() {
+  const kpiSecao = document.getElementById('kpi-secao-topo');
+  const kpiSub = document.getElementById('kpi-conicidade-sub');
+  if (kpiSecao) {
+    kpiSecao.textContent = `A: ${conicidadeAtual.topo_a} mm · B: ${conicidadeAtual.topo_b} mm`;
+  }
+  if (kpiSub) {
+    kpiSub.textContent = `Conicidade: ${conicidadeAtual.conicidade_a} mm/m (A) · ${conicidadeAtual.conicidade_b} mm/m (B)`;
+  }
+}
+
+function alternarAbaResultados(aba) {
+  const btnGrade = document.getElementById('tab-btn-grade');
+  const btnMemoria = document.getElementById('tab-btn-memoria');
+  const btnGuia = document.getElementById('tab-btn-guia');
+  const abaGrade = document.getElementById('aba-conteudo-grade');
+  const abaMemoria = document.getElementById('aba-conteudo-memoria');
+  const abaGuia = document.getElementById('aba-conteudo-guia');
+
+  [btnGrade, btnMemoria, btnGuia].forEach(b => b && b.classList.remove('active'));
+  [abaGrade, abaMemoria, abaGuia].forEach(a => a && (a.style.display = 'none'));
+
+  if (aba === 'grade') {
+    if (btnGrade) btnGrade.classList.add('active');
+    if (abaGrade) abaGrade.style.display = 'block';
+  } else if (aba === 'memoria') {
+    if (btnMemoria) btnMemoria.classList.add('active');
+    if (abaMemoria) abaMemoria.style.display = 'block';
+  } else if (aba === 'guia') {
+    if (btnGuia) btnGuia.classList.add('active');
+    if (abaGuia) abaGuia.style.display = 'block';
+  }
+}
+
+function filtrarMemorial(tipo) {
+  const btnTodos = document.getElementById('btn-filtro-mem-todos');
+  const btnTopo = document.getElementById('btn-filtro-mem-topo');
+  const btnGaveta = document.getElementById('btn-filtro-mem-gaveta');
+  const secTopo = document.getElementById('secao-memoria-topo');
+  const secGaveta = document.getElementById('secao-memoria-gaveta');
+
+  [btnTodos, btnTopo, btnGaveta].forEach(b => b && b.classList.remove('active'));
+
+  if (tipo === 'topo') {
+    if (btnTopo) btnTopo.classList.add('active');
+    if (secTopo) secTopo.style.display = 'block';
+    if (secGaveta) secGaveta.style.display = 'none';
+  } else if (tipo === 'gaveta') {
+    if (btnGaveta) btnGaveta.classList.add('active');
+    if (secTopo) secTopo.style.display = 'none';
+    if (secGaveta) secGaveta.style.display = 'block';
+  } else {
+    if (btnTodos) btnTodos.classList.add('active');
+    if (secTopo) secTopo.style.display = 'block';
+    if (secGaveta) secGaveta.style.display = 'block';
+  }
+}
 
 async function carregarDadosIniciais() {
   try {
     const res = await fetch('/dimensionar-parafusos/api/dados');
     dadosGlobais = await res.json();
+
+    if (dadosGlobais.conicidade) {
+      conicidadeAtual = {
+        topo_a: parseFloat(dadosGlobais.conicidade.topo_a) || 140.0,
+        conicidade_a: parseFloat(dadosGlobais.conicidade.conicidade_a) || 28.0,
+        topo_b: parseFloat(dadosGlobais.conicidade.topo_b) || 110.0,
+        conicidade_b: parseFloat(dadosGlobais.conicidade.conicidade_b) || 20.0
+      };
+      atualizarKpiConicidade();
+    }
 
     const selEst = document.getElementById('sel-estrutura');
     selEst.innerHTML = '<option value="">— Selecione uma estrutura —</option>';
@@ -625,7 +2170,6 @@ async function carregarDadosIniciais() {
   }
 }
 
-// Mostra/esconde os botões que só fazem sentido com uma estrutura salva selecionada.
 function alternarBotoesEstrutura(visivel) {
   ['btn-excluir-est', 'btn-renomear-est'].forEach(id => {
     const el = document.getElementById(id);
@@ -638,10 +2182,12 @@ async function aoMudarEstrutura() {
   const valor = selEst.value;
   const divCustom = document.getElementById('div-nome-custom');
   const inputCustom = document.getElementById('input-nome-estrutura');
+  const kpiEstrutura = document.getElementById('kpi-estrutura');
 
   if (valor === '__NOVA__') {
     divCustom.style.display = 'block';
     inputCustom.value = '';
+    if (kpiEstrutura) kpiEstrutura.textContent = 'Nova Estrutura';
     alternarBotoesEstrutura(false);
     linhasGridAtuais = [criarLinhaVazia(1, '0.2')];
     renderizarGridNiveis();
@@ -651,6 +2197,7 @@ async function aoMudarEstrutura() {
 
   divCustom.style.display = 'none';
   if (!valor) {
+    if (kpiEstrutura) kpiEstrutura.textContent = '—';
     alternarBotoesEstrutura(false);
     linhasGridAtuais = [];
     renderizarGridNiveis();
@@ -658,6 +2205,7 @@ async function aoMudarEstrutura() {
     return;
   }
 
+  if (kpiEstrutura) kpiEstrutura.textContent = valor;
   alternarBotoesEstrutura(true);
 
   try {
@@ -683,19 +2231,26 @@ function criarNovaEstrutura() {
 }
 
 function aoDigitarNomeCustom() {
+  const nome = document.getElementById('input-nome-estrutura').value.trim().toUpperCase();
+  const kpiEstrutura = document.getElementById('kpi-estrutura');
+  if (kpiEstrutura) kpiEstrutura.textContent = nome || 'Nova Estrutura';
   calcularTudo();
 }
 
-function criarLinhaVazia(nivel, distProg) {
+function criarLinhaVazia(nivel, distProg, montagem, faceOposta) {
   return {
     nivel: nivel || 1,
     distancia_prog: distProg || '0.2',
+    face_oposta: faceOposta ? 1 : 0,
+    montagem: montagem || '',
     cruzeta: 1,
+    esf_maq: 50,
     p_maquina: 2,
     porca_m: 2,
     arruela_m: 2,
     olhal_m: 0,
     sobra_m: 1,
+    esf_dup: 70,
     p_dupla: 0,
     porca_d: 2,
     arruela_d: 2,
@@ -709,8 +2264,6 @@ function formatarDisplayZero(val) {
   return val;
 }
 
-// Uma célula numérica da grade de níveis. `extra` marca as colunas-âncora
-// (a quantidade de parafusos de cada grupo), que ganham cor própria.
 function celulaNivel(idx, campo, valor, grupo, extra) {
   const zero = Number(valor) === 0;
   const classes = ['cell'];
@@ -739,14 +2292,25 @@ function renderizarGridNiveis() {
   tbody.innerHTML = '';
 
   if (!linhasGridAtuais.length) {
-    tbody.innerHTML = '<tr><td colspan="14" class="tbl-vazia">Selecione uma estrutura ou crie uma nova para editar os níveis.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="18" class="tbl-vazia">Selecione uma estrutura ou crie uma nova para editar os níveis.</td></tr>';
     atualizarBadgeCH();
     return;
   }
 
+  const montagensList = dadosGlobais.montagens || [];
+
   linhasGridAtuais.forEach((linha, idx) => {
     const num = c => (linha[c] != null ? Number(linha[c]) : 0);
+    const esfMaq = linha.esf_maq != null ? Number(linha.esf_maq) : 50;
+    const esfDup = linha.esf_dup != null ? Number(linha.esf_dup) : 70;
     const tr = document.createElement('tr');
+
+    const optionsMontagem = [
+      `<option value="">— Personalizado —</option>`,
+      ...montagensList.map(m => `
+        <option value="${esc(m.nome)}" ${linha.montagem === m.nome ? 'selected' : ''}>${esc(m.nome)}</option>
+      `)
+    ].join('');
 
     tr.innerHTML = `
       <td>
@@ -757,15 +2321,40 @@ function renderizarGridNiveis() {
         <input type="text" class="cell" value="${esc(linha.distancia_prog)}" placeholder="0.2 ou CH+0.2"
                onchange="atualizarCampoLinha(${idx}, 'distancia_prog', this.value, this)">
       </td>
+      <td style="text-align: center;">
+        <input type="checkbox" class="chk-face-oposta"
+               ${linha.face_oposta ? 'checked' : ''}
+               onchange="atualizarCampoLinha(${idx}, 'face_oposta', this.checked, this)"
+               title="Marcar se este nível fura a face oposta (90° transversal) à posição padrão do poste">
+      </td>
+      <td>
+        <select class="select-montagem ${linha.montagem ? 'ativo' : ''}"
+                onchange="aoMudarMontagemLinha(${idx}, this.value)"
+                title="Padrão de montagem deste nível">
+          ${optionsMontagem}
+        </select>
+      </td>
       ${celulaNivel(idx, 'cruzeta', num('cruzeta'), '', '')}
 
-      ${celulaNivel(idx, 'p_maquina', num('p_maquina'), 'g-maq sep-l', 'main-maq')}
+      <td class="g-maq sep-l">
+        <select class="select-esf" onchange="atualizarCampoLinha(${idx}, 'esf_maq', this.value, this)" title="Classe de esforço Cabeça Quadrada">
+          <option value="50" ${esfMaq === 50 ? 'selected' : ''}>50 kN</option>
+          <option value="70" ${esfMaq === 70 ? 'selected' : ''}>70 kN</option>
+        </select>
+      </td>
+      ${celulaNivel(idx, 'p_maquina', num('p_maquina'), 'g-maq', 'main-maq')}
       ${celulaNivel(idx, 'porca_m',   num('porca_m'),   'g-maq', '')}
       ${celulaNivel(idx, 'arruela_m', num('arruela_m'), 'g-maq', '')}
       ${celulaNivel(idx, 'olhal_m',   num('olhal_m'),   'g-maq', '')}
       ${celulaNivel(idx, 'sobra_m',   num('sobra_m'),   'g-maq', '')}
 
-      ${celulaNivel(idx, 'p_dupla',   num('p_dupla'),   'g-dup sep-l', 'main-dup')}
+      <td class="g-dup sep-l">
+        <select class="select-esf" onchange="atualizarCampoLinha(${idx}, 'esf_dup', this.value, this)" title="Classe de esforço Rosca Dupla">
+          <option value="70" ${esfDup === 70 ? 'selected' : ''}>70 kN</option>
+          <option value="50" ${esfDup === 50 ? 'selected' : ''}>50 kN</option>
+        </select>
+      </td>
+      ${celulaNivel(idx, 'p_dupla',   num('p_dupla'),   'g-dup', 'main-dup')}
       ${celulaNivel(idx, 'porca_d',   num('porca_d'),   'g-dup', '')}
       ${celulaNivel(idx, 'arruela_d', num('arruela_d'), 'g-dup', '')}
       ${celulaNivel(idx, 'olhal_d',   num('olhal_d'),   'g-dup', '')}
@@ -781,7 +2370,37 @@ function renderizarGridNiveis() {
   atualizarBadgeCH();
 }
 
-// A altura só é obrigatória quando alguma cota é relativa ao topo (CH+...).
+function aoMudarMontagemLinha(idx, nomeMontagem) {
+  const linha = linhasGridAtuais[idx];
+  if (!nomeMontagem) {
+    linha.montagem = '';
+    renderizarGridNiveis();
+    calcularTudo();
+    return;
+  }
+
+  const padrao = (dadosGlobais.montagens || []).find(m => m.nome === nomeMontagem);
+  if (!padrao) return;
+
+  linha.montagem = padrao.nome;
+  linha.cruzeta = Number(padrao.cruzeta);
+  linha.esf_maq = padrao.esf_maq != null ? Number(padrao.esf_maq) : 50;
+  linha.p_maquina = Number(padrao.p_maquina);
+  linha.porca_m = Number(padrao.porca_m);
+  linha.arruela_m = Number(padrao.arruela_m);
+  linha.olhal_m = Number(padrao.olhal_m);
+  linha.sobra_m = Number(padrao.sobra_m);
+  linha.esf_dup = padrao.esf_dup != null ? Number(padrao.esf_dup) : 70;
+  linha.p_dupla = Number(padrao.p_dupla);
+  linha.porca_d = Number(padrao.porca_d);
+  linha.arruela_d = Number(padrao.arruela_d);
+  linha.olhal_d = Number(padrao.olhal_d);
+  linha.sobra_d = Number(padrao.sobra_d);
+
+  renderizarGridNiveis();
+  calcularTudo();
+}
+
 function atualizarBadgeCH() {
   const temCH = linhasGridAtuais.some(
     l => String(l.distancia_prog || '').toUpperCase().includes('CH')
@@ -790,8 +2409,6 @@ function atualizarBadgeCH() {
   if (badge) badge.style.display = temCH ? 'inline' : 'none';
 }
 
-// Atualiza só a célula editada — não re-renderiza a grade toda, para não
-// destruir o campo que o usuário acabou de focar ao tabular.
 function atualizarCampoLinha(idx, campo, valor, el) {
   if (campo === 'nivel') {
     const n = parseInt(valor) || 1;
@@ -800,6 +2417,27 @@ function atualizarCampoLinha(idx, campo, valor, el) {
   } else if (campo === 'distancia_prog') {
     linhasGridAtuais[idx][campo] = valor;
     atualizarBadgeCH();
+  } else if (campo === 'face_oposta') {
+    linhasGridAtuais[idx][campo] = valor ? 1 : 0;
+  } else if (campo === 'esf_maq' || campo === 'esf_dup') {
+    const defaultVal = campo === 'esf_maq' ? 50 : 70;
+    const v = parseFloat(valor) || defaultVal;
+    linhasGridAtuais[idx][campo] = v;
+    if (linhasGridAtuais[idx].montagem) {
+      const padrao = (dadosGlobais.montagens || []).find(m => m.nome === linhasGridAtuais[idx].montagem);
+      const padraoVal = padrao && padrao[campo] != null ? Number(padrao[campo]) : defaultVal;
+      if (padrao && padraoVal !== v) {
+        linhasGridAtuais[idx].montagem = '';
+        const tr = el.closest('tr');
+        if (tr) {
+          const sel = tr.querySelector('.select-montagem');
+          if (sel) {
+            sel.value = '';
+            sel.classList.remove('ativo');
+          }
+        }
+      }
+    }
   } else {
     const s = String(valor).trim();
     const v = (s === '—' || s === '-' || s === '' || s === '0')
@@ -809,6 +2447,21 @@ function atualizarCampoLinha(idx, campo, valor, el) {
     if (el) {
       el.value = formatarDisplayZero(v);
       el.classList.toggle('dash', v === 0);
+    }
+    // Se alterou quantidade de ferragem/parafuso manualmente e divergiu do padrão, vira personalizado
+    if (linhasGridAtuais[idx].montagem) {
+      const padrao = (dadosGlobais.montagens || []).find(m => m.nome === linhasGridAtuais[idx].montagem);
+      if (padrao && Number(padrao[campo]) !== v) {
+        linhasGridAtuais[idx].montagem = '';
+        const tr = el.closest('tr');
+        if (tr) {
+          const sel = tr.querySelector('.select-montagem');
+          if (sel) {
+            sel.value = '';
+            sel.classList.remove('ativo');
+          }
+        }
+      }
     }
   }
   calcularTudo();
@@ -861,7 +2514,8 @@ async function calcularTudo() {
         esforco: esforco,
         altura: altura,
         cruzeta_adicional: cruzeta,
-        linhas: linhasGridAtuais
+        linhas: linhasGridAtuais,
+        config_poste: conicidadeAtual
       })
     });
 
@@ -873,6 +2527,12 @@ async function calcularTudo() {
     }
 
     resultadoCalculoAtual = data;
+    // Se havia alerta de aviso exibido (por exemplo: pendência de altura), limpa agora que calculou com sucesso
+    const alertaFeedback = document.getElementById('alerta-feedback');
+    if (alertaFeedback && alertaFeedback.classList.contains('warning')) {
+      alertaFeedback.className = 'alerta';
+      alertaFeedback.innerHTML = '';
+    }
     renderizarResultados(data);
   } catch (e) {
     console.error('Erro ao calcular:', e);
@@ -880,11 +2540,20 @@ async function calcularTudo() {
 }
 
 function renderizarResultados(data) {
-  // 1. Converte lista plana de parafusos consolidados em specs matriciais (Idêntico ao Cadastrar Parafusos)
+  // 1. Converte lista plana de parafusos consolidados em specs matriciais e totaliza por cenário
   const specsMap = {};
   specsMatrizAtuais = [];
+  let totalTopo = 0;
+  let totalGaveta = 0;
 
   (data.parafusos_consolidados || []).forEach(p => {
+    const qtd = Number(p.quantidade || 0);
+    if (p.posicao === 'TOPO') {
+      totalTopo += qtd;
+    } else {
+      totalGaveta += qtd;
+    }
+
     const chave = p.posicao + '|' + p.parafuso + '|' + p.esf_parafuso;
     if (!(chave in specsMap)) {
       specsMap[chave] = specsMatrizAtuais.length;
@@ -895,61 +2564,339 @@ function renderizarResultados(data) {
         comprimentos: {}
       });
     }
-    specsMatrizAtuais[specsMap[chave]].comprimentos[p.comprimento] = p.quantidade;
+    specsMatrizAtuais[specsMap[chave]].comprimentos[p.comprimento] = qtd;
   });
 
+  // Atualiza KPIs com indicação clara por cenário e contagem de níveis únicos
+  const kpiTotal = document.getElementById('kpi-total-parafusos');
+  const kpiNiveis = document.getElementById('kpi-niveis-calc');
+  if (kpiTotal) {
+    if (totalTopo === totalGaveta) {
+      kpiTotal.textContent = `${totalTopo} un. / cenário`;
+    } else {
+      kpiTotal.textContent = `Topo: ${totalTopo} un · Gaveta: ${totalGaveta} un`;
+    }
+  }
+  if (kpiNiveis) {
+    const niveisUnicos = new Set((data.detalhes_niveis || []).map(d => d.nivel));
+    const totalNiveisUnicos = data.total_niveis_unicos != null ? data.total_niveis_unicos : niveisUnicos.size;
+    const totalLinhas = (data.detalhes_niveis || []).length;
+    if (totalNiveisUnicos < totalLinhas) {
+      kpiNiveis.textContent = `${totalNiveisUnicos} nível(is) calculados (${totalLinhas} linhas)`;
+    } else {
+      kpiNiveis.textContent = `${totalNiveisUnicos} nível(is) calculados`;
+    }
+  }
+
+  // Atualiza métricas de Cruzetas Adicionais Mobilizadas (Item 36)
+  const nCruzetas = Number(data.qtd_cruzetas_adic || 0);
+  const nNiveisExtras = nCruzetas > 0 ? (nCruzetas / 2) : 0;
+
+  // 1) KPI Card Cruzetas Adicionais
+  const kpiCardCruz = document.getElementById('kpi-card-cruzetas');
+  const kpiQtdCruz = document.getElementById('kpi-qtd-cruzetas');
+  const kpiSubCruz = document.getElementById('kpi-sub-cruzetas');
+  if (kpiCardCruz && kpiQtdCruz) {
+    if (nCruzetas > 0) {
+      kpiCardCruz.style.display = 'flex';
+      kpiQtdCruz.textContent = `${nCruzetas} un.`;
+      if (kpiSubCruz) kpiSubCruz.textContent = `${nNiveisExtras} nível(is) extra(s) (Item 36)`;
+    } else {
+      kpiCardCruz.style.display = 'none';
+    }
+  }
+
+  // 2) Card 1: Input e Badge
+  const inputCruz = document.getElementById('input-cruzeta-adic');
+  const badgeCruzAuto = document.getElementById('badge-cruzeta-auto');
+  const labelItem36 = document.getElementById('label-item-36');
+  if (nCruzetas > 0) {
+    if (inputCruz) {
+      inputCruz.value = nCruzetas;
+      inputCruz.style.borderColor = '#059669';
+    }
+    if (badgeCruzAuto) {
+      badgeCruzAuto.style.display = 'inline';
+      badgeCruzAuto.textContent = `⚡ Auto (Item 36)`;
+    }
+    if (labelItem36) labelItem36.style.display = 'none';
+  } else {
+    if (inputCruz) inputCruz.style.borderColor = '';
+    if (badgeCruzAuto) badgeCruzAuto.style.display = 'none';
+    if (labelItem36) labelItem36.style.display = 'inline';
+  }
+
+  // 3) Card 1: Banner informativo sobre o vão variável CH
+  const avisoCh = document.getElementById('aviso-ch-info');
+  if (avisoCh) {
+    if (data.valor_ch != null && data.depende_altura) {
+      avisoCh.style.display = 'block';
+      let msgExtras = '';
+      if (nCruzetas > 0) {
+        msgExtras = `<strong>${nNiveisExtras} nível(is) intermediário(s) adicional(is) inserido(s)</strong> (${nCruzetas} cruzetas metálicas espaçadas em ≤ 3,0 m).`;
+      } else {
+        msgExtras = `Vão inferior a 5,0 m — ligação direta sem necessidade de cruzetas adicionais.`;
+      }
+      avisoCh.innerHTML = `⚡ <strong>Vão Variável CH:</strong> ${data.valor_ch.toFixed(2)} m (poste de ${data.altura} m). ${msgExtras}`;
+    } else {
+      avisoCh.style.display = 'none';
+    }
+  }
+
+  // 4) Card 2: Aviso de Nível Inserido
+  const avisoNivelGrid = document.getElementById('aviso-nivel-inserido-grid');
+  const txtNiveisExtrasGrid = document.getElementById('txt-niveis-extras-grid');
+  const txtCruzetasExtrasGrid = document.getElementById('txt-cruzetas-extras-grid');
+  if (avisoNivelGrid) {
+    if (nCruzetas > 0) {
+      avisoNivelGrid.style.display = 'block';
+      if (txtNiveisExtrasGrid) txtNiveisExtrasGrid.textContent = nNiveisExtras;
+      if (txtCruzetasExtrasGrid) txtCruzetasExtrasGrid.textContent = nCruzetas;
+    } else {
+      avisoNivelGrid.style.display = 'none';
+    }
+  }
+
+  // 5) Card 3: Seção Destacada de Cruzetas Mobilizadas
+  const secaoCruzMob = document.getElementById('secao-cruzetas-mobilizadas');
+  const txtQtdCruzMob = document.getElementById('txt-qtd-cruzetas-mobilizadas');
+  const txtDescCruzMob = document.getElementById('txt-desc-cruzetas-mobilizadas');
+  if (secaoCruzMob) {
+    if (nCruzetas > 0) {
+      secaoCruzMob.style.display = 'block';
+      if (txtQtdCruzMob) txtQtdCruzMob.textContent = `${nCruzetas} un.`;
+      if (txtDescCruzMob) {
+        txtDescCruzMob.textContent = `Inserção de ${nNiveisExtras} nível(is) intermediário(s) para suporte dos cabos condutores devido ao vão CH de ${data.valor_ch ? data.valor_ch.toFixed(2) : ''} m (espaçamento ≤ 3,0 m).`;
+      }
+    } else {
+      secaoCruzMob.style.display = 'none';
+    }
+  }
+
+  // 2. Renderiza os Cards de Resumo Visual de Parafusos separados por cenário
+  renderizarCardsResumo(data.parafusos_consolidados || []);
+
+  // 3. Renderiza a Matriz com badges coloridos
   renderizarMatrizParafusos();
 
-  // 2. Memória de cálculo passo a passo para Topo e Gaveta
-  const tbodyMemoria = document.getElementById('tbody-memoria-calculo');
-  tbodyMemoria.innerHTML = '';
+  // 4. Memória de cálculo detalhada separada em blocos TOPO e GAVETA
+  const tbodyTopo = document.getElementById('tbody-memoria-topo');
+  const tbodyGaveta = document.getElementById('tbody-memoria-gaveta');
+  if (tbodyTopo) tbodyTopo.innerHTML = '';
+  if (tbodyGaveta) tbodyGaveta.innerHTML = '';
 
-  const linhaMemoria = (n, d, face) => {
-    const tag = face === 'topo' ? 'topo' : 'gaveta';
-    const res = face === 'topo' ? 'res-maq' : 'res-dup';
+  const renderizarLinhaMemorial = (n, d, cenario) => {
+    const isMaq = String(d.tipo).toUpperCase().includes('CABEÇA') || String(d.tipo).toUpperCase().includes('MAQUINA');
+    const resClass = isMaq ? 'res-maq' : 'res-dup';
+    const tagTipo = isMaq 
+      ? '<span class="tag topo">CABEÇA QUADRADA</span>' 
+      : '<span class="tag gaveta">ROSCA DUPLA</span>';
+
+    const isAuto = Boolean(n.is_auto_cruzeta || d.is_auto_cruzeta);
     const tr = document.createElement('tr');
+    if (isAuto) {
+      tr.classList.add('linha-auto-cruzeta');
+    }
+
+    const badgeOposta = n.face_oposta
+      ? `<span class="badge-oposta" title="Nível montado na Face Oposta (90° transversal)">⮂ Oposta</span>`
+      : '';
+
+    let colNivelHtml = `<strong>Nível ${esc(n.nivel)}</strong> ${badgeOposta}`;
+    if (isAuto) {
+      colNivelHtml += `
+        <div style="margin-top: 4px;">
+          <span class="badge-auto-cruzeta" style="background:#059669; color:#ffffff; font-weight:800; font-size:0.70rem; padding:2px 8px; border-radius:4px; display:inline-block;" title="Nível intermediário de cruzeta adicional inserido automaticamente">
+            ⚡ NÍVEL ADICIONAL INSERIDO AUTOMATICAMENTE (Vão CH ≥ 5m)
+          </span>
+          <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.72rem; font-weight:700; color:#059669; margin-top:2px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 7h16M7 12h10"/></svg>
+            2 Cruzetas Metálicas Mobilizadas (Item 36)
+          </span>
+        </div>
+      `;
+    }
+
+    let tagFaceFurada = '';
+    if (cenario === 'topo') {
+      tagFaceFurada = n.face_oposta
+        ? `<span class="tag gaveta" title="Face B transversal devido à montagem oposta">Face B (Oposta 90°)</span>`
+        : `<span class="tag topo" title="Face A longitudinal principal">Face A (Topo)</span>`;
+    } else {
+      tagFaceFurada = n.face_oposta
+        ? `<span class="tag topo" title="Face A longitudinal devido à montagem oposta">Face A (Oposta 90°)</span>`
+        : `<span class="tag gaveta" title="Face B transversal principal">Face B (Gaveta)</span>`;
+    }
+
     tr.innerHTML = `
-      <td><strong>Nível ${esc(n.nivel)}</strong></td>
-      <td class="num">${esc(n.distancia_prog_raw)} (${esc(n.distancia_m)} m)</td>
-      <td><span class="tag ${tag}">${tag.toUpperCase()}</span> ${esc(d.tipo)}</td>
+      <td>${colNivelHtml}</td>
+      <td class="num">${esc(n.distancia_prog_raw)} <small style="color:var(--text-muted); font-size:0.75rem;">(${esc(n.distancia_m)} m)</small></td>
+      <td>${tagFaceFurada}</td>
+      <td>${tagTipo}</td>
+      <td class="num"><strong style="font-size:0.80rem;">${esc(d.esf_parafuso)} kN</strong></td>
       <td class="num">${esc(d.secao_poste)} mm</td>
       <td class="num">+ ${esc(d.esp_ferragens)} mm</td>
       <td class="num">= ${esc(d.comp_calc)} mm</td>
-      <td class="num"><span class="${res}">${esc(d.comp_comercial)} mm</span> · ${esc(d.quantidade)} un</td>
+      <td class="num"><span class="${resClass}"><strong>${esc(d.comp_comercial)} mm</strong></span> · <strong>${esc(d.quantidade)} un</strong></td>
     `;
     return tr;
   };
 
-  let total = 0;
+  let countTopo = 0;
+  let countGaveta = 0;
+
   (data.detalhes_niveis || []).forEach(n => {
-    (n.detalhes_topo || []).forEach(d => { tbodyMemoria.appendChild(linhaMemoria(n, d, 'topo')); total++; });
-    (n.detalhes_gaveta || []).forEach(d => { tbodyMemoria.appendChild(linhaMemoria(n, d, 'gaveta')); total++; });
+    (n.detalhes_topo || []).forEach(d => {
+      if (tbodyTopo) tbodyTopo.appendChild(renderizarLinhaMemorial(n, d, 'topo'));
+      countTopo++;
+    });
+    (n.detalhes_gaveta || []).forEach(d => {
+      if (tbodyGaveta) tbodyGaveta.appendChild(renderizarLinhaMemorial(n, d, 'gaveta'));
+      countGaveta++;
+    });
   });
 
-  if (!total) {
-    tbodyMemoria.innerHTML = '<tr><td colspan="7" class="tbl-vazia">Nenhum nível calculado.</td></tr>';
+  if (tbodyTopo && !countTopo) {
+    tbodyTopo.innerHTML = '<tr><td colspan="9" class="tbl-vazia">Nenhum nível com parafusos calculado para TOPO.</td></tr>';
   }
+  if (tbodyGaveta && !countGaveta) {
+    tbodyGaveta.innerHTML = '<tr><td colspan="9" class="tbl-vazia">Nenhum nível com parafusos calculado para GAVETA.</td></tr>';
+  }
+
+  // Atualiza os badges dos cabeçalhos dos cenários
+  const badgeTopo = document.getElementById('resumo-topo-badge');
+  const badgeGaveta = document.getElementById('resumo-gaveta-badge');
+  if (badgeTopo) badgeTopo.textContent = `${totalTopo} un. de parafusos`;
+  if (badgeGaveta) badgeGaveta.textContent = `${totalGaveta} un. de parafusos`;
+}
+
+function renderizarCardsResumo(parafusos) {
+  const container = document.getElementById('container-resumo-parafusos');
+  if (!container) return;
+
+  if (!parafusos || !parafusos.length) {
+    container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.88rem; padding: 10px 0;">Nenhum parafuso necessário para esta configuração.</div>';
+    return;
+  }
+
+  const parafusosTopo = parafusos.filter(p => p.posicao === 'TOPO');
+  const parafusosGaveta = parafusos.filter(p => p.posicao === 'GAVETA');
+
+  const totalTopo = parafusosTopo.reduce((sum, p) => sum + Number(p.quantidade || 0), 0);
+  const totalGaveta = parafusosGaveta.reduce((sum, p) => sum + Number(p.quantidade || 0), 0);
+
+  const criarCardsHtml = (lista) => {
+    if (!lista.length) {
+      return '<div style="color: var(--text-muted); font-size: 0.82rem; padding: 12px 0;">Nenhum parafuso nesta posição.</div>';
+    }
+    return lista.map(p => {
+      const isMaq = String(p.parafuso).toUpperCase().includes('CABEÇA') || String(p.parafuso).toUpperCase().includes('MAQUINA');
+      const tipoClasse = isMaq ? 'tipo-maq' : 'tipo-dup';
+      const tagTexto = isMaq ? 'Cabeça Quadrada' : 'Rosca Dupla';
+
+      return `
+        <div class="parafuso-card ${tipoClasse}">
+          <div class="parafuso-card-header">
+            <span class="parafuso-card-tag">${tagTexto}</span>
+            <span class="parafuso-card-qtd">${esc(p.quantidade)} <small style="font-size:0.75rem; font-weight:600;">un</small></span>
+          </div>
+          <div class="parafuso-card-body">
+            <span>Comprimento:</span>
+            <span class="parafuso-card-compr">${esc(p.comprimento)} mm</span>
+          </div>
+          <div class="parafuso-card-meta">
+            <span>Classe: <strong>${esc(p.esf_parafuso)} kN</strong></span>
+            <span>Comercial: <strong>${esc(p.comprimento)} mm</strong></span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  container.innerHTML = `
+    <div class="resumo-cenarios-grid">
+      <!-- Coluna TOPO -->
+      <div class="cenario-coluna cenario-topo">
+        <div class="cenario-coluna-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge-posicao topo">POSTE EM TOPO</span>
+            <span style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600;">(Face A principal)</span>
+          </div>
+          <span class="cenario-total-badge">${totalTopo} un</span>
+        </div>
+        <div class="cenario-cards-container">
+          ${criarCardsHtml(parafusosTopo)}
+        </div>
+      </div>
+
+      <!-- Coluna GAVETA -->
+      <div class="cenario-coluna cenario-gaveta">
+        <div class="cenario-coluna-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge-posicao gaveta">POSTE EM GAVETA</span>
+            <span style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600;">(Face B principal)</span>
+          </div>
+          <span class="cenario-total-badge">${totalGaveta} un</span>
+        </div>
+        <div class="cenario-cards-container">
+          ${criarCardsHtml(parafusosGaveta)}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderizarMatrizParafusos() {
   const tbody = document.getElementById('tbody-matriz-parafusos');
+  const thead = document.getElementById('thead-matriz-parafusos');
+  const colgroup = document.getElementById('colgroup-matriz-parafusos');
+  if (!tbody) return;
+
+  const colunas = obterComprimentosGrade();
+  const totalCols = 3 + colunas.length + 1;
+
+  if (colgroup) {
+    let colgroupHtml = '<col class="c-pos"><col class="c-paraf"><col class="c-classe">';
+    colunas.forEach(() => {
+      colgroupHtml += '<col class="c-compr">';
+    });
+    colgroupHtml += '<col class="c-del">';
+    colgroup.innerHTML = colgroupHtml;
+  }
+
+  if (thead) {
+    let theadHtml = `<tr>
+      <th class="esq">Posição</th>
+      <th class="esq">Parafuso</th>
+      <th>Classe</th>`;
+    colunas.forEach((c, idx) => {
+      const sep = idx === 0 ? ' sep-l' : '';
+      theadHtml += `<th class="c-compr-h${sep}">${c}</th>`;
+    });
+    theadHtml += '<th class="sep-l"></th></tr>';
+    thead.innerHTML = theadHtml;
+  }
+
   tbody.innerHTML = '';
 
   if (!specsMatrizAtuais.length) {
-    tbody.innerHTML = '<tr><td colspan="19" class="tbl-vazia">Nenhum parafuso necessário para esta configuração.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="${totalCols}" class="tbl-vazia">Nenhum parafuso necessário para esta configuração.</td></tr>`;
     return;
   }
 
   specsMatrizAtuais.forEach((spec, sIdx) => {
     const tr = document.createElement('tr');
+    const badgePos = spec.posicao === 'TOPO' 
+      ? '<span class="badge-posicao topo">TOPO</span>' 
+      : '<span class="badge-posicao gaveta">GAVETA</span>';
 
     let html = `
-      <td class="esq">${esc(spec.posicao)}</td>
+      <td class="esq">${badgePos}</td>
       <td class="esq">${esc(spec.parafuso)}</td>
-      <td class="classe">${esc(spec.esf_parafuso)}</td>
+      <td class="classe">${esc(spec.esf_parafuso)} kN</td>
     `;
 
-    COMPRIMENTOS_GRADE.forEach((c, i) => {
+    colunas.forEach((c, i) => {
       const sep = i === 0 ? ' sep-l' : '';
       const v = spec.comprimentos[c];
       if (v != null && v > 0) {
@@ -990,10 +2937,51 @@ function removerSpecMatriz(sIdx) {
 
 function limparResultados() {
   specsMatrizAtuais = [];
-  document.getElementById('tbody-matriz-parafusos').innerHTML =
-    '<tr><td colspan="19" class="tbl-vazia">Preencha os parâmetros para calcular os parafusos.</td></tr>';
-  document.getElementById('tbody-memoria-calculo').innerHTML =
-    '<tr><td colspan="7" class="tbl-vazia">Nenhum nível calculado.</td></tr>';
+  const kpiTotal = document.getElementById('kpi-total-parafusos');
+  const kpiNiveis = document.getElementById('kpi-niveis-calc');
+  if (kpiTotal) kpiTotal.textContent = '0 un.';
+  if (kpiNiveis) kpiNiveis.textContent = '0 nível(is) calculados';
+
+  const container = document.getElementById('container-resumo-parafusos');
+  if (container) container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.88rem;">Preencha os parâmetros para calcular os parafusos.</div>';
+
+  const colunas = obterComprimentosGrade();
+  const totalCols = 3 + colunas.length + 1;
+  const tbodyMatriz = document.getElementById('tbody-matriz-parafusos');
+  if (tbodyMatriz) tbodyMatriz.innerHTML = `<tr><td colspan="${totalCols}" class="tbl-vazia">Preencha os parâmetros para calcular os parafusos.</td></tr>`;
+
+  const tbodyTopo = document.getElementById('tbody-memoria-topo');
+  if (tbodyTopo) tbodyTopo.innerHTML = '<tr><td colspan="9" class="tbl-vazia">Nenhum nível calculado para TOPO.</td></tr>';
+
+  const tbodyGaveta = document.getElementById('tbody-memoria-gaveta');
+  if (tbodyGaveta) tbodyGaveta.innerHTML = '<tr><td colspan="9" class="tbl-vazia">Nenhum nível calculado para GAVETA.</td></tr>';
+
+  const badgeTopo = document.getElementById('resumo-topo-badge');
+  if (badgeTopo) badgeTopo.textContent = '0 un. de parafusos';
+
+  const badgeGaveta = document.getElementById('resumo-gaveta-badge');
+  if (badgeGaveta) badgeGaveta.textContent = '0 un. de parafusos';
+
+  const avisoCh = document.getElementById('aviso-ch-info');
+  if (avisoCh) avisoCh.style.display = 'none';
+
+  const kpiCardCruz = document.getElementById('kpi-card-cruzetas');
+  if (kpiCardCruz) kpiCardCruz.style.display = 'none';
+
+  const avisoNivelGrid = document.getElementById('aviso-nivel-inserido-grid');
+  if (avisoNivelGrid) avisoNivelGrid.style.display = 'none';
+
+  const secaoCruzMob = document.getElementById('secao-cruzetas-mobilizadas');
+  if (secaoCruzMob) secaoCruzMob.style.display = 'none';
+
+  const badgeCruzAuto = document.getElementById('badge-cruzeta-auto');
+  if (badgeCruzAuto) badgeCruzAuto.style.display = 'none';
+
+  const labelItem36 = document.getElementById('label-item-36');
+  if (labelItem36) labelItem36.style.display = 'inline';
+
+  const inputCruz = document.getElementById('input-cruzeta-adic');
+  if (inputCruz) inputCruz.style.borderColor = '';
 }
 
 // Ações de Persistência no Parque
@@ -1091,7 +3079,6 @@ async function renomearEstruturaAtual() {
 }
 
 async function salvarParafusosNaReceita() {
-  // Converte specsMatrizAtuais de volta para lista plana de parafusos
   const linhasParaSalvar = [];
   specsMatrizAtuais.forEach(spec => {
     for (const compr in spec.comprimentos) {
@@ -1146,6 +3133,419 @@ async function salvarParafusosNaReceita() {
     }
   } catch (e) {
     exibirAlerta('Erro de comunicação: ' + esc(e.message), 'danger');
+  }
+}
+
+// ── Gerenciamento de Padrões de Montagem (Modal) ──────────────────────────
+
+function abrirModalMontagens() {
+  const modal = document.getElementById('modal-montagens');
+  if (modal) {
+    modal.style.display = 'flex';
+    voltarParaListaMontagens();
+    renderizarListaMontagensModal();
+  }
+}
+
+function fecharModalMontagens() {
+  const modal = document.getElementById('modal-montagens');
+  if (modal) modal.style.display = 'none';
+}
+
+function fecharModalMontagensAoClicarFora(e) {
+  if (e.target.id === 'modal-montagens') {
+    fecharModalMontagens();
+  }
+}
+
+function voltarParaListaMontagens() {
+  document.getElementById('view-montagens-lista').style.display = 'block';
+  document.getElementById('view-montagens-form').style.display = 'none';
+}
+
+function renderizarListaMontagensModal() {
+  const tbody = document.getElementById('tbody-lista-montagens');
+  const countEl = document.getElementById('total-montagens-cadastradas');
+  const montagens = dadosGlobais.montagens || [];
+
+  if (countEl) countEl.textContent = montagens.length;
+  tbody.innerHTML = '';
+
+  if (!montagens.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="tbl-vazia">Nenhum padrão cadastrado neste parque.</td></tr>';
+    return;
+  }
+
+  montagens.forEach(m => {
+    const tr = document.createElement('tr');
+    const esfMaq = m.esf_maq != null ? m.esf_maq : 50;
+    const esfDup = m.esf_dup != null ? m.esf_dup : 70;
+    tr.innerHTML = `
+      <td style="text-align: left; padding-left: 12px; font-weight: 700; color: var(--text-main);">
+        ${esc(m.nome)}
+      </td>
+      <td>${esc(m.cruzeta)}</td>
+      <td class="g-maq sep-l" style="font-weight: 700; color: var(--c-maq);">
+        ${esc(m.p_maquina)} <small style="font-size:0.74rem; font-weight:600; opacity:0.85;">(${esc(esfMaq)} kN)</small>
+      </td>
+      <td class="g-maq">${esc(m.porca_m)} / ${esc(m.arruela_m)} / ${esc(m.olhal_m)}</td>
+      <td class="g-dup sep-l" style="font-weight: 700; color: var(--c-dup);">
+        ${esc(m.p_dupla)} <small style="font-size:0.74rem; font-weight:600; opacity:0.85;">(${esc(esfDup)} kN)</small>
+      </td>
+      <td class="g-dup">${esc(m.porca_d)} / ${esc(m.arruela_d)} / ${esc(m.olhal_d)}</td>
+      <td class="sep-l" style="white-space: nowrap;">
+        <button type="button" class="btn-del" title="Editar padrão" onclick="abrirFormularioEditarMontagem('${esc(m.nome)}')">✏️</button>
+        <button type="button" class="btn-del" title="Excluir padrão" onclick="excluirPadraoMontagemModal('${esc(m.nome)}')">🗑️</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function abrirFormularioNovaMontagem() {
+  document.getElementById('view-montagens-lista').style.display = 'none';
+  document.getElementById('view-montagens-form').style.display = 'block';
+  document.getElementById('titulo-form-montagem').textContent = '➕ Novo Padrão de Montagem';
+  document.getElementById('input-montagem-nome-antigo').value = '';
+  document.getElementById('input-montagem-nome').value = '';
+  document.getElementById('input-montagem-cruzeta').value = '0';
+  document.getElementById('input-montagem-esf-maq').value = '50';
+  document.getElementById('input-montagem-p-maq').value = '0';
+  document.getElementById('input-montagem-porca-m').value = '0';
+  document.getElementById('input-montagem-arruela-m').value = '0';
+  document.getElementById('input-montagem-olhal-m').value = '0';
+  document.getElementById('input-montagem-sobra-m').value = '0';
+  document.getElementById('input-montagem-esf-dup').value = '70';
+  document.getElementById('input-montagem-p-dup').value = '0';
+  document.getElementById('input-montagem-porca-d').value = '0';
+  document.getElementById('input-montagem-arruela-d').value = '0';
+  document.getElementById('input-montagem-olhal-d').value = '0';
+  document.getElementById('input-montagem-sobra-d').value = '0';
+  document.getElementById('chk-montagem-propagar').checked = true;
+  document.getElementById('input-montagem-nome').focus();
+}
+
+function abrirFormularioEditarMontagem(nome) {
+  const m = (dadosGlobais.montagens || []).find(item => item.nome === nome);
+  if (!m) return;
+
+  document.getElementById('view-montagens-lista').style.display = 'none';
+  document.getElementById('view-montagens-form').style.display = 'block';
+  document.getElementById('titulo-form-montagem').textContent = `✏️ Editar Padrão: ${esc(m.nome)}`;
+  document.getElementById('input-montagem-nome-antigo').value = m.nome;
+  document.getElementById('input-montagem-nome').value = m.nome;
+  document.getElementById('input-montagem-cruzeta').value = m.cruzeta;
+  document.getElementById('input-montagem-esf-maq').value = String(m.esf_maq != null ? m.esf_maq : 50);
+  document.getElementById('input-montagem-p-maq').value = m.p_maquina;
+  document.getElementById('input-montagem-porca-m').value = m.porca_m;
+  document.getElementById('input-montagem-arruela-m').value = m.arruela_m;
+  document.getElementById('input-montagem-olhal-m').value = m.olhal_m;
+  document.getElementById('input-montagem-sobra-m').value = m.sobra_m;
+  document.getElementById('input-montagem-esf-dup').value = String(m.esf_dup != null ? m.esf_dup : 70);
+  document.getElementById('input-montagem-p-dup').value = m.p_dupla;
+  document.getElementById('input-montagem-porca-d').value = m.porca_d;
+  document.getElementById('input-montagem-arruela-d').value = m.arruela_d;
+  document.getElementById('input-montagem-olhal-d').value = m.olhal_d;
+  document.getElementById('input-montagem-sobra-d').value = m.sobra_d;
+  document.getElementById('chk-montagem-propagar').checked = true;
+  document.getElementById('input-montagem-nome').focus();
+}
+
+async function salvarPadraoMontagemModal(e) {
+  e.preventDefault();
+  const nome = document.getElementById('input-montagem-nome').value.trim().toUpperCase();
+  const nomeAntigo = document.getElementById('input-montagem-nome-antigo').value.trim().toUpperCase();
+  const propagar = document.getElementById('chk-montagem-propagar').checked;
+
+  if (!nome) {
+    alert('O nome do padrão é obrigatório.');
+    return;
+  }
+
+  const payload = {
+    nome: nome,
+    nome_antigo: nomeAntigo || null,
+    propagar: propagar,
+    cruzeta: parseFloat(document.getElementById('input-montagem-cruzeta').value) || 0,
+    esf_maq: parseFloat(document.getElementById('input-montagem-esf-maq').value) || 50,
+    p_maquina: parseFloat(document.getElementById('input-montagem-p-maq').value) || 0,
+    porca_m: parseFloat(document.getElementById('input-montagem-porca-m').value) || 0,
+    arruela_m: parseFloat(document.getElementById('input-montagem-arruela-m').value) || 0,
+    olhal_m: parseFloat(document.getElementById('input-montagem-olhal-m').value) || 0,
+    sobra_m: parseFloat(document.getElementById('input-montagem-sobra-m').value) || 0,
+    esf_dup: parseFloat(document.getElementById('input-montagem-esf-dup').value) || 70,
+    p_dupla: parseFloat(document.getElementById('input-montagem-p-dup').value) || 0,
+    porca_d: parseFloat(document.getElementById('input-montagem-porca-d').value) || 0,
+    arruela_d: parseFloat(document.getElementById('input-montagem-arruela-d').value) || 0,
+    olhal_d: parseFloat(document.getElementById('input-montagem-olhal-d').value) || 0,
+    sobra_d: parseFloat(document.getElementById('input-montagem-sobra-d').value) || 0,
+  };
+
+  try {
+    const res = await fetch('/dimensionar-parafusos/api/salvar-montagem', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      let msg = `Padrão de montagem <strong>${esc(nome)}</strong> salvo com sucesso.`;
+      if (data.propagados > 0) {
+        msg += ` Atualizados automaticamente <strong>${esc(data.propagados)}</strong> níveis de estruturas que utilizam este padrão.`;
+      }
+      exibirAlerta(msg, 'success');
+
+      // Recarrega montagens
+      const resMont = await fetch('/dimensionar-parafusos/api/montagens');
+      dadosGlobais.montagens = await resMont.json();
+
+      // Se a estrutura atual usa essa montagem, atualiza suas linhas também
+      linhasGridAtuais.forEach(l => {
+        if (l.montagem === (nomeAntigo || nome)) {
+          l.montagem = nome;
+          l.cruzeta = payload.cruzeta;
+          l.esf_maq = payload.esf_maq;
+          l.p_maquina = payload.p_maquina;
+          l.porca_m = payload.porca_m;
+          l.arruela_m = payload.arruela_m;
+          l.olhal_m = payload.olhal_m;
+          l.sobra_m = payload.sobra_m;
+          l.esf_dup = payload.esf_dup;
+          l.p_dupla = payload.p_dupla;
+          l.porca_d = payload.porca_d;
+          l.arruela_d = payload.arruela_d;
+          l.olhal_d = payload.olhal_d;
+          l.sobra_d = payload.sobra_d;
+        }
+      });
+      renderizarGridNiveis();
+      calcularTudo();
+
+      voltarParaListaMontagens();
+      renderizarListaMontagensModal();
+    } else {
+      alert(data.erro || 'Erro ao salvar padrão de montagem.');
+    }
+  } catch (err) {
+    alert('Erro de comunicação: ' + err.message);
+  }
+}
+
+async function excluirPadraoMontagemModal(nome) {
+  if (!confirm(`Deseja realmente excluir o padrão de montagem "${nome}"?\n\nAs estruturas que o utilizam manterão suas ferragens atuais, passando a ser consideradas como personalizadas.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/dimensionar-parafusos/api/excluir-montagem', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({nome: nome})
+    });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      exibirAlerta(`Padrão <strong>${esc(nome)}</strong> excluído.`, 'info');
+
+      // Atualiza lista local
+      const resMont = await fetch('/dimensionar-parafusos/api/montagens');
+      dadosGlobais.montagens = await resMont.json();
+
+      // Desvincula na estrutura ativa
+      linhasGridAtuais.forEach(l => {
+        if (l.montagem === nome) l.montagem = '';
+      });
+      renderizarGridNiveis();
+
+      renderizarListaMontagensModal();
+    } else {
+      alert(data.erro || 'Erro ao excluir padrão.');
+    }
+  } catch (err) {
+    alert('Erro de comunicação: ' + err.message);
+  }
+}
+
+// ── Gerenciamento de Conicidade e Dimensões do Poste (Modal) ──────────
+
+function abrirModalConicidade() {
+  const modal = document.getElementById('modal-conicidade');
+  if (!modal) return;
+
+  const inTopoA = document.getElementById('input-topo-a');
+  const inConA = document.getElementById('input-conicidade-a');
+  const inTopoB = document.getElementById('input-topo-b');
+  const inConB = document.getElementById('input-conicidade-b');
+
+  if (inTopoA) inTopoA.value = conicidadeAtual.topo_a;
+  if (inConA) inConA.value = conicidadeAtual.conicidade_a;
+  if (inTopoB) inTopoB.value = conicidadeAtual.topo_b;
+  if (inConB) inConB.value = conicidadeAtual.conicidade_b;
+
+  // Sincroniza esforço inicial no simulador com o selecionado na tela
+  const esfSel = document.getElementById('sel-esforco');
+  const simEsf = document.getElementById('sim-esf');
+  if (esfSel && simEsf) {
+    simEsf.value = esfSel.value;
+  }
+
+  // Preenche conteúdo do guia dentro do modal
+  const wrapper = document.getElementById('modal-guia-conteudo-wrapper');
+  const guiaOriginal = document.getElementById('aba-conteudo-guia');
+  if (wrapper && guiaOriginal) {
+    wrapper.innerHTML = guiaOriginal.innerHTML;
+  }
+
+  alternarAbaModalConicidade('fatores');
+  atualizarPreviewConicidade();
+  modal.style.display = 'flex';
+}
+
+function fecharModalConicidade() {
+  const modal = document.getElementById('modal-conicidade');
+  if (modal) modal.style.display = 'none';
+}
+
+function fecharModalConicidadeAoClicarFora(e) {
+  if (e.target.id === 'modal-conicidade') {
+    fecharModalConicidade();
+  }
+}
+
+function alternarAbaModalConicidade(aba) {
+  const btnFatores = document.getElementById('modal-tab-btn-fatores');
+  const btnGuia = document.getElementById('modal-tab-btn-guia');
+  const viewFatores = document.getElementById('modal-view-conicidade-fatores');
+  const viewGuia = document.getElementById('modal-view-conicidade-guia');
+
+  if (aba === 'fatores') {
+    if (btnFatores) btnFatores.classList.add('active');
+    if (btnGuia) btnGuia.classList.remove('active');
+    if (viewFatores) viewFatores.style.display = 'block';
+    if (viewGuia) viewGuia.style.display = 'none';
+  } else {
+    if (btnGuia) btnGuia.classList.add('active');
+    if (btnFatores) btnFatores.classList.remove('active');
+    if (viewGuia) viewGuia.style.display = 'block';
+    if (viewFatores) viewFatores.style.display = 'none';
+  }
+}
+
+function atualizarPreviewConicidade() {
+  const topoA = parseFloat(document.getElementById('input-topo-a').value) || 0;
+  const conA = parseFloat(document.getElementById('input-conicidade-a').value) || 0;
+  const topoB = parseFloat(document.getElementById('input-topo-b').value) || 0;
+  const conB = parseFloat(document.getElementById('input-conicidade-b').value) || 0;
+
+  const dist = parseFloat(document.getElementById('sim-dist').value) || 0;
+  const esf = parseInt(document.getElementById('sim-esf').value) || 1000;
+  const fatEsf = { 600: 1.0, 1000: 1.5, 1500: 2.0, 2000: 2.5, 2500: 3.0, 3000: 3.5 }[esf] || 1.5;
+
+  const resA = topoA + (conA * fatEsf) + (conA * dist);
+  const resB = topoB + (conB * fatEsf) + (conB * dist);
+
+  const elResA = document.getElementById('sim-res-a');
+  const elDetA = document.getElementById('sim-det-a');
+  const elResB = document.getElementById('sim-res-b');
+  const elDetB = document.getElementById('sim-det-b');
+
+  if (elResA) elResA.textContent = `${resA.toFixed(1)} mm`;
+  if (elDetA) elDetA.textContent = `${topoA} + (${conA}×${fatEsf}) + (${conA}×${dist}m)`;
+
+  if (elResB) elResB.textContent = `${resB.toFixed(1)} mm`;
+  if (elDetB) elDetB.textContent = `${topoB} + (${conB}×${fatEsf}) + (${conB}×${dist}m)`;
+}
+
+function aplicarConicidadeSessao() {
+  const topoA = parseFloat(document.getElementById('input-topo-a').value);
+  const conA = parseFloat(document.getElementById('input-conicidade-a').value);
+  const topoB = parseFloat(document.getElementById('input-topo-b').value);
+  const conB = parseFloat(document.getElementById('input-conicidade-b').value);
+
+  if (isNaN(topoA) || isNaN(conA) || isNaN(topoB) || isNaN(conB)) {
+    alert('Por favor, informe valores numéricos válidos para topo e conicidade.');
+    return;
+  }
+
+  conicidadeAtual = {
+    topo_a: topoA,
+    conicidade_a: conA,
+    topo_b: topoB,
+    conicidade_b: conB
+  };
+
+  atualizarKpiConicidade();
+  fecharModalConicidade();
+  calcularTudo();
+  exibirAlerta('Fatores de conicidade aplicados temporariamente para esta sessão.', 'info');
+}
+
+async function salvarConicidadeParque() {
+  const topoA = parseFloat(document.getElementById('input-topo-a').value);
+  const conA = parseFloat(document.getElementById('input-conicidade-a').value);
+  const topoB = parseFloat(document.getElementById('input-topo-b').value);
+  const conB = parseFloat(document.getElementById('input-conicidade-b').value);
+
+  if (isNaN(topoA) || isNaN(conA) || isNaN(topoB) || isNaN(conB)) {
+    alert('Por favor, informe valores numéricos válidos para topo e conicidade.');
+    return;
+  }
+
+  const payload = {
+    topo_a: topoA,
+    conicidade_a: conA,
+    topo_b: topoB,
+    conicidade_b: conB
+  };
+
+  try {
+    const res = await fetch('/dimensionar-parafusos/api/salvar-conicidade', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      conicidadeAtual = data.conicidade;
+      atualizarKpiConicidade();
+      fecharModalConicidade();
+      await calcularTudo();
+      exibirAlerta('Fatores de conicidade salvos com sucesso para o parque ativo!', 'success');
+    } else {
+      alert(data.erro || 'Erro ao salvar conicidade.');
+    }
+  } catch (e) {
+    alert('Erro de comunicação: ' + e.message);
+  }
+}
+
+async function restaurarConicidadePadrao() {
+  if (!confirm('Deseja realmente restaurar os fatores de conicidade e seções para o padrão de fábrica (Topo A: 140 mm, Conicidade A: 28 mm/m; Topo B: 110 mm, Conicidade B: 20 mm/m)?')) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/dimensionar-parafusos/api/restaurar-conicidade', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({})
+    });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      conicidadeAtual = data.conicidade;
+      document.getElementById('input-topo-a').value = conicidadeAtual.topo_a;
+      document.getElementById('input-conicidade-a').value = conicidadeAtual.conicidade_a;
+      document.getElementById('input-topo-b').value = conicidadeAtual.topo_b;
+      document.getElementById('input-conicidade-b').value = conicidadeAtual.conicidade_b;
+      atualizarPreviewConicidade();
+      atualizarKpiConicidade();
+      fecharModalConicidade();
+      await calcularTudo();
+      exibirAlerta('Padrões de fábrica restaurados com sucesso!', 'info');
+    } else {
+      alert(data.erro || 'Erro ao restaurar padrões.');
+    }
+  } catch (e) {
+    alert('Erro de comunicação: ' + e.message);
   }
 }
 

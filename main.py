@@ -31,6 +31,7 @@ from src.exportador import exportar_para_excel, exportar_multiplas_abas
 from src.consolidador import processar_consolidacao
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 _banco_inicializado = False
 
@@ -466,12 +467,80 @@ def api_paraf_excluir():
 def api_dimensionar_dados():
     pid = _parque_ativo_id()
     estruturas = banco.listar_estruturas_calculadora(pid)
+    montagens = banco.listar_montagens_calculadora(pid)
+    conicidade = banco.obter_conicidade_calculadora(pid)
     return jsonify({
         'estruturas': estruturas,
+        'montagens': montagens,
+        'conicidade': conicidade,
         'esforcos_padrao': [600, 1000, 1500, 2000, 2500, 3000],
         'dimensoes_ferragens': calculadora_parafusos.DIMENSOES_FERRAGENS,
         'comprimentos_comerciais': calculadora_parafusos.COMPRIMENTOS_COMERCIAIS,
     })
+
+
+@app.route('/dimensionar-parafusos/api/conicidade')
+def api_dimensionar_obter_conicidade():
+    pid = _parque_ativo_id()
+    return jsonify(banco.obter_conicidade_calculadora(pid))
+
+
+@app.route('/dimensionar-parafusos/api/salvar-conicidade', methods=['POST'])
+def api_dimensionar_salvar_conicidade():
+    data = request.get_json(force=True)
+    pid = _parque_ativo_id()
+    try:
+        res = banco.salvar_conicidade_calculadora(data, pid)
+        return jsonify({'ok': True, 'conicidade': res})
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 400
+
+
+@app.route('/dimensionar-parafusos/api/restaurar-conicidade', methods=['POST'])
+def api_dimensionar_restaurar_conicidade():
+    pid = _parque_ativo_id()
+    try:
+        res = banco.restaurar_conicidade_calculadora(pid)
+        return jsonify({'ok': True, 'conicidade': res})
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 400
+
+
+@app.route('/dimensionar-parafusos/api/montagens')
+def api_dimensionar_montagens():
+    pid = _parque_ativo_id()
+    montagens = banco.listar_montagens_calculadora(pid)
+    return jsonify(montagens)
+
+
+@app.route('/dimensionar-parafusos/api/salvar-montagem', methods=['POST'])
+def api_dimensionar_salvar_montagem():
+    data = request.get_json(force=True)
+    nome = str(data.get('nome', '')).strip().upper()
+    if not nome:
+        return jsonify({'erro': 'Nome da montagem é obrigatório.'}), 400
+    nome_antigo = str(data.get('nome_antigo', '')).strip().upper() or None
+    propagar = bool(data.get('propagar', True))
+    pid = _parque_ativo_id()
+    try:
+        res = banco.salvar_montagem_calculadora(nome, data, pid, nome_antigo=nome_antigo, propagar=propagar)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 400
+
+
+@app.route('/dimensionar-parafusos/api/excluir-montagem', methods=['POST'])
+def api_dimensionar_excluir_montagem():
+    data = request.get_json(force=True)
+    nome = str(data.get('nome', '')).strip().upper()
+    if not nome:
+        return jsonify({'erro': 'Nome da montagem é obrigatório.'}), 400
+    pid = _parque_ativo_id()
+    try:
+        count = banco.excluir_montagem_calculadora(nome, pid)
+        return jsonify({'ok': True, 'count': count, 'nome': nome})
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 400
 
 
 @app.route('/dimensionar-parafusos/api/estrutura')
@@ -538,13 +607,19 @@ def api_dimensionar_calcular():
 
     linhas = data.get('linhas') or data.get('niveis')
 
+    pid = _parque_ativo_id()
+    config_poste = data.get('config_poste') or data.get('conicidade')
+    if not config_poste:
+        config_poste = banco.obter_conicidade_calculadora(pid)
+
     try:
         resultado = calculadora_parafusos.calcular_estrutura_completa(
             tipo_estrutura=tipo,
             esforco_dan=esforco,
             altura_m=altura,
             niveis_grid=linhas,
-            cruzeta_adicional=cruzeta
+            cruzeta_adicional=cruzeta,
+            config_poste=config_poste
         )
         return jsonify(resultado)
     except ValueError as e:
